@@ -1,0 +1,7 @@
+# ENVIROMENT #
+.DS_Store
+node_modules/
+
+# BUILD #
+builds/
+dist/
