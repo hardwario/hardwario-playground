@@ -18,7 +18,10 @@ if ( process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) 
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1024, height: 768, show: false
+    width: 1024, 
+    height: 768, 
+    show: false
+    //,titleBarStyle: 'hidden' future purpose?
   });
 
   // Setup menu, you should change this

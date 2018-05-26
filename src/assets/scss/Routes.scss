@@ -1,0 +1,21 @@
+#app {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+
+    & > navbar {
+        display: flex;
+        flex-direction: column;
+        background-color: #BF805F;
+        a {
+            color: #FFDCC8;
+        }
+        .active{
+            background-color: #9D5B37;
+        }
+    }
+    & > main {
+        width: 100%;
+        background-color: #E5B294;
+    }
+}

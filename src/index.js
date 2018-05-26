@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.css";
 // Import router
 import Router from "./render/Routes";
 
-// Creates div when React will be attached
+// Creates div where React will be attached
 let root = document.createElement("div");
 root.id = "root";
 document.body.appendChild(root);

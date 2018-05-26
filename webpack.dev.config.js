@@ -25,6 +25,11 @@ module.exports = {
         include: [defaultInclude, /node_modules/]
       },
       {
+        test: /\.scss$/,
+        use: ["style-loader", "css-loader", "sass-loader"],
+        include: defaultInclude
+      },
+      {
         test: /\.jsx?$/,
         use: [{ loader: "babel-loader" }],
         include: defaultInclude
