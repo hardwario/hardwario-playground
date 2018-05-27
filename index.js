@@ -7,7 +7,8 @@ const url = require("url")
 
 // Import background workers
 const NodeREDWorker = require("./src/background/NodeREDWorker");
-const HomeDirectory = require("./src/background/HomeDirectory")
+const HomeDirectory = require("./src/background/HomeDirectory");
+const MqttBroker = require("./src/background/MqttBroker");
 
 // Keep a global reference of the window object, if you don"t, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -21,6 +22,7 @@ if ( process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) 
 
 console.log("Starting background procedures");
 HomeDirectory.setup()
+MqttBroker.setup(23000);
 NodeREDWorker.setup(HomeDirectory.nodeRed());
 
 function createWindow() {
