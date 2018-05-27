@@ -7,8 +7,9 @@
     "dev": "webpack-dev-server --hot --host 0.0.0.0 --config=./webpack.dev.config.js",
     "prod": "webpack --progress --config webpack.build.config.js && electron --noDevServer .",
     "build": "webpack --progress --config webpack.build.config.js",
-    "package": "webpack --config webpack.build.config.js",
-    "postpackage": "electron-packager ./ --out=./builds --overwrite"
+    "package-osx": "webpack --config webpack.build.config.js && electron-packager ./ --overwrite --platform=darwin --arch=x64 --icon=./src/assets/icons/icon.icns --prune=true --out=builds",
+    "package-win": "webpack --config webpack.build.config.js && electron-packager ./ --overwrite --asar=true --platform=win32 --arch=ia32 --icon=./src/assets/icons/icon.ico --prune=true --out=builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"BigClown flasher\"",
+    "package-linux": "webpack --config webpack.build.config.js &&  electron-packager ./ --overwrite --platform=linux --arch=x64 --icon=./src/assets/icons/icon.png --prune=true --out=builds"
   },
   "author": "",
   "license": "MIT",

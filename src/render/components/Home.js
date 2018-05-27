@@ -1,5 +1,5 @@
 import React, { Component } from "react";
 
 export default () => {
-    return (<div>Home</div>)
+    return (<div id="home">Home</div>)
 };
