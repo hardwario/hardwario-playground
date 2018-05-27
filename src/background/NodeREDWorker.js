@@ -1,3 +1,5 @@
+"use strict";
+
 const http = require("http");
 const express = require("express");
 const RED = require("node-red");

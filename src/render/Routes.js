@@ -7,6 +7,8 @@ import reducers from "./reducers";
 import Home from "./components/Home";
 import NodeRED from "./components/NodeRED";
 
+import Navbar from "./components/Navbar";
+
 // Import SCSS
 import "../assets/scss/index.scss";
 
@@ -17,10 +19,10 @@ export default (
     <Provider store={createStoreWithMiddleware(reducers)}>
         <HashRouter>
             <div id="app">
-                <navbar>
+                <Navbar>
                     <NavLink exact to="/">Home</NavLink>
                     <NavLink to="/nodered">NodeRED</NavLink>
-                </navbar>
+                </Navbar>
                 <main>
                     <Route path="/nodered" component={NodeRED} />
                     <Route path="/" exact component={Home} />

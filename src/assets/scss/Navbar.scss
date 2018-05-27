@@ -1,0 +1,55 @@
+$animation-slide-duration: 1s;
+
+$navbar-width: 300px;
+$navbar-font-size: 27px;
+
+$navbar-padding-top: 5px;
+$navbar-padding-right: 15px;
+$navbar-padding-bottom: 5px;
+$navbar-padding-left: 5px;
+
+
+#navbar {
+    display: flex;
+    
+
+    @keyframes slide-left {
+        0% { width: 100%; a {padding: $navbar-padding-top $navbar-padding-right $navbar-padding-bottom $navbar-padding-left;} }
+        100% { width: 0px; a {padding: 0px;} }
+    }
+    @keyframes slide-right {
+        0% { width: 0%; a {padding: 0px;} }
+        100% { width: 100%; a {padding: $navbar-padding-top $navbar-padding-right $navbar-padding-bottom $navbar-padding-left;} }
+    }
+
+    .fade-in{
+        animation: slide-right $animation-slide-duration forwards;
+    }
+    .fade-out{
+        animation: slide-left $animation-slide-duration forwards;
+    }
+    & >navbar {
+        padding: 0px;
+        width: $navbar-width;
+        font-size: $navbar-font-size;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background-color: #BF805F;
+        a {
+            padding: 5px 10px;
+            color: #FFDCC8;
+        }
+        .active{
+            background-color: #9D5B37;
+            
+        }
+    }
+    & >div:last-of-type{
+        display: flex;
+        border-right: 1px solid black;
+        & >img{
+            align-self: center;
+        }
+    }
+}
