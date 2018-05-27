@@ -31,8 +31,7 @@ module.exports = {
       },
       {
         test: /\.jsx?$/,
-        use: [{ loader: "babel-loader" }],
-        include: defaultInclude
+        use: [{ loader: "babel-loader" }]
       },
       {
         test: /\.(jpe?g|png|gif)$/,

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
 
 export default () => {
-    return (<div>NodeRED</div>)
+    return (<iframe src="http://localhost:24898/admin"></iframe>)
 };
