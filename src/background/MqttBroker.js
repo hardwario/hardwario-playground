@@ -1,19 +1,24 @@
 'use strict';
 const mosca = require('mosca');
+const isPortReachable = require('is-port-reachable');
 
 const DefaultMqttPort = 1883;
 
 let server;
 
-function setup(port) {
-    server = new mosca.Server({ port: port || DefaultMqttPort });
-    server.on('clientConnected', function (client) {
-        console.log('MQTT client connected', client.id);
-    });
+async function setup(port) {
+    const reachable =  await isPortReachable(port || DefaultMqttPort);
+    console.log("Port statuts " + reachable);
+    if (!reachable) {
+        server = new mosca.Server({ port: port || DefaultMqttPort });
+        server.on('clientConnected', function (client) {
+            console.log('MQTT client connected', client.id);
+        });
 
-    server.on('ready', function () {
-        console.log('MQTT Mosca server is up and running');
-    });
+        server.on('ready', function () {
+            console.log('MQTT Mosca server is up and running');
+        });
+    }
 }
 
 module.exports = { setup }
