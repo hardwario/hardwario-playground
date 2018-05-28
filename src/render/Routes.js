@@ -6,6 +6,7 @@ import { HashRouter, Route, Switch, NavLink } from "react-router-dom";
 import reducers from "./reducers";
 import Home from "./components/Home";
 import NodeRED from "./components/NodeRED";
+import Dashboard from "./components/Dashboard";
 
 import Navbar from "./components/Navbar";
 
@@ -22,8 +23,10 @@ export default (
                 <Navbar>
                     <NavLink exact to="/">Home</NavLink>
                     <NavLink to="/nodered">NodeRED</NavLink>
+                    <NavLink to="/dashboard">Dashboard</NavLink>
                 </Navbar>
                 <main>
+                    <Route path="/Dashboard" component={Dashboard} />
                     <Route path="/nodered" component={NodeRED} />
                     <Route path="/" exact component={Home} />
                 </main>
