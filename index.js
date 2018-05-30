@@ -1,7 +1,7 @@
 "use strict";
 
 // Import parts of electron to use
-const {app, BrowserWindow, Menu} = require("electron");
+const { app, BrowserWindow, Menu, ipcMain } = require("electron");
 const path = require("path")
 const url = require("url")
 
@@ -9,6 +9,7 @@ const url = require("url")
 const NodeREDWorker = require("./src/background/NodeREDWorker");
 const HomeDirectory = require("./src/background/HomeDirectory");
 const MqttBroker = require("./src/background/MqttBroker");
+const MqttClient = require("./src/background/MqttClient");
 
 // Keep a global reference of the window object, if you don"t, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -16,7 +17,7 @@ let mainWindow;
 
 // Keep a reference for dev mode
 let dev = false;
-if ( process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath) ) {
+if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath)) {
   dev = true;
 }
 
@@ -26,21 +27,20 @@ MqttBroker.setup();
 NodeREDWorker.setup(HomeDirectory.nodeRed());
 
 function createWindow() {
-  console.log("Creating new window");
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1024, 
-    height: 768, 
+    width: 1024,
+    height: 768,
     show: false
     //,titleBarStyle: 'hidden' future purpose?
   });
 
   // Setup menu, you should change this
-  Menu.setApplicationMenu( null )
+  Menu.setApplicationMenu(null)
 
   // and load the index.html of the app.
   let indexPath;
-  if ( dev && process.argv.indexOf("--noDevServer") === -1 ) {
+  if (dev && process.argv.indexOf("--noDevServer") === -1) {
     indexPath = url.format({
       protocol: "http:",
       host: "localhost:8080",
@@ -54,19 +54,19 @@ function createWindow() {
       slashes: true
     });
   }
-  mainWindow.loadURL( indexPath );
+  mainWindow.loadURL(indexPath);
 
   // Don"t show until we are ready and loaded
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
     // Open the DevTools automatically if developing
-    if ( dev ) {
+    if (dev) {
       mainWindow.webContents.openDevTools();
     }
   });
 
   // Emitted when the window is closed.
-  mainWindow.on("closed", function() {
+  mainWindow.on("closed", function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
