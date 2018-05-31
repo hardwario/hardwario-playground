@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 import { ipcRenderer } from "electron";
 
+// Import language files
+const i18n = require("../../utils/i18n");
+i18n.setup();
+
 export default class extends Component {
     constructor(props) {
         super(props);
@@ -45,7 +49,7 @@ export default class extends Component {
         return (
             <div id="mqttlog">
                 <div className="col-xs-12">
-                    <header className="h4">MQTT log</header>
+                    <header className="h4">{i18n.__("mqttLog")}</header>
                     <div className="Console">
                         <ul>
                             {
@@ -67,7 +71,7 @@ export default class extends Component {
                     <form>
                         <div className="form-group">
                             <label className="control-label col-xs-1">
-                                {this.state.checkbox ? "Publish mode" : "Subsribe mode"}
+                                {this.state.checkbox ? i18n.__("publishMode") : i18n.__("subscribeMode")}
                             </label>
                             <div className="col-xs-2">
                                 <label className="switch">
@@ -78,30 +82,30 @@ export default class extends Component {
                         </div>
                         {this.state.checkbox ?
                             <div className="form-group">
-                                <label className="control-label col-xs-1">Payload</label>
+                                <label className="control-label col-xs-1">{i18n.__("payload")}</label>
                                 <div className="col-xs-8">
-                                    <input className="form-control" value={this.state.pub_topic} onChange={(e) => this.setState({ pub_topic: e.target.value })} type="text" placeholder="Enter topic to sub" />
-                                    <input className="form-control" value={this.state.pub_payload} onChange={(e) => this.setState({ pub_payload: e.target.value })} type="text" placeholder="Enter message to pub" />
+                                    <input className="form-control" value={this.state.pub_topic} onChange={(e) => this.setState({ pub_topic: e.target.value })} type="text" placeholder={i18n.__("enterTopicToPublish")} />
+                                    <input className="form-control" value={this.state.pub_payload} onChange={(e) => this.setState({ pub_payload: e.target.value })} type="text" placeholder={i18n.__("enterMessageToPublish")} />
                                 </div>
                                 <div className="col-xs-2">
-                                    <button disabled={!this.state.isConnected} onClick={this.onPublish.bind(this)} className="btn btn-default Stretch">Publish</button>
+                                    <button disabled={!this.state.isConnected} onClick={this.onPublish.bind(this)} className="btn btn-default Stretch">{i18n.__("publish")}</button>
                                 </div>
                             </div>
                             :
                             <div className="form-group">
-                                <label className="control-label col-xs-1">Topic</label>
+                                <label className="control-label col-xs-1">{i18n.__("topic")}</label>
                                 <div className="col-xs-8">
-                                    <input className="form-control" placeholder="Enter topic to subscribe" value={this.state.sub_topic} onChange={(e) => this.setState({ sub_topic: e.target.value })} type="text" />
+                                    <input className="form-control" placeholder={i18n.__("enterTopicToSubscribe")} value={this.state.sub_topic} onChange={(e) => this.setState({ sub_topic: e.target.value })} type="text" />
                                 </div>
                                 <div className="col-xs-2">
-                                    <button disabled={!this.state.isConnected} onClick={this.onSubscribe.bind(this)} className="btn btn-default Stretch">Subscribe</button>
+                                    <button disabled={!this.state.isConnected} onClick={this.onSubscribe.bind(this)} className="btn btn-default Stretch">{i18n.__("subscribe")}</button>
                                 </div>
                             </div>
                         }
                     </form>
                 </div>
                 <div className="col-xs-12">
-                    <header className="h4">Subscribed topics</header>
+                    <header className="h4">{i18n.__("subscribedTopics")}</header>
                     <div className="Console">
                         <ul>
                             {
@@ -116,7 +120,7 @@ export default class extends Component {
                             }
                         </ul>
                     </div>
-                    <button disabled={!this.state.isConnected} onClick={x => this.onUnsubscribeAll(this.state.subscribed_topics)} className="btn btn-danger Stretch">Unsubscribe all</button>
+                    <button disabled={!this.state.isConnected} onClick={x => this.onUnsubscribeAll(this.state.subscribed_topics)} className="btn btn-danger Stretch">{i18n.__("unSubscribeAll")}</button>
                 </div>
             </div>
         )

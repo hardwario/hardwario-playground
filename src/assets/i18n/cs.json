@@ -1,0 +1,18 @@
+{
+    "home": "Domov",
+    "nodered": "NodeRED",
+    "dashboard": "Nástěnka",
+    "mqttLog": "MQTT Výpis",
+    "settings": "Nastavení",
+    "subscribeMode": "Odebírací režim",
+    "publishMode": "Publikující režim",
+    "topic": "Předmět",
+    "payload": "Zpráva",
+    "enterTopicToSubscribe": "Zadejte odebíraný předmět",
+    "enterTopicToPublish": "Zadejte publikující předmět",
+    "enterMessageToPublish": "Zadejte publikující zprávu",
+    "subscribe": "Odebírat",
+    "publish": "Publikovat",
+    "subscribedTopics": "Odebírané předměty",
+    "unSubscribeAll": "Zrušit všechny odebírané předměty"
+}

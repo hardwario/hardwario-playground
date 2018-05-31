@@ -1,0 +1,18 @@
+{
+    "home": "Home",
+    "nodered": "NodeRED",
+    "dashboard": "Dashboard",
+    "mqttLog": "MQTT Log",
+    "settings": "Settings",
+    "subscribeMode": "Subscribe mode",
+    "publishMode": "Publish mode",
+    "topic": "Topic",
+    "payload": "Payload",
+    "enterTopicToSubscribe": "Enter topic to subscribe",
+    "enterTopicToPublish": "Enter topic to publish",
+    "enterMessageToPublish": "Enter message to publish",
+    "subscribe": "Subscribe",
+    "publish": "Publish",
+    "subscribedTopics": "Subscribed topics",
+    "unSubscribeAll": "Unsubscribe all"
+}

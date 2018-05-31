@@ -17,12 +17,10 @@ function setup(ip, view) {
         view: view
     }
     carry.client.on("message", (topic, message) => {
-        console.log("Zprava");
         var _parse = { topic, payload: message.toString('utf8'), time: new Date().getHours() + ":" + new Date().getMinutes() };
         carry.view.send("mqtt:client:message", _parse);
     })
     carry.client.on("connect", () => {
-        console.log("Connected");
         carry.view.send("mqtt:client:connected", true);
     })
     return carry;
@@ -60,7 +58,6 @@ ipcMain.on("mqtt:client:subscribed", (event) => {
 })
 */
 ipcMain.on("mqtt:client:publish", (event, data) => {
-    console.log("Publishing", data);
     var window = findWindow(event.sender.id);
     if (window != null && window.client.connected) {
         window.client.publish(data.topic, data.payload);
@@ -68,7 +65,6 @@ ipcMain.on("mqtt:client:publish", (event, data) => {
 })
 
 ipcMain.on("mqtt:client:subscribe", (event, data) => {
-    console.log("data to sub", windowList.length);
     var window = findWindow(event.sender.id);
     if (window != null && window.client.connected) {
         window.topics.push(data);
@@ -89,7 +85,6 @@ ipcMain.on("mqtt:window:subscribe", (event, data) => {
     var window = findWindow(event.sender.id);
     if (window == null) {
         windowList.push(setup(data, event.sender));
-        console.log("Subbing window", windowList.length);
     }
 })
 
