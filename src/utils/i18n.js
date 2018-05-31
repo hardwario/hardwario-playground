@@ -6,14 +6,15 @@ let fallBackLanguage;
 let app = electron.app ? electron.app : electron.remote.app
 
 
-function setup(renderer = true) {
-    if (fs.existsSync(path.join("src", "assets", "i18n", app.getLocale() + ".json"))) {
-        loadedLanguage = JSON.parse(fs.readFileSync(path.join("src", "assets", "i18n", app.getLocale() + ".json"), 'utf8'));
-        fallBackLanguage = JSON.parse(fs.readFileSync(path.join("src", "assets", "i18n", "en.json"), 'utf8'));
+function setup() {
+    if (fs.existsSync(path.join(app.getPath("userData"), app.getLocale() + ".json"))) {
+        loadedLanguage = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), app.getLocale() + ".json"), "utf8"));
+        fallBackLanguage = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "en.json"), "utf8"));
     }
     else {
-        loadedLanguage = JSON.parse(fs.readFileSync(path.join("src", "assets", "i18n", "en.json"), 'utf8'));
+        loadedLanguage = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "en.json"), "utf8"));
     }
+    console.log("Tada", app.getPath("userData"));
 }
 
 function __(phrase) {

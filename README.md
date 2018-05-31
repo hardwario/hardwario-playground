@@ -1,10 +1,18 @@
 <a href="https://www.bigclown.com/"><img src="https://bigclown.sirv.com/logo.png" width="200" height="59" alt="BigClown Logo" align="right"></a>
 
-# BigClown [:write_app_name:] app
+# BigClown Playground app
 
-This repository contains all-in-one application.
+This repository contains Playground application.
 
-## Commands
+## Contains
+- NodeRED instance
+- NodeRED Dashboard
+- MQTT logger
+- MQTT broker
+
+# Development
+
+# Commands
 
 |       Meaning      |      Command      |
 | ------------------ | :---------------: |

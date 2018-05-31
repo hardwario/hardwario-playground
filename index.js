@@ -25,7 +25,7 @@ if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) |
 console.log("Starting background procedures");
 HomeDirectory.setup()
 MqttBroker.setup();
-NodeREDWorker.setup(HomeDirectory.nodeRed());
+NodeREDWorker.setup();
 
 function createWindow() {
   let mainWindow;

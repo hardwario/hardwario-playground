@@ -4,6 +4,7 @@ const express = require("express");
 const RED = require("node-red");
 const fs = require("fs");
 const path = require("path");
+const { app } = require("electron");
 const isPortReachable = require('is-port-reachable');
 
 const listenPort = 1880;
@@ -11,13 +12,14 @@ const flowFile = "flows.json";
 const flowFileStarting = "starting-flows.json";
 let userDir;
 
-async function setup(dir) {
+async function setup() {
     const reachable = await isPortReachable(listenPort);
     if (!reachable) {
-        userDir = dir || __dirname;
+        userDir = app.getPath("userData");
 
-        if (!fs.existsSync(path.join(dir, flowFile))) {
-            fs.writeFileSync(path.join(dir, flowFile), fs.readFileSync(path.join(__dirname, "..", "assets", "nodered", flowFileStarting)));
+        
+        if (!fs.existsSync(path.join(userDir, flowFile))) {
+            fs.writeFileSync(path.join(userDir, flowFile), fs.readFileSync(path.join(__dirname, "..", "assets", "nodered", flowFileStarting)));
         }
 
         var settings = {
