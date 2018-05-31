@@ -76,6 +76,14 @@ ipcMain.on("mqtt:client:subscribe", (event, data) => {
     }
 })
 
+ipcMain.on("mqtt:client:unsubscribe", (event, data) => {
+    var window = findWindow(event.sender.id);
+    if (window != null && window.client.connected) {
+        //window.topics.push(data);
+        window.client.unsubscribe(data);
+    }
+})
+
 // Notify this background that view wants to subscribe to MQTT
 ipcMain.on("mqtt:window:subscribe", (event, data) => {
     var window = findWindow(event.sender.id);

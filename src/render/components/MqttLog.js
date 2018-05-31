@@ -139,15 +139,23 @@ export default class extends Component {
         ipcRenderer.send("mqtt:client:publish", { topic: this.state.pub_topic, payload: this.state.pub_payload })
     }
     onAdd(item) {
-
+        this.setState((prevState) => { return { highlighted_messages: [...prevState.highlighted_messages, item] } });
     }
     onRemove(item) {
+        this.state.highlighted_messages.findIndex((data) => data == item);
+        this.setState((prevState) => { return { highlighted_messages: prevState.highlighted_messages.filter(x => x != item) } });
     }
     onUnsubscribeAll() {
-
+        this.state.subscribed_topics.forEach((topic) => {
+            ipcRenderer.send("mqtt:client:unsubscribe", topic);
+        })
+        this.setState({ subscribed_topics: [] })
     }
     onUnsubscribeOne(topic) {
-
+        ipcRenderer.send("mqtt:client:unsubscribe", topic);
+        this.setState(prev => {
+            return { subscribed_topics: prev.subscribed_topics.filter((item) => item != topic) }
+        })
     }
     /* END OF EVENT HANDLERS */
 }
