@@ -14,7 +14,6 @@ function setup() {
     else {
         loadedLanguage = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "en.json"), "utf8"));
     }
-    console.log("Tada", app.getPath("userData"));
 }
 
 function __(phrase) {

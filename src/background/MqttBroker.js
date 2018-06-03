@@ -16,7 +16,7 @@ async function setup(port) {
             console.log('MQTT client connected', client.id);
         });
         server.on('clientDisconnected', function (client) {
-            console.log('MQTT client disconnectedaaaaaaconnected', client.id);
+            console.log('MQTT client disconnected', client.id);
         });
 
         server.on('ready', function () {

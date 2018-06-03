@@ -14,5 +14,8 @@
     "subscribe": "Subscribe",
     "publish": "Publish",
     "subscribedTopics": "Subscribed topics",
-    "unSubscribeAll": "Unsubscribe all"
+    "unSubscribeAll": "Unsubscribe all",
+    "language": "Language",
+    "en": "English",
+    "cs": "Czech"
 }

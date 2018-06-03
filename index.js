@@ -11,6 +11,7 @@ const HomeDirectory = require("./src/background/HomeDirectory");
 const MqttBroker = require("./src/background/MqttBroker");
 const MqttClient = require("./src/background/MqttClient");
 const CustomMenu = require("./src/utils/Menu");
+const Settings = require("./src/background/Settings");
 
 // Keep a global reference of the window object, if you don"t, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -22,8 +23,7 @@ if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) |
   dev = true;
 }
 
-console.log("Starting background procedures");
-HomeDirectory.setup()
+HomeDirectory.setup(dev)
 MqttBroker.setup();
 NodeREDWorker.setup();
 
@@ -68,7 +68,6 @@ function createWindow() {
 
   mainWindow.on("closed", function () {
     const index = windows.indexOf(mainWindow);
-    console.log(windows.length);
     windows.splice(index, 1);
     mainWindow = null;
   });

@@ -6,6 +6,7 @@ import Home from "./components/Home";
 import NodeRED from "./components/NodeRED";
 import Dashboard from "./components/Dashboard";
 import MqttLog from "./components/MqttLog";
+import Settings from "./components/Settings";
 
 import Navbar from "./components/Navbar";
 
@@ -27,6 +28,7 @@ export default (
                 <NavLink to="/settings">{i18n.__("settings")}</NavLink>
             </Navbar>
             <main>
+                <Route path="/settings" component={Settings} />
                 <Route path="/mqttlog" component={MqttLog} />
                 <Route path="/dashboard" component={Dashboard} />
                 <Route path="/nodered" component={NodeRED} />

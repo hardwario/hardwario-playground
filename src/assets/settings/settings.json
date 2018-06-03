@@ -1,0 +1,8 @@
+{
+    "mqttLog": {
+        "connectionType": [ "MQTT", "WebsocketsMQTT" ]
+    },
+    "language": {
+        "languages": ["cs", "en"]
+    }
+}

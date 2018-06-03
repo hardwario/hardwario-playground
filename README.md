@@ -10,6 +10,14 @@ This repository contains Playground application.
 - MQTT logger
 - MQTT broker
 
+# Contributing
+
+Feel free to contribute to this application.
+
+## Language contributing
+
+TODO
+
 # Development
 
 # Commands
