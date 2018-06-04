@@ -1,0 +1,15 @@
+#settings {
+    margin: 10px;
+    ul {
+        padding: 0px;
+        li {
+            position: relative;
+            border: gray 2px dashed;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            * {
+                margin: 5px;
+            }
+        }
+    }
+}

@@ -8,5 +8,5 @@ ipcMain.on("settings:get", (event, data) => {
 });
 
 ipcMain.on("settings:set", (event, data) => {
-    event.sender.send(fs.writeSync(path.join(app.getPath("userData"), "settings.json"), JSON.stringify(data)));
+    fs.writeFileSync(path.join(app.getPath("userData"), "settings.json"), JSON.stringify(data));
 });

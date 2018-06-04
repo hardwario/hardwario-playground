@@ -5,10 +5,11 @@ let loadedLanguage;
 let fallBackLanguage;
 let app = electron.app ? electron.app : electron.remote.app
 
-
 function setup() {
-    if (fs.existsSync(path.join(app.getPath("userData"), app.getLocale() + ".json"))) {
-        loadedLanguage = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), app.getLocale() + ".json"), "utf8"));
+    var language = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "settings.json")))["app"]["languages"][0];
+
+    if (fs.existsSync(path.join(app.getPath("userData"), language + ".json"))) {
+        loadedLanguage = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), language + ".json"), "utf8"));
         fallBackLanguage = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "en.json"), "utf8"));
     }
     else {
@@ -26,6 +27,5 @@ function __(phrase) {
     }
     return translation;
 }
-
 
 module.exports = { setup, __ };

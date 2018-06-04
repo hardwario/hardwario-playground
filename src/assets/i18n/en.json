@@ -15,7 +15,10 @@
     "publish": "Publish",
     "subscribedTopics": "Subscribed topics",
     "unSubscribeAll": "Unsubscribe all",
-    "language": "Language",
+    "app": "Applicatin",
+    "languages": "Languages",
+    "connectionType": "Connection type",
     "en": "English",
-    "cs": "Czech"
+    "cs": "Czech",
+    "save": "Save"
 }
