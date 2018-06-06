@@ -1,13 +1,25 @@
+$hintbar-height: 24px;
+
 #app {
     display: flex;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-
-    & > main {
+    &>main {
         width: 100%;
         background-color: rgb(255, 255, 255);
         position: relative;
         overflow: auto;
+        padding-bottom: $hintbar-height;
+        footer {
+            border-top: solid black 1px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200px;
+            height: $hintbar-height;
+            width: 100%;
+            padding-left: 5px;
+        }
     }
 }

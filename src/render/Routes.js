@@ -7,6 +7,7 @@ import NodeRED from "./components/NodeRED";
 import Dashboard from "./components/Dashboard";
 import MqttLog from "./components/MqttLog";
 import Settings from "./components/Settings";
+import HintBar from "./components/HintBar";
 
 import Navbar from "./components/Navbar";
 
@@ -39,6 +40,7 @@ const Routes = () => {
                     <Route path="/dashboard" component={Dashboard} />
                     <Route path="/nodered" component={NodeRED} />
                     <Route path="/" exact component={Home} />
+                    <HintBar />
                 </main>
             </div>
         </HashRouter>
