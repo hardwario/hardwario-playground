@@ -3,7 +3,6 @@ import { ipcRenderer } from "electron";
 
 // Import language files
 const i18n = require("../../utils/i18n");
-i18n.setup();
 
 export default class extends Component {
     constructor(props) {
@@ -13,7 +12,10 @@ export default class extends Component {
     }
 
     componentDidMount() {
-        ipcRenderer.on("settings:get", (sender, settings) => this.setState({ settings }));
+        ipcRenderer.on("settings:get", (sender, settings) => {
+            this.setState({ settings });
+            //i18n.setup(settings.app.languages[0]);
+        });
         ipcRenderer.send("settings:get");
     }
 
@@ -41,6 +43,7 @@ export default class extends Component {
                                                 <div key={item + subItem} className="form-group">
                                                     <label htmlFor={item + subItem}>{i18n.__(subItem)}</label>
                                                     <select
+                                                        className="form-control"
                                                         id={item + subItem}
                                                         onChange={(e) => this._handleInput(item, subItem, e.target.value)}
                                                         value={this.state.settings[item][subItem][0]}>{
@@ -49,7 +52,14 @@ export default class extends Component {
                                                 </div>
                                             )
                                         }
-                                        else return "neni pole";
+                                        else {
+                                            return (
+                                                <div key={item + subItem} className="form-group">
+                                                    <label htmlFor={item + subItem}>{i18n.__(subItem)}</label>
+                                                    <input id={item + subItem} value={this.state.settings[item][subItem][0]} className="form-control" />
+                                                </div>
+                                            )
+                                        };
                                     })
                                 }
                             </li>

@@ -3,7 +3,8 @@
         "connectionType": [
             "MQTT",
             "WebsocketsMQTT"
-        ]
+        ],
+        "websocketsIp": ""
     },
     "app": {
         "languages": [

@@ -15,16 +15,17 @@ let homeDirPath;
 function setup(dev) {
     homeDirPath = path.join(os.homedir(), rootName);
     if (!fs.existsSync(homeDirPath)) {
-        fs.mkdirSync(homeDirPath,);
-
-        // Copy language packs to userData
-        fs.readdirSync(path.join(__dirname, "..", "assets", "i18n")).forEach((file) => {
-            fs.writeFileSync(path.join(homeDirPath, file), fs.readFileSync(path.join(__dirname, "..", "assets", "i18n", file), "utf8"));
-        })
+        fs.mkdirSync(homeDirPath);
 
         // Copy settings to userData
         fs.writeFileSync(path.join(homeDirPath, "settings.json"), fs.readFileSync(path.join(__dirname, "..", "assets", "settings", "settings.json"), "utf8"));
     }
+
+    // Copy language packs to userData
+    fs.readdirSync(path.join(__dirname, "..", "assets", "i18n")).forEach((file) => {
+        fs.writeFileSync(path.join(homeDirPath, file), fs.readFileSync(path.join(__dirname, "..", "assets", "i18n", file), "utf8"));
+    })
+    
     app.setPath("userData", homeDirPath);
 }
 

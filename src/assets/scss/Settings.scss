@@ -7,7 +7,10 @@
             border: gray 2px dashed;
             border-radius: 4px;
             margin-bottom: 20px;
-            * {
+            header{
+                font-size: 2em;
+            }
+            div{
                 margin: 5px;
             }
         }

@@ -3,7 +3,6 @@ import { ipcRenderer } from "electron";
 
 // Import language files
 const i18n = require("../../utils/i18n");
-i18n.setup();
 
 export default class extends Component {
     constructor(props) {

@@ -15,9 +15,10 @@
     "publish": "Publish",
     "subscribedTopics": "Subscribed topics",
     "unSubscribeAll": "Unsubscribe all",
-    "app": "Applicatin",
+    "app": "Application",
     "languages": "Languages",
     "connectionType": "Connection type",
+    "websocketsIp": "Websockets IP",
     "en": "English",
     "cs": "Czech",
     "save": "Save"

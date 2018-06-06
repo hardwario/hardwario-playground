@@ -1,15 +1,21 @@
 import React from "react";
 import { render } from "react-dom";
+import { ipcRenderer } from "electron";
 import "bootstrap/dist/css/bootstrap.css";
 
 // Import router
 import Router from "./render/Routes";
+import Routes from "./render/Routes";
 
 // Creates div where React will be attached
 let root = document.createElement("div");
 root.id = "root";
 document.body.appendChild(root);
 
-render(Router, document.getElementById("root"));
+ipcRenderer.on("settings:get", (sender, settings) => {
+    render(Routes(), document.getElementById("root"));
+    ipcRenderer.removeAllListeners("settings:get");
+});
+ipcRenderer.send("settings:get");
 
-
+render(<div>Loading...</div>, document.getElementById("root"));

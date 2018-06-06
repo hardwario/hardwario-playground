@@ -14,5 +14,12 @@
     "subscribe": "Odebírat",
     "publish": "Publikovat",
     "subscribedTopics": "Odebírané předměty",
-    "unSubscribeAll": "Zrušit všechny odebírané předměty"
+    "unSubscribeAll": "Zrušit všechny odebírané předměty",
+    "app": "Aplikace",
+    "languages": "Jazyky",
+    "connectionType": "Typ připojení",
+    "websocketsIp": "Websockets IP",
+    "en": "Angličtina",
+    "cs": "Čeština",
+    "save": "Uložit"
 }
