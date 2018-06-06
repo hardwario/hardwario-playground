@@ -12,6 +12,8 @@ const MqttBroker = require("./src/background/MqttBroker");
 const MqttClient = require("./src/background/MqttClient");
 const CustomMenu = require("./src/utils/Menu");
 const Settings = require("./src/background/Settings");
+const Gateway = require("./src/background/Gateway");
+
 
 // Keep a global reference of the window object, if you don"t, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,6 +28,7 @@ if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) |
 HomeDirectory.setup(dev)
 MqttBroker.setup();
 NodeREDWorker.setup();
+Gateway.setup();
 
 function createWindow() {
   let mainWindow;
@@ -34,7 +37,7 @@ function createWindow() {
     width: 1024,
     height: 768,
     show: false
-    //,titleBarStyle: 'hidden' future purpose?
+      //,titleBarStyle: 'hidden' future purpose?
   });
 
   // Setup menu, you should change this
@@ -66,7 +69,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.on("closed", function () {
+  mainWindow.on("closed", function() {
     const index = windows.indexOf(mainWindow);
     windows.splice(index, 1);
     mainWindow = null;

@@ -46,6 +46,7 @@
     "mosca": "^2.8.1",
     "mqtt": "^2.18.0",
     "node-red": "*",
-    "node-red-dashboard": "*"
+    "node-red-dashboard": "*",
+    "serialport": "^6.2.0"
   }
 }

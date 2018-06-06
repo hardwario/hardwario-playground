@@ -3,43 +3,57 @@
 const SerialPort = require("serialport");
 var mqtt = require("mqtt");
 
+const DefaultDevice = "/dev/ttyUSB0";
+const DefaultMqttUrl = "mqtt://127.0.0.1:1883";
+
+const gateway_topics = [
+  "/nodes/get",
+  "/nodes/purge",
+  "/nodes/add",
+  "/nodes/remove",
+  "/pairing-mode/start",
+  "/pairing-mode/stop",
+  "/alias/set",
+  "/alias/remove"
+];
+
 class Gateway {
-  constructor(device) {
+  constructor(device, mqttUrl) {
     this._name = null;
     this._alias = null;
     this._nodes = null;
+    this._subscribes = [];
 
-    this.ser = new SerialPort(device, {
+    this._ser = new SerialPort(device, {
       autoOpen: false,
       baudRate: 115200,
       parity: "none",
     });
 
-    this.ser.on("open", function() {
+    this._ser.on("open", function() {
       console.log("Gateway device open");
-      this.ser.flush(function() {
-        this.ser.write("\n");
+      this._ser.flush(function() {
+        this._ser.write("\n");
         this.write("/info/get");
       }.bind(this));
     }.bind(this));
 
-    const parser = this.ser.pipe(new SerialPort.parsers.Readline({ delimiter: "\n" }));
+    const parser = this._ser.pipe(new SerialPort.parsers.Readline({ delimiter: "\n" }));
     parser.on("data", this._device_readline.bind(this));
 
-    this.ser.open();
+    this._ser.open();
 
-    this._subscribes = ["gateway/all/info/get"];
-
-    this.mqtt = mqtt.connect("mqtt://127.0.0.1:1883");
-    this.mqtt.on("connect", this._mqtt_on_connect.bind(this));
-    this.mqtt.on("message", this._mqtt_on_message.bind(this));
-    this.mqtt.on("disconnect", this._mqtt_on_disconnect.bind(this));
+    this._mqtt = mqtt.connect(mqttUrl);
+    this._mqtt.on("connect", this._mqtt_on_connect.bind(this));
+    this._mqtt.on("message", this._mqtt_on_message.bind(this));
+    this._mqtt.on("disconnect", this._mqtt_on_disconnect.bind(this));
   }
 
   _mqtt_on_connect() {
     console.log("Gateway MQTT connect");
+    this._mqtt.subscribe("gateway/all/info/get");
     for (let i in this._subscribes) {
-      this.mqtt.subscribe(this._subscribes[i]);
+      this._mqtt.subscribe(this._subscribes[i]);
     }
   }
 
@@ -61,8 +75,21 @@ class Gateway {
         this.write("/info/get");
         return;
       }
+
       if (t.shift(0) == this._name) {
-        this.write("/" + t.join("/"));
+
+        topic = "/" + t.join("/");
+
+        if (topic == "/alias/set") {
+          this._eeprom_alias_add(payload.id, payload.alias);
+          return;
+
+        } else if (topic == "/alias/remove") {
+          this._eeprom_alias_remove(payload);
+          return;
+        }
+
+        this.write(topic, payload);
       }
 
     } else if (typ == "node") {
@@ -74,7 +101,6 @@ class Gateway {
 
       this.write(t.join("/"), payload);
     }
-
   }
 
   _device_readline(line) {
@@ -88,15 +114,41 @@ class Gateway {
     } else if (topic[0] == "$") {
       this._sys_message(topic, payload);
     } else if (topic[0] == "#") {
-
+      // log messages
     } else {
 
       let id = topic.substr(0, 12);
-      if (id in this._alias.id) {
-        this.pub("node/" + this._alias.id[id] + topic.substr(12), payload);
-      } else {
-        this.pub("node/" + topic, payload);
+      topic = topic.substr(12);
+
+      if (topic == "/info") {
+        // auto rename from firemware name
+        if (this._alias.id[id] == undefined) {
+          let new_alias_base = payload["firmware"];
+
+          if (new_alias_base.startsWith('generic-node')) {
+            new_alias_base = "generic-node";
+          }
+
+          let new_alias = null;
+
+          for (let i = 0; i < 32; i++) {
+            new_alias = new_alias_base + ':' + i;
+            if (!this._alias.name[new_alias]) {
+              break;
+            }
+          }
+
+          this._eeprom_alias_add(id, new_alias);
+        }
       }
+
+      let alias = id;
+
+      if (id in this._alias.id) {
+        alias = this._alias.id[id];
+      }
+
+      this.pub("node/" + alias + topic.substr(12), payload);
     }
   }
 
@@ -114,12 +166,9 @@ class Gateway {
 
       this._name = m[1];
 
-      this._subscribe("gateway/" + this._name + "/nodes/get");
-      this._subscribe("gateway/" + this._name + "/nodes/purge");
-      this._subscribe("gateway/" + this._name + "/nodes/add");
-      this._subscribe("gateway/" + this._name + "/nodes/remove");
-      this._subscribe("gateway/" + this._name + "/pairing-mode/start");
-      this._subscribe("gateway/" + this._name + "/pairing-mode/stop");
+      for (let i in gateway_topics) {
+        this._subscribe("gateway/" + this._name + gateway_topics[i]);
+      }
 
       if (this._nodes == null) {
         this._nodes = [];
@@ -131,28 +180,34 @@ class Gateway {
 
       this._nodes = payload;
 
-      for (let i in payload) {
-        let id = payload[i];
-        this._subscribe("node/" + id + "/+/+/+/+");
-        if (this._alias && (payload[i] in this._alias.id)) {
-          this._subscribe("node/" + this._alias.id[id] + "/+/+/+/+");
-        }
-      }
-
       if (this._alias == null) {
         this._alias = {
           id: {},
           name: {},
+          rename: {}
         };
         this.write("$eeprom/alias/list", 0)
       }
 
+      let nodes = [];
+
+      for (let i in payload) {
+        let id = payload[i];
+        this._subscribe_node(id);
+        nodes.push({ id: id, alias: this._alias.id[id] })
+      }
+
+      payload = nodes;
+
     } else if (topic == "/detach") {
+      this._unsubscribe_node(payload);
+      this._nodes.pop(payload);
+      this._eeprom_alias_remove(payload);
 
     } else if (topic == "/attach") {
-      this.write("/nodes/get");
+      this._nodes.push(payload);
+      this._subscribe_node(payload);
     }
-
 
     if (this._name) {
       this.pub("gateway/" + this._name + topic, payload);
@@ -160,34 +215,102 @@ class Gateway {
   }
 
   _sys_message(topic, payload) {
+
+    if (topic == "$eeprom/alias/add/ok") {
+      let id = payload;
+      let alias = this._alias.rename[id];
+
+      this._alias.id[id] = alias;
+      this._alias.name[alias] = id;
+
+      this.pub("gateway/" + this._name + "/alias/set/ok", { id: id, alias: alias });
+
+      delete this._alias.rename[id];
+      return;
+    } else if (topic == "$eeprom/alias/remove/ok") {
+      let id = payload;
+      if (this._alias.id[id]) {
+        let alias = this._alias.id[id];
+        delete this._alias.id[id];
+        delete this._alias.name[alias];
+      }
+      this.pub("gateway/" + this._name + "/alias/remove/ok", id);
+      return;
+    }
+
     let m = topic.match(/\$eeprom\/alias\/list\/(\d+)/);
     if (m) {
+      let cnt = 0;
       for (let key in payload) {
+        cnt++;
         this._alias.id[key] = payload[key];
         this._alias.name[payload[key]] = key;
-
-        if (key in this._nodes) {
-          this._subscribe("node/" + payload[key] + "/+/+/+/+");
+      }
+      if (cnt == 8) {
+        this.write("$eeprom/alias/list", parseInt(m[1]) + 1);
+      } else {
+        for (let i in this._nodes) {
+          let id = this._nodes[i];
+          this._subscribe_node(id);
         }
       }
-      this.write("$eeprom/alias/list", parseInt(m[1]) + 1);
+    }
+  }
+
+  _subscribe_node(id) {
+    this._subscribe("node/" + id + "/+/+/+/+");
+
+    if (this._alias && (id in this._alias.id)) {
+      this._subscribe("node/" + this._alias.id[id] + "/+/+/+/+");
+    }
+  }
+
+  _unsubscribe_node(id) {
+    this._unsubscribe("node/" + id + "/+/+/+/+");
+
+    if (this._alias && (id in this._alias.id)) {
+      this._unsubscribe("node/" + this._alias.id[id] + "/+/+/+/+");
     }
   }
 
   _subscribe(topic) {
     if (this._subscribes.indexOf(topic) == -1) {
       this._subscribes.push(topic);
-      this.mqtt.subscribe(topic);
+      this._mqtt.subscribe(topic);
     }
   }
 
+  _unsubscribe(topic) {
+    let index = this._subscribes.indexOf(topic);
+    if (index != -1) {
+      this._subscribes.pop(topic);
+      this._mqtt.unsubscribe(topic);
+    }
+  }
+
+  _eeprom_alias_add(id, alias) {
+    if (alias == "") alias = null;
+
+    if (alias) {
+      this._alias.rename[id] = alias;
+      this.write('$eeprom/alias/add', { 'id': id, 'name': alias });
+    } else {
+      this._eeprom_alias_remove(id);
+    }
+  }
+
+  _eeprom_alias_remove(id) {
+    if (!this._alias.id[id]) return;
+    this.write('$eeprom/alias/remove', id);
+  }
+
   write(topic, payload = null, callback = null) {
-    this.ser.write(JSON.stringify([topic, payload]) + "\n");
-    this.ser.drain(callback);
+    this._ser.write(JSON.stringify([topic, payload]) + "\n");
+    this._ser.drain(callback);
   }
 
   pub(topic, payload) {
-    this.mqtt.publish(topic, JSON.stringify(payload));
+    this._mqtt.publish(topic, JSON.stringify(payload));
   }
 
 }
@@ -208,4 +331,8 @@ function port_list() {
   });
 }
 
-module.exports = { Gateway, port_list }
+async function setup(device, mqttUrl) {
+  return new Gateway(device || DefaultDevice, mqttUrl || DefaultMqttUrl);
+}
+
+module.exports = { setup, Gateway, port_list }
