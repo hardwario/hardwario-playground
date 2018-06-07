@@ -23,6 +23,9 @@ function setup(ip, view) {
     carry.client.on("connect", () => {
         carry.view.send("mqtt:client:connected", true);
     })
+    carry.client.on("disconnect", () => {
+        carry.view.send("mqtt:client:disconnect", true);
+    })
     return carry;
 }
 
