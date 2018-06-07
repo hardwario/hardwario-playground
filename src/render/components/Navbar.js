@@ -9,11 +9,15 @@ export default class extends Component {
         const { children } = this.props;
         return (
             <div id="navbar" >
-                <navbar className={this.state.visible ? "fade-in" : "fade-out"}>
-                    {children}
-                </navbar>
-                <div onClick={() => this.setState(prev => { return { visible: !prev.visible } })}>
-                    <img src={ this.state.visible ? require("../../assets/images/arrow-left.jpg") : require("../../assets/images/arrow-right.jpg") } />
+                <aside className={this.state.visible ? "fade-in" : "fade-out"}>
+                    <navbar >
+                        {children}
+
+                    </navbar>
+                    <img src={require("../../assets/images/logo.png")} style={{ margin: 5, width: 120, alignSelf: "center" }} />
+                </aside>
+                <div id="hider" onClick={() => this.setState(prev => { return { visible: !prev.visible } })}>
+                    <img src={this.state.visible ? require("../../assets/images/arrow-left.jpg") : require("../../assets/images/arrow-right.jpg")} />
                 </div>
             </div>
 
