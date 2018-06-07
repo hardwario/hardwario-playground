@@ -40,8 +40,8 @@ const Routes = () => {
                     <Route path="/dashboard" component={Dashboard} />
                     <Route path="/nodered" component={NodeRED} />
                     <Route path="/" exact component={Home} />
-                    <HintBar />
                 </main>
+                <HintBar />
             </div>
         </HashRouter>
     )

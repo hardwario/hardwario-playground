@@ -2,9 +2,12 @@
 
 const SerialPort = require("serialport");
 var mqtt = require("mqtt");
+const { ipcMain } = require("electron");
 
 const DefaultDevice = "/dev/ttyUSB0";
 const DefaultMqttUrl = "mqtt://127.0.0.1:1883";
+
+let gateway;
 
 const gateway_topics = [
   "/nodes/get",
@@ -30,9 +33,9 @@ class Gateway {
       parity: "none",
     });
 
-    this._ser.on("open", function() {
+    this._ser.on("open", function () {
       console.log("Gateway device open");
-      this._ser.flush(function() {
+      this._ser.flush(function () {
         this._ser.write("\n");
         this.write("/info/get");
       }.bind(this));
@@ -63,7 +66,6 @@ class Gateway {
 
   _mqtt_on_message(topic, message) {
     let payload = message.toString();
-
     console.log("Gateway MQTT message", topic, payload);
 
     payload = payload.length > 0 ? JSON.parse(message.toString()) : null;
@@ -97,7 +99,7 @@ class Gateway {
         t[0] = this._alias.name[t[0]]
       }
 
-      console.log(t, payload);
+      console.log("test", t, payload);
 
       this.write(t.join("/"), payload);
     }
@@ -315,24 +317,40 @@ class Gateway {
 
 }
 
-function port_list() {
-  return new Promise((resolve, reject) => {
-    SerialPort.list()
-      .then((all_ports) => {
-        let ports = []
-        all_ports.map((port) => {
-          if (port.manufacturer == "0403" && port.vendorId == "0403") {
-            ports.push(port);
-          }
-        });
-        resolve(ports);
-      })
-      .catch(reject);
+async function port_list() {
+  let ports = []
+  var all_ports = await SerialPort.list() || [];
+  all_ports.forEach((port) => {
+    if (port.manufacturer == "0403" || port.vendorId == "0403") {
+      ports.push(port);
+    }
   });
+  return ports;
 }
 
-async function setup(device, mqttUrl) {
-  return new Gateway(device || DefaultDevice, mqttUrl || DefaultMqttUrl);
+function setup(device = DefaultDevice, mqttUrl = DefaultMqttUrl) {
+  gateway = new Gateway(device, mqttUrl);
 }
+
+ipcMain.on("gateway:list", (event, data) => {
+  port_list()
+    .then((ports) => {
+      event.sender.send("gateway:list", ports);
+    })
+    .catch(() => console.log("Error getting ports"));
+});
+
+ipcMain.on("gateway:connect", (event, data) => {
+  setup(data);
+});
+
+ipcMain.on("gateway:disconnect", (event, data) => {
+  gateway = null;
+});
+
+// Returns gateway's connection status TODO: make more robust?
+ipcMain.on("gateway:status", (event, data) => {
+  event.sender.send("gateway:status", gateway == null ? false : true);
+});
 
 module.exports = { setup, Gateway, port_list }

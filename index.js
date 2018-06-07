@@ -28,7 +28,7 @@ if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) |
 HomeDirectory.setup(dev)
 MqttBroker.setup();
 NodeREDWorker.setup();
-Gateway.setup();
+//Gateway.setup();
 
 function createWindow() {
   let mainWindow;
