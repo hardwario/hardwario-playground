@@ -329,6 +329,7 @@ async function port_list() {
 }
 
 function setup(device = DefaultDevice, mqttUrl = DefaultMqttUrl) {
+  console.log("Starting gateway");
   gateway = new Gateway(device, mqttUrl);
 }
 
@@ -342,6 +343,7 @@ ipcMain.on("gateway:list", (event, data) => {
 
 ipcMain.on("gateway:connect", (event, data) => {
   setup(data);
+  event.sender.send("gateway:status", gateway == null ? false : true);
 });
 
 ipcMain.on("gateway:disconnect", (event, data) => {
