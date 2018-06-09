@@ -13,7 +13,8 @@ export default class extends Component {
             name: "usb-dongle",
             nodes: [],
             pairing: false,
-            editId: null
+            editId: null,
+            editValue: ""
         };
 
         this.mqttc = new MqttClient();
@@ -50,7 +51,8 @@ export default class extends Component {
         this.get_nodes = this.get_nodes.bind(this);
         this.pairringToggle = this.pairringToggle.bind(this);
         this.nodeRemove = this.nodeRemove.bind(this);
-        this.nodeRename = this.nodeRename.bind(this);
+        this.setEditId = this.setEditId.bind(this);
+        this.renameInputKeyPress = this.renameInputKeyPress.bind(this);
     }
 
     componentDidMount() {
@@ -91,10 +93,11 @@ export default class extends Component {
                                     return  <tr key={index}>
                                                 <td>{item.id}</td>
                                                 <td>
-                                                    {this.state.editId == item.id ? <input type="text" class="form-control" value={item.alias}/> : item.alias}
+                                                    {this.state.editId == item.id ?
+                                                    <input type="text" className="form-control" defaultValue={item.alias} onKeyPress={this.renameInputKeyPress}/> :
+                                                    item.alias}
                                                 </td>
-                                                <td>
-                                                    <button onClick={() => this.nodeRename(item)} className="btn btn-warning">rename</button>
+                                                <td>{this.state.editId != item.id ? <button onClick={() => this.setEditId(item)} className="btn btn-warning">rename</button> : ""}
                                                     <button onClick={() => this.nodeRemove(item)} className="btn btn-danger">remove</button></td>
                                             </tr>
                                 })
@@ -107,6 +110,7 @@ export default class extends Component {
     }
 
     /* START OF EVENT HANDLERS */
+    //
     get_nodes(e) {
       if (e) e.preventDefault();
       this.mqttc.publish('gateway/' + this.state.name + '/nodes/get', null);
@@ -129,8 +133,21 @@ export default class extends Component {
         this.mqttc.publish('gateway/' + this.state.name + '/nodes/remove', JSON.stringify(item.id));
     }
 
-    nodeRename(item) {
-        this.setState(prev => { return { editId: item.id } })
+    setEditId(item) {
+        this.setState(prev => { return { editId: item.id, editValue: item.alias } })
+    }
+
+    inputOnChange(event) {
+        this.setState(prev => { return { editValue: event.target.value } });
+    }
+
+    renameInputKeyPress(event) {
+        if (event.key === 'Enter') {
+            if (this.state.editValue != event.target.value) {
+                this.mqttc.publish('gateway/' + this.state.name + '/alias/set', JSON.stringify({ id: this.state.editId, alias: event.target.value }));
+            }
+            this.setState(prev => { return { editId: null } });
+        }
     }
     /* END OF EVENT HANDLERS */
 }
