@@ -8,10 +8,12 @@ const MqttClient = require('./MqttClient');
 export default class extends Component {
     constructor(props) {
         super(props);
+
         this.state = {
             name: "usb-dongle",
             nodes: [],
-            pairing: false
+            pairing: false,
+            editId: null
         };
 
         this.mqttc = new MqttClient();
@@ -48,6 +50,7 @@ export default class extends Component {
         this.get_nodes = this.get_nodes.bind(this);
         this.pairringToggle = this.pairringToggle.bind(this);
         this.nodeRemove = this.nodeRemove.bind(this);
+        this.nodeRename = this.nodeRename.bind(this);
     }
 
     componentDidMount() {
@@ -87,8 +90,12 @@ export default class extends Component {
                                 this.state.nodes.map((item, index) => {
                                     return  <tr key={index}>
                                                 <td>{item.id}</td>
-                                                <td>{item.alias}</td>
-                                                <td><button onClick={() => this.nodeRemove(item)} className="btn btn-danger">-</button></td>
+                                                <td>
+                                                    {this.state.editId == item.id ? <input type="text" class="form-control" value={item.alias}/> : item.alias}
+                                                </td>
+                                                <td>
+                                                    <button onClick={() => this.nodeRename(item)} className="btn btn-warning">rename</button>
+                                                    <button onClick={() => this.nodeRemove(item)} className="btn btn-danger">remove</button></td>
                                             </tr>
                                 })
                             }
@@ -120,6 +127,10 @@ export default class extends Component {
     nodeRemove(item) {
         console.log('nodeRemove', item);
         this.mqttc.publish('gateway/' + this.state.name + '/nodes/remove', JSON.stringify(item.id));
+    }
+
+    nodeRename(item) {
+        this.setState(prev => { return { editId: item.id } })
     }
     /* END OF EVENT HANDLERS */
 }

@@ -11,6 +11,8 @@ import HintBar from "./components/HintBar";
 import RadioManager from "./components/RadioManager";
 import Navbar from "./components/Navbar";
 
+const MqttClient = require('./components/MqttClient');
+
 // Import SCSS
 import "../assets/scss/index.scss";
 
