@@ -55,15 +55,7 @@ export default class extends Component {
         this.renameInputKeyPress = this.renameInputKeyPress.bind(this);
     }
 
-    componentDidMount() {
-        console.log("RM componentDidMount");
-    }
-    componentWillUpdate() {
-        console.log("RM Updating");
-    }
     componentWillUnmount() {
-        console.log("RM componentWillUnmount");
-
         this.mqttc.destroy();
     }
 
@@ -110,7 +102,6 @@ export default class extends Component {
     }
 
     /* START OF EVENT HANDLERS */
-    //
     get_nodes(e) {
       if (e) e.preventDefault();
       this.mqttc.publish('gateway/' + this.state.name + '/nodes/get', null);

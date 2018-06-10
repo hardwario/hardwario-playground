@@ -26,17 +26,12 @@ export default class extends Component {
 
     componentDidMount() {
         ipcRenderer.send("mqtt:window:subscribe");
-        //ipcRenderer.on("mqtt:client:subscribed", (topics) => this.setState({ subscribed_topics: topics }))
-        //ipcRenderer.on("mqtt:client:history", (history) => this.setState({ messages: history }))
         ipcRenderer.on("mqtt:client:connected", (sender, connected) => {
             this.setState({ isConnected: connected })
         })
         ipcRenderer.on("mqtt:client:message", (sender, message) => {
             this.setState(prev => { return { messages: [...prev.messages, { ...message }] } })
         })
-    }
-    componentWillUpdate() {
-        console.log("Updating");
     }
     componentWillUnmount() {
         ipcRenderer.send("mqtt:window:unsubscribe");

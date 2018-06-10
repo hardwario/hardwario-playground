@@ -5,6 +5,7 @@ export default class extends Component {
         super(props);
         this.state = { visible: true }
     }
+    
     render() {
         const { children } = this.props;
         return (

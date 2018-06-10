@@ -14,7 +14,6 @@ export default class extends Component {
     componentDidMount() {
         ipcRenderer.on("settings:get", (sender, settings) => {
             this.setState({ settings });
-            //i18n.setup(settings.app.languages[0]);
         });
         ipcRenderer.send("settings:get");
     }

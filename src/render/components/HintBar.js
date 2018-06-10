@@ -12,7 +12,6 @@ export default class extends Component {
         ipcRenderer.on("gateway:status", (sender, gatewayStatus) => this.setState({ gatewayStatus }));
 
         ipcRenderer.send("gateway:list");
-        //ipcRenderer.send("gateway:connect");
         ipcRenderer.send("gateway:status");
     }
 
