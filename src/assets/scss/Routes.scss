@@ -1,4 +1,3 @@
-$hintbar-height: 30px;
 #app {
     display: flex;
     height: 100vh;
@@ -12,15 +11,6 @@ $hintbar-height: 30px;
         overflow: auto;
     }
     >footer {
-        border-top: solid black 1px;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 200px;
-        height: $hintbar-height;
-        width: 100%;
-        padding-left: 5px;
-        display: flex;
-        justify-content: flex-end;
+
     }
 }

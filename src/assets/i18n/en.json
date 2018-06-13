@@ -3,7 +3,7 @@
   "nodered": "NodeRED",
   "dashboard": "Dashboard",
   "mqttLog": "MQTT Log",
-  "radio_manager": "Radio manager",
+  "radioManager": "Radio manager",
   "settings": "Settings",
   "subscribeMode": "Subscribe mode",
   "publishMode": "Publish mode",
@@ -22,5 +22,13 @@
   "websocketsIp": "Websockets IP",
   "en": "English",
   "cs": "Czech",
-  "save": "Save"
+  "save": "Save",
+  "pairingStart": "Pairing start",
+  "pairingStop": "Pairing stop",
+  "gatewayStatus" : "Gateway status",
+  "online": "ONLINE",
+  "offline": "OFFLINE",
+  "connect": "Connect",
+  "remove": "Remove",
+  "rename": "Rename"
 }

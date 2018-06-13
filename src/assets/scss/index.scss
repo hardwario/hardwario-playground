@@ -1,3 +1,5 @@
+$hintbar-height: 30px;
+
 // GLOBAL APP STYLES
 @import "./Routes";
 
@@ -8,3 +10,5 @@
 @import "./Dashboard";
 @import "./MqttLog";
 @import "./Settings";
+@import "./RadioManager";
+@import "./HintBar";

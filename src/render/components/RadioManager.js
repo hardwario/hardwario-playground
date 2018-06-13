@@ -3,7 +3,8 @@ import { ipcRenderer } from "electron";
 
 // Import language files
 const i18n = require("../../utils/i18n");
-const MqttClient = require('./MqttClient');
+const { __ } = i18n;
+const MqttClient = require("./MqttClient");
 
 export default class extends Component {
     constructor(props) {
@@ -19,8 +20,8 @@ export default class extends Component {
 
         this.mqttc = new MqttClient();
 
-        this.mqttc.on('connect', () =>{
-            console.log('connect on mqttc');
+        this.mqttc.on("connect", () => {
+            console.log("connect on mqttc");
 
             this.mqttc.subscribe("gateway/" + this.state.name + "/nodes");
             this.mqttc.subscribe("gateway/" + this.state.name + "/attach");
@@ -32,7 +33,7 @@ export default class extends Component {
             this.get_nodes()
         });
 
-        this.mqttc.on('message', (message) =>{
+        this.mqttc.on("message", (message) => {
             console.log("aaaa", message.topic, message.payload);
 
             let payload = JSON.parse(message.payload);
@@ -55,47 +56,58 @@ export default class extends Component {
         this.renameInputKeyPress = this.renameInputKeyPress.bind(this);
     }
 
+    componentDidMount() {
+        ipcRenderer.on("gateway:status", (sender, gatewayStatus) => this.setState({ gatewayStatus }));
+        ipcRenderer.send("gateway:status");
+    }
+
     componentWillUnmount() {
         this.mqttc.destroy();
     }
 
+    componentWillUnmount() {
+        ipcRenderer.removeAllListeners("gateway:status");
+    }
+
     render() {
+        const { gatewayStatus } = this.state;
+
         return (
-            <div id="gateway">
+            <div id="radiomanager">
                 <div className="col-xs-12">
-                    <header className="h4">{i18n.__("radio_manager")}</header>
-
-                        <button type="button" className={"btn " + (this.state.pairing ? 'btn-danger' :  'btn-success')} onClick={this.pairringToggle} >
-                        {i18n.__(this.state.pairing ? "Pairing stop" : "Pairing start")}
+                    <header className="h4">{i18n.__("radioManager")}</header>
+                    <div className="form-group">
+                        <button disabled={!gatewayStatus} type="button" className={"btn " + (this.state.pairing ? "btn-danger" : "btn-success")} onClick={this.pairringToggle}>
+                            {i18n.__(this.state.pairing ? "pairingStop" : "pairingStart")}
                         </button>
-
-                        <div></div>
-
-                        <table className="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Alias</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    </div>
+                    <table className="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Alias</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             {
                                 this.state.nodes.map((item, index) => {
-                                    return  <tr key={index}>
-                                                <td>{item.id}</td>
-                                                <td>
-                                                    {this.state.editId == item.id ?
-                                                    <input type="text" className="form-control" defaultValue={item.alias} onKeyPress={this.renameInputKeyPress}/> :
+                                    return (
+                                        <tr key={index}>
+                                            <td>{item.id}</td>
+                                            <td>
+                                                {this.state.editId == item.id ?
+                                                    <input type="text" className="form-control" defaultValue={item.alias} onKeyPress={this.renameInputKeyPress} /> :
                                                     item.alias}
-                                                </td>
-                                                <td>{this.state.editId != item.id ? <button onClick={() => this.setEditId(item)} className="btn btn-warning">rename</button> : ""}
-                                                    <button onClick={() => this.nodeRemove(item)} className="btn btn-danger">remove</button></td>
-                                            </tr>
+                                            </td>
+                                            <td>{this.state.editId != item.id ? <button onClick={() => this.setEditId(item)} className="btn btn-warning">{__("rename")}</button> : ""}
+                                                <button onClick={() => this.nodeRemove(item)} className="btn btn-danger">{__("remove")}</button></td>
+                                        </tr>
+                                    )
                                 })
                             }
-                            </tbody>
-                        </table>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         )
@@ -103,25 +115,25 @@ export default class extends Component {
 
     /* START OF EVENT HANDLERS */
     get_nodes(e) {
-      if (e) e.preventDefault();
-      this.mqttc.publish('gateway/' + this.state.name + '/nodes/get', null);
+        if (e) e.preventDefault();
+        this.mqttc.publish("gateway/" + this.state.name + "/nodes/get", null);
     }
 
     pairringToggle(e) {
         if (e) e.preventDefault();
-        console.log('pairringToggle');
+        console.log("pairringToggle");
 
         if (this.state.pairing) {
-            this.mqttc.publish('gateway/' + this.state.name + '/pairing-mode/stop', null);
+            this.mqttc.publish("gateway/" + this.state.name + "/pairing-mode/stop", null);
         }
         else {
-            this.mqttc.publish('gateway/' + this.state.name + '/pairing-mode/start', null);
+            this.mqttc.publish("gateway/" + this.state.name + "/pairing-mode/start", null);
         }
     }
 
     nodeRemove(item) {
-        console.log('nodeRemove', item);
-        this.mqttc.publish('gateway/' + this.state.name + '/nodes/remove', JSON.stringify(item.id));
+        console.log("nodeRemove", item);
+        this.mqttc.publish("gateway/" + this.state.name + "/nodes/remove", JSON.stringify(item.id));
     }
 
     setEditId(item) {
@@ -133,9 +145,9 @@ export default class extends Component {
     }
 
     renameInputKeyPress(event) {
-        if (event.key === 'Enter') {
+        if (event.key === "Enter") {
             if (this.state.editValue != event.target.value) {
-                this.mqttc.publish('gateway/' + this.state.name + '/alias/set', JSON.stringify({ id: this.state.editId, alias: event.target.value }));
+                this.mqttc.publish("gateway/" + this.state.name + "/alias/set", JSON.stringify({ id: this.state.editId, alias: event.target.value }));
             }
             this.setState(prev => { return { editId: null } });
         }

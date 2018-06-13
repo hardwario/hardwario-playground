@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 const { ipcRenderer } = require("electron");
 
+const i18n = require("../../utils/i18n");
+
 export default class extends Component {
     constructor(props) {
         super(props);
@@ -20,17 +22,24 @@ export default class extends Component {
     }
 
     render() {
-        console.log(this.state)
         return (
-            <footer>
-                GATEWAY STATUS: {this.state.gatewayStatus ? "ONLINE" : "OFFLINE"}
-                <select value={this.state.selectedPort} onChange={(e) => this.setState({ selectedPort: e.target.value })}>
-                    <option key={-1} value=""></option>
-                    {
-                        this.state.ports.map((port, index) => <option value={port.comName} key={index}>{port.comName}</option>)
+            <footer id="hintbar">
+                <span>
+                    {i18n.__("gatewayStatus")} <span className={this.state.gatewayStatus ? "online" : "offline"}>{this.state.gatewayStatus ? i18n.__("online") : i18n.__("online")}</span>
+                </span>
+                <span>
+                    <select value={this.state.selectedPort} onChange={(e) => this.setState({ selectedPort: e.target.value })}>
+                        <option key={-1} value=""></option>
+                        {
+                            this.state.ports.map((port, index) => <option value={port.comName} key={index}>{port.comName}</option>)
+                        }
+                    </select>
+                    <button onClick={() => {
+                        if (this.state.selectedPort == "") return;
+                        ipcRenderer.send("gateway:connect", this.state.selectedPort)
                     }
-                </select>
-                <button onClick={() => ipcRenderer.send("gateway:connect", this.state.selectedPort)}>connect</button>
+                    }>{i18n.__("connect")}</button>
+                </span>
             </footer>
         )
     }

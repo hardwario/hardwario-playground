@@ -3,7 +3,7 @@
   "nodered": "NodeRED",
   "dashboard": "Nástěnka",
   "mqttLog": "MQTT Výpis",
-  "radio_manager": "Rádio manager",
+  "radioManager": "Rádio manager",
   "settings": "Nastavení",
   "subscribeMode": "Odebírací režim",
   "publishMode": "Publikující režim",
@@ -23,6 +23,6 @@
   "en": "Angličtina",
   "cs": "Čeština",
   "save": "Uložit",
-  "Pairing start": "Párování start",
-  "Pairing stop": "Párování stop"
+  "pairingStart": "Párování start",
+  "pairingStop": "Párování stop"
 }

@@ -11,8 +11,6 @@ import HintBar from "./components/HintBar";
 import RadioManager from "./components/RadioManager";
 import Navbar from "./components/Navbar";
 
-const MqttClient = require('./components/MqttClient');
-
 // Import SCSS
 import "../assets/scss/index.scss";
 
@@ -34,12 +32,12 @@ const Routes = () => {
                     <NavLink to="/nodered">{i18n.__("nodered")}</NavLink>
                     <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                     <NavLink to="/mqttlog">{i18n.__("mqttLog")}</NavLink>
-                    <NavLink to="/radio_manager">{i18n.__("radio_manager")}</NavLink>
+                    <NavLink to="/radiomanager">{i18n.__("radioManager")}</NavLink>
                     <NavLink to="/settings">{i18n.__("settings")}</NavLink>
                 </Navbar>
                 <main>
                     <Route path="/settings" component={Settings} />
-                    <Route path="/radio_manager" component={RadioManager} />
+                    <Route path="/radiomanager" component={RadioManager} />
                     <Route path="/mqttlog" component={MqttLog} />
                     <Route path="/dashboard" component={Dashboard} />
                     <Route path="/nodered" component={NodeRED} />

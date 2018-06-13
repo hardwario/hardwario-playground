@@ -2,16 +2,16 @@
 
 const { ipcMain } = require("electron");
 const mqtt = require("mqtt");
+const { getSettings } = require("../utils/Settings");
 
-const defaultUrl = "mqtt://127.0.0.1:1883";
+const defaultUrl = "127.0.0.1:1883";
 
 // Window list contain reference to itself and MQTT client as well as subscribed topics and messages
 let windowList = [];
 
-function setup(ip, view) {
-
+function setup(ip = defaultUrl, view) {
     var carry = {
-        client: mqtt.connect(defaultUrl),
+        client: mqtt.connect("mqtt://" + ip),
         topics: [],
         history: [],
         view: view
@@ -32,13 +32,6 @@ function setup(ip, view) {
 function findWindow(id) {
     return windowList.find((item) => item.view.id == id);
 }
-
-/*
-// Returns connected status for window
-ipcMain.on("mqtt:client:connected", (event) => {
-    var window = findWindow(event.sender.id);
-    event.returnValue = (window == null ? false : window.client.connected);
-})*/
 
 /* TODO?
 // Returns subscribed topics and messages for window
@@ -87,6 +80,10 @@ ipcMain.on("mqtt:client:unsubscribe", (event, data) => {
 ipcMain.on("mqtt:window:subscribe", (event, data) => {
     var window = findWindow(event.sender.id);
     if (window == null) {
+        var settings = getSettings();
+        if (settings.mqttLog.connectionType[0] == "WebsocketsMQTT") {
+            data = settings.mqttLog.websocketsIp + ":8083";
+        }
         windowList.push(setup(data, event.sender));
     }
 })

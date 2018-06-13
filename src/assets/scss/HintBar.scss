@@ -1,0 +1,23 @@
+#hintbar {
+    border-top: solid black 1px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200px;
+    height: $hintbar-height;
+    width: 100%;
+    padding-left: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    select{
+        min-width: 200px;
+        margin-right: 2px;
+    }
+    .online{
+        background-color: green;
+    }
+    .offline{
+        background-color: red;
+    }
+}

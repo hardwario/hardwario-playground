@@ -55,7 +55,7 @@ export default class extends Component {
                                             return (
                                                 <div key={item + subItem} className="form-group">
                                                     <label htmlFor={item + subItem}>{i18n.__(subItem)}</label>
-                                                    <input id={item + subItem} value={this.state.settings[item][subItem][0]} className="form-control" />
+                                                    <input onChange={(e) => this._handleInput(item, subItem, e.target.value)} id={item + subItem} value={this.state.settings[item][subItem]} className="form-control" />
                                                 </div>
                                             )
                                         };
@@ -76,6 +76,9 @@ export default class extends Component {
         if (Array.isArray(element)) {
             element.splice(element.indexOf(value), 1);
             element.unshift(value);
+        }
+        else {
+            newObject[category][subCategory] = value;
         }
         this.setState(newObject);
     }
