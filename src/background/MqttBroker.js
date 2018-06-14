@@ -9,8 +9,10 @@ const DefaultMqttPort = 1883;
 let server;
 
 async function setup(port) {
+    console.log("Starting mosca");
     const reachable = await isPortReachable(port || DefaultMqttPort);
     if (!reachable) {
+        console.log("Starting mosca2");
         server = new mosca.Server({ port: port || DefaultMqttPort });
         server.on('clientConnected', function (client) {
             console.log('MQTT client connected', client.id);

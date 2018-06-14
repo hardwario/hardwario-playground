@@ -21,7 +21,8 @@ const gateway_topics = [
 ];
 
 class Gateway {
-  constructor(device, mqttUrl) {
+  constructor(device, mqttUrl, getStatus = (portStatus) => { }) {
+    this.connected = false;
     this._name = null;
     this._alias = null;
     this._nodes = null;
@@ -34,12 +35,18 @@ class Gateway {
     });
 
     this._ser.on("open", function () {
-      console.log("Gateway device open");
+      this.connected = true;
+      getStatus(this.connected)
       this._ser.flush(function () {
         this._ser.write("\n");
         this.write("/info/get");
       }.bind(this));
     }.bind(this));
+
+    this._ser.on("close", () => {
+      this.connected = false;
+      getStatus(this.connected)
+    });
 
     const parser = this._ser.pipe(new SerialPort.parsers.Readline({ delimiter: "\n" }));
     parser.on("data", this._device_readline.bind(this));
@@ -98,9 +105,7 @@ class Gateway {
       if (t[0] in this._alias.name) {
         t[0] = this._alias.name[t[0]]
       }
-
       console.log("test", t, payload);
-
       this.write(t.join("/"), payload);
     }
   }
@@ -328,29 +333,49 @@ async function port_list() {
   return ports;
 }
 
-function setup(device = DefaultDevice, mqttUrl = DefaultMqttUrl) {
-  console.log("Starting gateway");
-  gateway = new Gateway(device, mqttUrl);
+function setup(device = DefaultDevice, mqttUrl = DefaultMqttUrl, getStatus) {
+  console.log("Setting up gateway")
+  gateway = new Gateway(device, mqttUrl, getStatus);
 }
 
 ipcMain.on("gateway:list", (event, data) => {
   port_list()
     .then((ports) => {
+      if (ports.length == 1) {
+        setup(ports[0].comName, DefaultMqttUrl, (portStatus) => event.sender.send("gateway:status", portStatus));
+      }
       event.sender.send("gateway:list", ports);
     })
     .catch(() => console.log("Error getting ports"));
 });
 
+ipcMain.on("gateway:list:watch", (event, data) => {
+  var interval = setInterval(() => {
+    console.log("Trying reconnecting watch");
+    port_list()
+      .then((ports) => {
+        if (ports.length == 1) {
+          setup(ports[0].comName, DefaultMqttUrl, (portStatus) => event.sender.send("gateway:status", portStatus));
+          clearInterval(interval);
+        }
+        else if (ports.length > 1) {
+          clearInterval(interval);
+        }
+        event.sender.send("gateway:list", ports);
+      })
+      .catch(() => console.log("Error getting ports"));
+  }, 1000)
+});
+
 ipcMain.on("gateway:connect", (event, data) => {
-  setup(data);
-  event.sender.send("gateway:status", gateway == null ? false : true);
+  setup(data, DefaultMqttUrl, (portStatus) => event.sender.send("gateway:status", portStatus));
+  event.sender.send("gateway:status", gateway == null || !gateway.connected ? false : true);
 });
 
 ipcMain.on("gateway:disconnect", (event, data) => {
   gateway = null;
 });
 
-// Returns gateway's connection status TODO: make more robust?
 ipcMain.on("gateway:status", (event, data) => {
   event.sender.send("gateway:status", gateway == null ? false : true);
 });
