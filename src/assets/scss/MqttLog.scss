@@ -3,7 +3,7 @@
     .Console {
         border: 2px solid gray;
         border-radius: 4px;
-        height: 200px;
+        height: 300px;
         overflow-y: auto;
         &>ul {
             margin: 1px;
@@ -12,11 +12,14 @@
             justify-content: space-between;
         }
         & li {
+            min-height: 35px;
             display: flex;
             align-items: center;
+            .ConsoleButton{
+                margin-left: auto;
+            }
         }
     }
-    ul {}
     hr {
         margin: 0px;
         border-color: #333;

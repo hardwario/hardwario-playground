@@ -81,9 +81,7 @@ ipcMain.on("mqtt:window:subscribe", (event, data) => {
     var window = findWindow(event.sender.id);
     if (window == null) {
         var settings = getSettings();
-        if (settings.mqttLog.connectionType[0] == "WebsocketsMQTT") {
-            data = settings.mqttLog.websocketsIp + ":8083";
-        }
+        data = settings.mqtt.remoteIp;
         windowList.push(setup(data, event.sender));
     }
 })

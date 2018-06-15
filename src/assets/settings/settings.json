@@ -1,10 +1,6 @@
 {
-    "mqttLog": {
-        "connectionType": [
-            "MQTT",
-            "WebsocketsMQTT"
-        ],
-        "websocketsIp": ""
+    "mqtt": {
+        "remoteIp": "127.0.0.1:1883"
     },
     "app": {
         "languages": [

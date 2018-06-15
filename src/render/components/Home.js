@@ -1,5 +1,10 @@
 import React, { Component } from "react";
+const { __ } = require("../../utils/i18n");
 
 export default () => {
-    return (<div id="home">Home</div>)
+    return (
+        <div id="home">
+            <h1>{__("Welcome to Playground")}</h1>
+        </div>
+    )
 };

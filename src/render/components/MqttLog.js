@@ -22,6 +22,7 @@ export default class extends Component {
         this.onSubscribe = this.onSubscribe.bind(this);
         this.onUnsubscribeAll = this.onUnsubscribeAll.bind(this);
         this.onUnsubscribeOne = this.onUnsubscribeOne.bind(this);
+        this.updateLocalState = this.updateLocalState.bind(this);
     }
 
     componentDidMount() {
@@ -30,7 +31,8 @@ export default class extends Component {
             this.setState({ isConnected: connected })
         })
         ipcRenderer.on("mqtt:client:message", (sender, message) => {
-            this.setState(prev => { return { messages: [...prev.messages, { ...message }] } })
+            this.updateLocalState(message);
+            this.setState(prev => { return { messages: [...prev.messages, { ...message }] } });
         })
     }
     componentWillUnmount() {
@@ -42,81 +44,90 @@ export default class extends Component {
     render() {
         return (
             <div id="mqttlog">
-                <div className="col-xs-12">
-                    <header className="h4">{i18n.__("mqttLog")}</header>
-                    <div className="Console">
-                        <ul>
-                            {
-                                this.state.highlighted_messages.map((item, index) => {
-                                    return <li key={index}><div>{item.time}&nbsp;{item.topic}</div><div>{item.payload}</div><div><button onClick={() => this.onRemove(item)} className="btn btn-danger">-</button></div></li>
-                                })
-                            }
-                        </ul>
-                        {this.state.highlighted_messages.length > 0 ? <hr /> : null}
-                        <ul >
-                            {
-                                this.state.messages.map((item, index) => {
-                                    return <li key={index}><div>{item.time}&nbsp;{item.topic}</div><div className="col-xs-4 ConsoleOutputItem">{item.payload}</div><div >
-                                        {this.state.highlighted_messages.find(x => item.topic == x.topic) == null ? <button onClick={x => this.onAdd(item)} className="btn btn-success ConsoleOutputAdd">+</button> : null}</div></li>
-                                }).reverse()
-                            }
-                        </ul>
-                    </div>
-                    <form>
-                        <div className="form-group">
-                            <label className="control-label col-xs-1">
-                                {this.state.checkbox ? i18n.__("publishMode") : i18n.__("subscribeMode")}
+                <header className="h4">{i18n.__("mqttLog")}</header>
+                <div className="Console">
+                    <ul>
+                        {
+                            this.state.highlighted_messages.map((item, index) => {
+                                return (
+                                    <li key={index}>
+                                        <div>{item.time}&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
+                                        <div>{item.payload}</div>
+                                        <div className="ConsoleButton"><button onClick={() => this.onRemove(item)}>-</button></div>
+                                    </li>
+                                )
+                            })
+                        }
+                    </ul>
+                    {this.state.highlighted_messages.length > 0 ? <hr /> : null}
+                    <ul >
+                        {
+                            this.state.messages.map((item, index) => {
+                                return (
+                                    <li key={index}>
+                                        <div>{item.time}&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
+                                        <div>{item.payload}</div>
+                                        <div className="ConsoleButton">
+                                            {this.state.highlighted_messages.find(x => item.topic == x.topic) == null ? <button onClick={x => this.onAdd(item)}>+</button> : null}
+                                        </div>
+                                    </li>)
+                            }).reverse()
+                        }
+                    </ul>
+                </div>
+                <form>
+                    <div className="form-group">
+                        <label className="control-label col-xs-1">
+                            {this.state.checkbox ? i18n.__("publishMode") : i18n.__("subscribeMode")}
+                        </label>
+                        <div className="col-xs-2">
+                            <label className="switch">
+                                <input type="checkbox" onChange={(event) => this.setState({ checkbox: event.target.checked })} />
+                                <span className="slider round"></span>
                             </label>
+                        </div>
+                    </div>
+                    {this.state.checkbox ?
+                        <div className="form-group">
+                            <label className="control-label col-xs-1">{i18n.__("payload")}</label>
+                            <div className="col-xs-8">
+                                <input className="form-control" value={this.state.pub_topic} onChange={(e) => this.setState({ pub_topic: e.target.value })} type="text" placeholder={i18n.__("enterTopicToPublish")} />
+                                <input className="form-control" value={this.state.pub_payload} onChange={(e) => this.setState({ pub_payload: e.target.value })} type="text" placeholder={i18n.__("enterMessageToPublish")} />
+                            </div>
                             <div className="col-xs-2">
-                                <label className="switch">
-                                    <input type="checkbox" onChange={(event) => this.setState({ checkbox: event.target.checked })} />
-                                    <span className="slider round"></span>
-                                </label>
+                                <button disabled={!this.state.isConnected} onClick={this.onPublish.bind(this)} className="btn btn-default">{i18n.__("publish")}</button>
                             </div>
                         </div>
-                        {this.state.checkbox ?
-                            <div className="form-group">
-                                <label className="control-label col-xs-1">{i18n.__("payload")}</label>
-                                <div className="col-xs-8">
-                                    <input className="form-control" value={this.state.pub_topic} onChange={(e) => this.setState({ pub_topic: e.target.value })} type="text" placeholder={i18n.__("enterTopicToPublish")} />
-                                    <input className="form-control" value={this.state.pub_payload} onChange={(e) => this.setState({ pub_payload: e.target.value })} type="text" placeholder={i18n.__("enterMessageToPublish")} />
-                                </div>
-                                <div className="col-xs-2">
-                                    <button disabled={!this.state.isConnected} onClick={this.onPublish.bind(this)} className="btn btn-default Stretch">{i18n.__("publish")}</button>
-                                </div>
+                        :
+                        <div className="form-group">
+                            <label className="control-label col-xs-1">{i18n.__("topic")}</label>
+                            <div className="col-xs-8">
+                                <input className="form-control" placeholder={i18n.__("enterTopicToSubscribe")} value={this.state.sub_topic} onChange={(e) => this.setState({ sub_topic: e.target.value })} type="text" />
                             </div>
-                            :
-                            <div className="form-group">
-                                <label className="control-label col-xs-1">{i18n.__("topic")}</label>
-                                <div className="col-xs-8">
-                                    <input className="form-control" placeholder={i18n.__("enterTopicToSubscribe")} value={this.state.sub_topic} onChange={(e) => this.setState({ sub_topic: e.target.value })} type="text" />
-                                </div>
-                                <div className="col-xs-2">
-                                    <button disabled={!this.state.isConnected} onClick={this.onSubscribe.bind(this)} className="btn btn-default Stretch">{i18n.__("subscribe")}</button>
-                                </div>
+                            <div className="col-xs-2">
+                                <button disabled={!this.state.isConnected} onClick={this.onSubscribe.bind(this)} className="btn btn-default">{i18n.__("subscribe")}</button>
                             </div>
+                        </div>
+                    }
+                </form>
+                <header className="h4">{i18n.__("subscribedTopics")}</header>
+                <div className="Console">
+                    <ul>
+                        {
+                            this.state.subscribed_topics.map((topic, index) => {
+                                return (
+                                    <li key={index}>
+                                        <div>{topic}</div>
+                                        <div className="ConsoleButton"><button onClick={() => this.onUnsubscribeOne(topic)}>-</button></div>
+                                    </li>
+                                )
+                            })
                         }
-                    </form>
+                    </ul>
                 </div>
-                <div className="col-xs-12">
-                    <header className="h4">{i18n.__("subscribedTopics")}</header>
-                    <div className="Console">
-                        <ul>
-                            {
-                                this.state.subscribed_topics.map((topic, index) => {
-                                    return (
-                                        <li key={index}>
-                                            <div className="col-xs-10">{topic}</div>
-                                            <div className="col-xs-1 ConsoleOutputItem"><button onClick={() => this.onUnsubscribeOne(topic)} className="btn btn-danger ConsoleOutputAdd">-</button></div>
-                                        </li>
-                                    )
-                                })
-                            }
-                        </ul>
-                    </div>
-                    <button disabled={!this.state.isConnected} onClick={x => this.onUnsubscribeAll(this.state.subscribed_topics)} className="btn btn-danger Stretch">{i18n.__("unSubscribeAll")}</button>
-                </div>
+                <button disabled={!this.state.isConnected} onClick={x => this.onUnsubscribeAll(this.state.subscribed_topics)} className="btn btn-danger">{i18n.__("unSubscribeAll")}</button>
             </div>
+
         )
     }
 
@@ -156,4 +167,15 @@ export default class extends Component {
         })
     }
     /* END OF EVENT HANDLERS */
+
+    /* START OF CARRY METHODS */
+    updateLocalState(data) {
+        var carryMessages = this.state.highlighted_messages.map((item) => {
+            if (item.topic == data.topic) { return item = { ...data }; }
+            return item;
+        });
+
+        this.setState({ highlighted_messages: carryMessages });
+    }
+    /* END OF CARRY METHODS */
 }

@@ -1,9 +1,10 @@
 "use strict";
 
 // Import parts of electron to use
-const { app, BrowserWindow, Menu, ipcMain } = require("electron");
-const path = require("path")
-const url = require("url")
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
+const path = require("path");
+const url = require("url");
+const { getSettings } = require("./src/utils/Settings");
 
 // Import background workers
 const NodeREDWorker = require("./src/background/NodeREDWorker");
@@ -14,9 +15,6 @@ const CustomMenu = require("./src/utils/Menu");
 const Settings = require("./src/background/Settings");
 const Gateway = require("./src/background/Gateway");
 
-
-// Keep a global reference of the window object, if you don"t, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let windows = [];
 
 // Keep a reference for dev mode
@@ -28,22 +26,21 @@ if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) |
 HomeDirectory.setup(dev)
 MqttBroker.setup();
 NodeREDWorker.setup();
-//Gateway.setup();
 
 function createWindow() {
   let mainWindow;
-  // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1024,
     height: 768,
+    minWidth: 720,
+    minHeight: 480,
     show: false
-      //,titleBarStyle: 'hidden' future purpose?
+    //,titleBarStyle: 'hidden' future purpose?
   });
 
-  // Setup menu, you should change this
   CustomMenu.setup(!dev);
 
-  // and load the index.html of the app.
+  // Load the index.html of the app.
   let indexPath;
   if (dev && process.argv.indexOf("--noDevServer") === -1) {
     indexPath = url.format({
@@ -69,7 +66,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.on("closed", function() {
+  mainWindow.on("closed", function () {
     const index = windows.indexOf(mainWindow);
     windows.splice(index, 1);
     mainWindow = null;
