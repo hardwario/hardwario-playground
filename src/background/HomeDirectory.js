@@ -4,7 +4,6 @@ const { app } = require("electron");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
-const { getSettings } = require("../utils/Settings");
 
 // Folders name definition
 const rootName = "." + app.getName();

@@ -1,13 +1,13 @@
 const { app } = require("electron");
 const fs = require("fs");
 const path = require("path");
-var deepAssign = require("deep-assign");
+var deepUpdate = require("./Deep-update");
 
 const getSettings = () => {
     var defaultData = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "assets", "settings", "settings.json"), { encoding: "utf8" }).toString());
     var readData = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "settings.json"), { encoding: "utf8" }).toString());
 
-    return deepAssign(defaultData, readData);
+    return deepUpdate(defaultData, readData);
 };
 
 const setSettings = (data) => {

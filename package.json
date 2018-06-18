@@ -41,7 +41,6 @@
     "webpack-dev-server": "^2.4.5"
   },
   "dependencies": {
-    "deep-assign": "^2.0.0",
     "is-port-reachable": "^2.0.0",
     "mosca": "^2.8.2",
     "mqtt": "^2.18.0",
