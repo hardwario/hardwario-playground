@@ -30,5 +30,7 @@
   "offline": "OFFLINE",
   "connect": "Connect",
   "remove": "Remove",
-  "rename": "Rename"
+  "rename": "Rename",
+  "mqtt": "MQTT",
+  "remoteIp": "Remote IP"
 }

@@ -24,5 +24,14 @@
   "cs": "Čeština",
   "save": "Uložit",
   "pairingStart": "Párování start",
-  "pairingStop": "Párování stop"
+  "pairingStop": "Párování stop",
+  "gatewayStatus" : "Gateway status",
+  "online": "AKTIVNÍ",
+  "offline": "NEAKTIVNÍ",
+  "connect": "Připojit",
+  "remove": "Odebrat",
+  "rename": "Přejmenovat",
+  "Welcome to the Playground": "Vítejte v Playground",
+  "mqtt": "MQTT",
+  "remoteIp": "Vzdálená IP"
 }
