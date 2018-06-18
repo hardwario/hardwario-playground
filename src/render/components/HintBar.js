@@ -10,24 +10,17 @@ export default class extends Component {
     }
 
     componentDidMount() {
-        ipcRenderer.on("gateway:list", (sender, ports) => this.setState({ ports }));
-        ipcRenderer.on("gateway:status", (sender, gatewayStatus) => {
-            this.setState({ gatewayStatus });
-            if (!gatewayStatus) {
-                this.setState({ ports: []}, () => ipcRenderer.send("gateway:list:watch"));
-            }
-            else {
-                ipcRenderer.send("gateway:list");
-            }
-        });
+        ipcRenderer.on("gateway:list", (sender, ports) => { this.setState({ ports }) });
+        ipcRenderer.on("gateway:status", (sender, gatewayStatus) => { this.setState({ gatewayStatus }); });
 
-
+        ipcRenderer.send("gateway:window:subscribe");
         ipcRenderer.send("gateway:status");
     }
 
     componentWillUnmount() {
-        //ipcRenderer.removeAllListeners("gateway:list");
-        //ipcRenderer.removeAllListeners("gateway:status");
+        ipcRenderer.removeAllListeners("gateway:list");
+        ipcRenderer.removeAllListeners("gateway:status");
+        ipcRenderer.send("gateway:window:unsubscribe");
     }
 
     render() {

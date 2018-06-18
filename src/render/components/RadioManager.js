@@ -4,13 +4,13 @@ import { ipcRenderer } from "electron";
 // Import language files
 const i18n = require("../../utils/i18n");
 const { __ } = i18n;
-const MqttClient = require("./MqttClient");
 
 export default class extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            gatewayStatus: false,
             name: "usb-dongle",
             nodes: [],
             pairing: false,
@@ -18,24 +18,41 @@ export default class extends Component {
             editValue: ""
         };
 
-        this.mqttc = new MqttClient();
+        this.get_nodes = this.get_nodes.bind(this);
+        this.pairringToggle = this.pairringToggle.bind(this);
+        this.nodeRemove = this.nodeRemove.bind(this);
+        this.setEditId = this.setEditId.bind(this);
+        this.renameInputKeyPress = this.renameInputKeyPress.bind(this);
+    }
 
-        this.mqttc.on("connect", () => {
-            console.log("connect on mqttc");
-
-            this.mqttc.subscribe("gateway/" + this.state.name + "/nodes");
-            this.mqttc.subscribe("gateway/" + this.state.name + "/attach");
-            this.mqttc.subscribe("gateway/" + this.state.name + "/detach");
-            this.mqttc.subscribe("gateway/" + this.state.name + "/alias/set/ok");
-            this.mqttc.subscribe("gateway/" + this.state.name + "/alias/remove/ok");
-            this.mqttc.subscribe("gateway/" + this.state.name + "/pairing-mode");
-
-            this.get_nodes()
+    componentDidMount() {
+        ipcRenderer.on("gateway:status", (sender, gatewayStatus) => {
+            console.log("Gateway status", gatewayStatus);
+            this.setState({ gatewayStatus });
+            if (gatewayStatus) {
+                this.setState({ nodes: [], pairing: false });
+            }
+            else {
+                ipcRenderer.send("mqtt:window:subscribe");
+            }
         });
+        ipcRenderer.on("mqtt:client:connected", (sender, mqttStatus) => {
 
-        this.mqttc.on("message", (message) => {
-            console.log("aaaa", message.topic, message.payload);
+            if (mqttStatus) {
 
+                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/nodes");
+                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/attach");
+                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/detach");
+                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/alias/set/ok");
+                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/alias/remove/ok");
+                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/pairing-mode");
+                this.get_nodes();
+            }
+            else if (!mqttStatus || !gatewayStatus) {
+                this.setState({ nodes: [], pairing: false });
+            }
+        });
+        ipcRenderer.on("mqtt:client:message", (sender, message) => {
             let payload = JSON.parse(message.payload);
 
             if (message.topic == "gateway/" + this.state.name + "/nodes") {
@@ -49,31 +66,22 @@ export default class extends Component {
             }
         });
 
-        this.get_nodes = this.get_nodes.bind(this);
-        this.pairringToggle = this.pairringToggle.bind(this);
-        this.nodeRemove = this.nodeRemove.bind(this);
-        this.setEditId = this.setEditId.bind(this);
-        this.renameInputKeyPress = this.renameInputKeyPress.bind(this);
-    }
-
-    componentDidMount() {
-        ipcRenderer.on("gateway:status", (sender, gatewayStatus) => this.setState({ gatewayStatus }));
         ipcRenderer.send("gateway:status");
     }
 
     componentWillUnmount() {
-        this.mqttc.destroy();
-    }
+        ipcRenderer.send("mqtt:window:unsubscribe");
 
-    componentWillUnmount() {
         ipcRenderer.removeAllListeners("gateway:status");
+        ipcRenderer.removeAllListeners("mqtt:client:connected");
+        ipcRenderer.removeAllListeners("mqtt:client:message");
     }
 
     render() {
         const { gatewayStatus } = this.state;
 
         return (
-            <div id="radiomanager">
+            <div id="radiomanager" >
                 <div className="col-xs-12">
                     <header className="h4">{i18n.__("radioManager")}</header>
                     <div className="form-group">
@@ -114,26 +122,24 @@ export default class extends Component {
     }
 
     /* START OF EVENT HANDLERS */
-    get_nodes(e) {
-        if (e) e.preventDefault();
-        this.mqttc.publish("gateway/" + this.state.name + "/nodes/get", null);
+    get_nodes() {
+        ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/nodes/get" });
     }
 
     pairringToggle(e) {
         if (e) e.preventDefault();
-        console.log("pairringToggle");
+        const { pairing } = this.state;
 
         if (this.state.pairing) {
-            this.mqttc.publish("gateway/" + this.state.name + "/pairing-mode/stop", null);
+            this.setState({ pairing: !pairing }, () => ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/pairing-mode/stop" }))
         }
         else {
-            this.mqttc.publish("gateway/" + this.state.name + "/pairing-mode/start", null);
+            this.setState({ pairing: !pairing }, () => ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/pairing-mode/start" }))
         }
     }
 
     nodeRemove(item) {
-        console.log("nodeRemove", item);
-        this.mqttc.publish("gateway/" + this.state.name + "/nodes/remove", JSON.stringify(item.id));
+        ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/nodes/remove", payload: JSON.stringify(item.id) });
     }
 
     setEditId(item) {
@@ -147,7 +153,7 @@ export default class extends Component {
     renameInputKeyPress(event) {
         if (event.key === "Enter") {
             if (this.state.editValue != event.target.value) {
-                this.mqttc.publish("gateway/" + this.state.name + "/alias/set", JSON.stringify({ id: this.state.editId, alias: event.target.value }));
+                ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/alias/set", payload: JSON.stringify({ id: this.state.editId, alias: event.target.value }) });
             }
             this.setState(prev => { return { editId: null } });
         }

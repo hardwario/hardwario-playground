@@ -81,9 +81,9 @@ app.on("app:window:new", createWindow);
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+  //if (process.platform !== "darwin") {
     app.quit();
-  }
+  //}
 });
 
 app.on("activate", () => {

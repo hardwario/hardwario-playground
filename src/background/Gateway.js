@@ -8,6 +8,9 @@ const DefaultDevice = "/dev/ttyUSB0";
 const DefaultMqttUrl = "mqtt://127.0.0.1:1883";
 
 let gateway;
+let windowList = [];
+let devices = [];
+let intervalCheck;
 
 const gateway_topics = [
   "/nodes/get",
@@ -322,6 +325,19 @@ class Gateway {
 
 }
 
+function findWindow(id) {
+  return windowList.find((item) => item.id == id);
+}
+
+function setup(device = DefaultDevice, mqttUrl = DefaultMqttUrl, getStatus) {
+  console.log("Setting up gateway")
+  gateway = new Gateway(device, mqttUrl, getStatus);
+}
+
+function notifyAll(topic, data) {
+  windowList.forEach((view) => view.send(topic, data));
+}
+
 async function port_list() {
   let ports = []
   var all_ports = await SerialPort.list() || [];
@@ -330,54 +346,60 @@ async function port_list() {
       ports.push(port);
     }
   });
-  return ports;
+  if (ports.length != devices.length) {
+    devices = ports;
+    notifyAll("gateway:list", devices);
+  }
 }
-
-function setup(device = DefaultDevice, mqttUrl = DefaultMqttUrl, getStatus) {
-  console.log("Setting up gateway")
-  gateway = new Gateway(device, mqttUrl, getStatus);
-}
-
-ipcMain.on("gateway:list", (event, data) => {
-  port_list()
-    .then((ports) => {
-      if (ports.length == 1) {
-        setup(ports[0].comName, DefaultMqttUrl, (portStatus) => event.sender.send("gateway:status", portStatus));
-      }
-      event.sender.send("gateway:list", ports);
-    })
-    .catch(() => console.log("Error getting ports"));
-});
-
-ipcMain.on("gateway:list:watch", (event, data) => {
-  var interval = setInterval(() => {
-    console.log("Trying reconnecting watch");
-    port_list()
-      .then((ports) => {
-        if (ports.length == 1) {
-          setup(ports[0].comName, DefaultMqttUrl, (portStatus) => event.sender.send("gateway:status", portStatus));
-          clearInterval(interval);
-        }
-        else if (ports.length > 1) {
-          clearInterval(interval);
-        }
-        event.sender.send("gateway:list", ports);
-      })
-      .catch(() => console.log("Error getting ports"));
-  }, 1000)
-});
 
 ipcMain.on("gateway:connect", (event, data) => {
-  setup(data, DefaultMqttUrl, (portStatus) => event.sender.send("gateway:status", portStatus));
-  event.sender.send("gateway:status", gateway == null || !gateway.connected ? false : true);
+  setup(data, DefaultMqttUrl, (portStatus) => notifyAll("gateway:status", portStatus));
+
+  notifyAll("gateway:status", gateway == null || !gateway.connected ? false : true);
+  notifyAll("gateway:list", devices);
 });
 
 ipcMain.on("gateway:disconnect", (event, data) => {
   gateway = null;
+  //notifyAll("gateway:status", gateway == null || !gateway.connected ? false : true)
 });
 
 ipcMain.on("gateway:status", (event, data) => {
-  event.sender.send("gateway:status", gateway == null ? false : true);
+  notifyAll("gateway:status", gateway == null ? false : true);
 });
 
-module.exports = { setup, Gateway, port_list }
+// Take reference for window to send async requests
+ipcMain.on("gateway:window:subscribe", (event, data) => {
+  var window = findWindow(event.sender.id);
+  if (window == null) {
+    windowList.push(event.sender);
+  }
+  if (windowList.length == 1) {
+    intervalCheck = setInterval(port_list, 250);
+  }
+})
+
+// Take off reference for window to send async requests
+ipcMain.on("gateway:window:unsubscribe", (event, data) => {
+  console.log("Window unsub");
+  console.log("Window unsub");
+  console.log("Window unsub");
+  console.log("Window unsub");
+  console.log("Window unsub");
+  console.log("Window unsub");
+  console.log("Window unsub");
+  
+  var window = findWindow(event.sender.id);
+  if (window != null) {
+    var index = windowList.indexOf(window);
+    if (index > -1) {
+      windowList.splice(index, 1);
+    }
+  }
+  if (windowList.length == 0) {
+    clearInterval(intervalCheck);
+  }
+  console.log(windowList.length);
+})
+
+module.exports = { setup, Gateway }
