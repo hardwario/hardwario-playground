@@ -33,26 +33,6 @@ function findWindow(id) {
     return windowList.find((item) => item.view.id == id);
 }
 
-/* TODO?
-// Returns subscribed topics and messages for window
-ipcMain.on("mqtt:client:history", (event) => {
-    console.log("Getting history");
-    var window = findWindow(event.sender.id)
-    if (window.client.connected && window != null) {
-        console.log(window.history);
-        window.view.send("mqtt:client:history", window.history);
-    }
-})
-
-ipcMain.on("mqtt:client:subscribed", (event) => {
-    console.log("Getting topics");
-    var window = findWindow(event.sender.id)
-    if (window.client.connected && window != null) {
-        console.log(window.topics);
-        window.view.send("mqtt:client:subscribed", window.topics);
-    }
-})
-*/
 ipcMain.on("mqtt:client:publish", (event, data) => {
     var window = findWindow(event.sender.id);
     if (window != null && window.client.connected) {

@@ -57,7 +57,6 @@ function createWindow() {
     });
   }
   mainWindow.loadURL(indexPath);
-
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
     // Open the DevTools automatically if developing

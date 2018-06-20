@@ -39,7 +39,7 @@ class Gateway {
 
     this._ser.on("open", function () {
       this.connected = true;
-      getStatus(this.connected)
+      getStatus(true)
       this._ser.flush(function () {
         this._ser.write("\n");
         this.write("/info/get");
@@ -48,7 +48,8 @@ class Gateway {
 
     this._ser.on("close", () => {
       this.connected = false;
-      getStatus(this.connected)
+      console.log("Gateway odpojena");
+      getStatus(false)
     });
 
     const parser = this._ser.pipe(new SerialPort.parsers.Readline({ delimiter: "\n" }));
@@ -335,7 +336,20 @@ function setup(device = DefaultDevice, mqttUrl = DefaultMqttUrl, getStatus) {
 }
 
 function notifyAll(topic, data) {
-  windowList.forEach((view) => view.send(topic, data));
+  let newList = [];
+  windowList.forEach((view) => {
+    try {
+      view.send(topic, data);
+      newList.push(view);
+    }
+    catch (error) {
+      // Window no longer exists
+    }
+    windowList = newList;
+    if (windowList.length == 0) {
+      clearInterval(intervalCheck);
+    }
+  });
 }
 
 async function port_list() {
@@ -353,7 +367,7 @@ async function port_list() {
 }
 
 ipcMain.on("gateway:connect", (event, data) => {
-  setup(data, DefaultMqttUrl, (portStatus) => notifyAll("gateway:status", portStatus));
+  setup(data, DefaultMqttUrl, (portStatus) => { notifyAll("gateway:status", portStatus); console.log("notifying all gateway odpojena asi", portStatus, windowList.length); });
 
   notifyAll("gateway:status", gateway == null || !gateway.connected ? false : true);
   notifyAll("gateway:list", devices);
@@ -361,11 +375,11 @@ ipcMain.on("gateway:connect", (event, data) => {
 
 ipcMain.on("gateway:disconnect", (event, data) => {
   gateway = null;
-  //notifyAll("gateway:status", gateway == null || !gateway.connected ? false : true)
+  notifyAll("gateway:status", gateway == null || !gateway.connected ? false : true)
 });
 
 ipcMain.on("gateway:status", (event, data) => {
-  notifyAll("gateway:status", gateway == null ? false : true);
+  notifyAll("gateway:status", gateway == null ? false : gateway.connected);
 });
 
 // Take reference for window to send async requests
@@ -381,18 +395,12 @@ ipcMain.on("gateway:window:subscribe", (event, data) => {
 
 // Take off reference for window to send async requests
 ipcMain.on("gateway:window:unsubscribe", (event, data) => {
-  console.log("Window unsub");
-  console.log("Window unsub");
-  console.log("Window unsub");
-  console.log("Window unsub");
-  console.log("Window unsub");
-  console.log("Window unsub");
-  console.log("Window unsub");
-  
   var window = findWindow(event.sender.id);
+  console.log("Odstranovani");
   if (window != null) {
     var index = windowList.indexOf(window);
     if (index > -1) {
+      console.log("Odstranovani");
       windowList.splice(index, 1);
     }
   }

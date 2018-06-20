@@ -23,19 +23,11 @@ export default class extends Component {
         this.nodeRemove = this.nodeRemove.bind(this);
         this.setEditId = this.setEditId.bind(this);
         this.renameInputKeyPress = this.renameInputKeyPress.bind(this);
+        this.onGatewayStatus = this.onGatewayStatus.bind(this);
     }
 
     componentDidMount() {
-        ipcRenderer.on("gateway:status", (sender, gatewayStatus) => {
-            console.log("Gateway status", gatewayStatus);
-            this.setState({ gatewayStatus });
-            if (gatewayStatus) {
-                this.setState({ nodes: [], pairing: false });
-            }
-            else {
-                ipcRenderer.send("mqtt:window:subscribe");
-            }
-        });
+        ipcRenderer.on("gateway:status", this.onGatewayStatus);
         ipcRenderer.on("mqtt:client:connected", (sender, mqttStatus) => {
 
             if (mqttStatus) {
@@ -65,17 +57,17 @@ export default class extends Component {
                 this.get_nodes();
             }
         });
-
+        this.get_nodes();
         ipcRenderer.send("gateway:status");
     }
 
     componentWillUnmount() {
         ipcRenderer.send("mqtt:window:unsubscribe");
-
-        ipcRenderer.removeAllListeners("gateway:status");
+        ipcRenderer.removeListener("gateway:status", this.onGatewayStatus);
         ipcRenderer.removeAllListeners("mqtt:client:connected");
         ipcRenderer.removeAllListeners("mqtt:client:message");
     }
+
 
     render() {
         const { gatewayStatus } = this.state;
@@ -122,6 +114,18 @@ export default class extends Component {
     }
 
     /* START OF EVENT HANDLERS */
+    onGatewayStatus(sender, gatewayStatus) {
+        console.log("Gateway status", gatewayStatus);
+        this.setState({ gatewayStatus });
+        if (gatewayStatus) {
+            this.setState({ nodes: [], pairing: false });
+            ipcRenderer.send("mqtt:window:subscribe");
+        }
+        else {
+            ipcRenderer.send("mqtt:window:unsubscribe");
+        }
+    }
+
     get_nodes() {
         ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/nodes/get" });
     }
