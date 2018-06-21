@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { ipcRenderer } from "electron";
 import clientMqtt from "../model/MQTT";
-import { stat } from "fs";
 
 // Import language files
 const i18n = require("../../utils/i18n");
@@ -33,23 +32,22 @@ export default class extends Component {
 
     componentDidMount() {
         ipcRenderer.on("settings:get", (sender, settings) => {
-            console.log("nastavení!!!!!");
             this.client = new clientMqtt(settings.mqtt.remoteIp, this.onMqttMessage, this.onMqttStatus);
             ipcRenderer.removeAllListeners("settings:get");
         });
         ipcRenderer.on("gateway:status", this.onGatewayStatus);
-
 
         ipcRenderer.send("settings:get");
         ipcRenderer.send("gateway:status");
     }
 
     componentWillUnmount() {
-        ipcRenderer.removeListener("gateway:status");
+        this.client.disconnect();
+        ipcRenderer.removeListener("gateway:status", this.onGatewayStatus);
     }
 
     render() {
-        const { gatewayStatus, mqttStatus } = this.state;
+        const { gatewayStatus, mqttStatus, nodes } = this.state;
 
         return (
             <div id="radiomanager" >
@@ -70,7 +68,7 @@ export default class extends Component {
                         </thead>
                         <tbody>
                             {
-                                this.state.nodes.map((item, index) => {
+                                nodes.map((item, index) => {
                                     return (
                                         <tr key={index}>
                                             <td>{item.id}</td>
@@ -94,7 +92,7 @@ export default class extends Component {
 
     /* START OF EVENT HANDLERS */
     onMqttMessage(message) {
-        let payload = JSON.parse(message);
+        let payload = JSON.parse(message).payload;
         if (message.topic == "gateway/" + this.state.name + "/nodes") {
             this.setState(prev => { return { nodes: payload } })
         }

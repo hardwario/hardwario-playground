@@ -5,8 +5,8 @@ export default class {
         this.client = mqtt.connect("mqtt://" + url);
         console.log("Setting up client", url);
         this.client.on("message", (topic, message) => {
-            console.log("Nova zprava", message);
-            onMessage({ topic, payload: JSON.stringify(message), time: new Date().getHours() + ":" + new Date().getMinutes() });
+            console.log("Nova zprava", message.toString());
+            onMessage({ topic, payload: message.toString(), time: new Date().getHours() + ":" + new Date().getMinutes() });
         })
         this.client.on("connect", () => {
             onConnect(true);
@@ -14,6 +14,9 @@ export default class {
         this.client.on("disconnect", () => {
             onConnect(false);
         })
+    }
+    disconnect(){
+        this.client.end();
     }
     subscribe(topic) {
         console.log("Subscribing", topic);
