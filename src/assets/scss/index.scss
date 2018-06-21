@@ -12,3 +12,7 @@ $hintbar-height: 30px;
 @import "./Settings";
 @import "./RadioManager";
 @import "./HintBar";
+
+body {
+    overflow: hidden;
+}
