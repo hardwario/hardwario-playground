@@ -3,9 +3,8 @@ const mqtt = require("mqtt");
 export default class {
     constructor(url, onMessage, onConnect) {
         this.client = mqtt.connect("mqtt://" + url);
-        console.log("Setting up client", url);
         this.client.on("message", (topic, message) => {
-            console.log("Nova zprava", message.toString());
+            console.log("Nova zprava", JSON.parse(message.toString()));
             onMessage({ topic, payload: message.toString(), time: new Date().getHours() + ":" + new Date().getMinutes() });
         })
         this.client.on("connect", () => {
@@ -26,6 +25,7 @@ export default class {
         this.client.unsubscribe(topic);
     }
     publish(topic, message = null) {
+        console.log("Publishing message", topic, message);
         this.client.publish(topic, message);
     }
 }

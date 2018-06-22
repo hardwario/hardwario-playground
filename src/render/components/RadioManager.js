@@ -92,7 +92,8 @@ export default class extends Component {
 
     /* START OF EVENT HANDLERS */
     onMqttMessage(message) {
-        let payload = JSON.parse(message).payload;
+        //console.log("Carry", message);
+        let payload = JSON.parse(message.payload);
         if (message.topic == "gateway/" + this.state.name + "/nodes") {
             this.setState(prev => { return { nodes: payload } })
         }

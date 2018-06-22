@@ -360,6 +360,7 @@ async function port_list() {
       ports.push(port);
     }
   });
+  console.log("Checking", windowList.length, all_ports.length);
   if (ports.length != devices.length) {
     devices = ports;
     notifyAll("gateway:list", devices);
@@ -383,7 +384,8 @@ ipcMain.on("gateway:status", (event, data) => {
 });
 
 // Take reference for window to send async requests
-ipcMain.on("gateway:window:subscribe", (event, data) => {
+ipcMain.on("gateway:window:subscribe", (event, data) => 
+{
   var window = findWindow(event.sender.id);
   if (window == null) {
     windowList.push(event.sender);
