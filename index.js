@@ -29,9 +29,8 @@ NodeREDWorker.setup();
 function createWindow() {
   let mainWindow;
   mainWindow = new BrowserWindow({
-    width: 1024,
-    height: 768,
-    minWidth: 720,
+    width: 1000,
+    minWidth: 1000,
     minHeight: 480,
     show: false
     //,titleBarStyle: 'hidden' future purpose?
@@ -80,7 +79,7 @@ app.on("app:window:new", createWindow);
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
   //if (process.platform !== "darwin") {
-    app.quit();
+  app.quit();
   //}
 });
 

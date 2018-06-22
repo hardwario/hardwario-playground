@@ -44,7 +44,6 @@ export default class extends Component {
     render() {
         return (
             <div id="mqttlog">
-                <header className="h4">{i18n.__("mqttLog")}</header>
                 <div className="Console">
                     <ul>
                         {

@@ -3,8 +3,6 @@ const { __ } = require("../../utils/i18n");
 
 export default () => {
     return (
-        <div id="home">
-            <h1>{__("Welcome to the Playground")}</h1>
-        </div>
+        <iframe id="home" src="https://www.bigclown.com/doc/"></iframe>
     )
 };

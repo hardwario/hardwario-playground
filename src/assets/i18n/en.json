@@ -1,11 +1,12 @@
 {
   "home": "Home",
-  "nodered": "NodeRED",
+  "node-red": "Node-RED",
   "dashboard": "Dashboard",
-  "mqttLog": "MQTT Log",
-  "radioManager": "Radio manager",
+  "mqtt": "MQTT",
+  "radio": "Radio",
   "settings": "Settings",
-  "flasher": "Flasher",
+  "firmware": "Firmware",
+  "gateway": "Gateway",
   "subscribeMode": "Subscribe mode",
   "publishMode": "Publish mode",
   "topic": "Topic",
@@ -32,6 +33,5 @@
   "connect": "Connect",
   "remove": "Remove",
   "rename": "Rename",
-  "mqtt": "MQTT",
   "remoteIp": "Remote IP"
 }

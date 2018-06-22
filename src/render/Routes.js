@@ -29,19 +29,19 @@ const Routes = () => {
             <div id="app">
                 <Navbar>
                     <NavLink exact to="/">{i18n.__("home")}</NavLink>
-                    <NavLink to="/nodered">{i18n.__("nodered")}</NavLink>
+                    <NavLink to="/node-red">{i18n.__("node-red")}</NavLink>
                     <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
-                    <NavLink to="/mqttlog">{i18n.__("mqttLog")}</NavLink>
-                    <NavLink to="/radiomanager">{i18n.__("radioManager")}</NavLink>
+                    <NavLink to="/mqttlog">{i18n.__("mqtt")}</NavLink>
+                    <NavLink to="/radiomanager">{i18n.__("radio")}</NavLink>
+                    <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
                     <NavLink to="/settings">{i18n.__("settings")}</NavLink>
-                    <NavLink to="/flasher">{i18n.__("flasher")}</NavLink>
                 </Navbar>
                 <main>
                     <Route path="/settings" component={Settings} />
                     <Route path="/radiomanager" component={RadioManager} />
                     <Route path="/mqttlog" component={MqttLog} />
                     <Route path="/dashboard" component={Dashboard} />
-                    <Route path="/nodered" component={NodeRED} />
+                    <Route path="/node-red" component={NodeRED} />
                     <Route path="/" exact component={Home} />
                 </main>
                 <HintBar />

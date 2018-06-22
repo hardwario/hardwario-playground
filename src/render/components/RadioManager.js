@@ -52,7 +52,6 @@ export default class extends Component {
         return (
             <div id="radiomanager" >
                 <div className="col-xs-12">
-                    <header className="h4">{i18n.__("radioManager")}</header>
                     <div className="form-group">
                         <button disabled={!gatewayStatus || !mqttStatus} type="button" className={"btn " + (this.state.pairing ? "btn-danger" : "btn-success")} onClick={this.pairringToggle}>
                             {i18n.__(this.state.pairing ? "pairingStop" : "pairingStart")}

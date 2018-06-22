@@ -1,5 +1,5 @@
 $animation-slide-duration: 0.2s;
-$navbar-font-size: 27px;
+$navbar-font-size: 16px;
 $navbar-padding-top: 5px;
 $navbar-padding-right: 15px;
 $navbar-padding-bottom: 5px;
@@ -51,11 +51,12 @@ $navbar-padding-left: 5px;
         flex-direction: column;
         a {
             padding: 5px 10px;
-            color: #FFDCC8;
-            border-bottom: 1px solid black;
+            color: black;
+            border-bottom: 1px solid #666;
         }
         .active {
-            background-color: #9D5B37;
+            background-color: #B7261C;
+            color: white;
         }
     }
     aside {
@@ -63,12 +64,14 @@ $navbar-padding-left: 5px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        background-color: #BF805F;
+        background-color: #eee;
+        border-right: 1px solid #666;
     }
     #hider {
-        background-color: white;
+        background-color: #eee;
         display: flex;
         border-right: 1px solid black;
+        border-left: 1px solid black;
         >img {
             align-self: center;
         }

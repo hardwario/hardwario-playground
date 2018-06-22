@@ -29,16 +29,19 @@ export default class extends Component {
     render() {
         return (
             <footer id="hintbar">
+                <div>
+                    <span>
+                        {i18n.__("gateway")} <span className={this.state.gatewayStatus ? "online" : "offline"}>{this.state.gatewayStatus ? i18n.__("online") : i18n.__("offline")}</span>
+                    </span>
+                    <span>
+                        {i18n.__("node-red")} <span className={this.state.noderedStatus ? "online" : "offline"}>{this.state.noderedStatus ? i18n.__("online") : i18n.__("offline")}</span>
+                    </span>
+                    <span>
+                        {i18n.__("mqtt")} <span className={this.state.brokerStatus ? "online" : "offline"}>{this.state.brokerStatus ? i18n.__("online") : i18n.__("offline")}</span>
+                    </span>
+                </div>
                 <span>
-                    {i18n.__("gatewayStatus")} <span className={this.state.gatewayStatus ? "online" : "offline"}>{this.state.gatewayStatus ? i18n.__("online") : i18n.__("offline")}</span>
-                </span>
-                <span>
-                    {i18n.__("noderedStatus")} <span className={this.state.noderedStatus ? "online" : "offline"}>{this.state.noderedStatus ? i18n.__("online") : i18n.__("offline")}</span>
-                </span>
-                <span>
-                    {i18n.__("brokerStatus")} <span className={this.state.brokerStatus ? "online" : "offline"}>{this.state.brokerStatus ? i18n.__("online") : i18n.__("offline")}</span>
-                </span>
-                <span>
+                    Device:&nbsp;
                     <select value={this.state.selectedPort} onChange={(e) => this.setState({ selectedPort: e.target.value })}>
                         <option key={-1} value=""></option>
                         {

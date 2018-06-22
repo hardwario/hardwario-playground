@@ -1,5 +1,5 @@
 #hintbar {
-    border-top: solid black 1px;
+    border-top: solid #666 1px;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -10,14 +10,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: #ccddff;
+    div>*{
+        margin-right: 15px;
+    }
     select{
         min-width: 200px;
         margin-right: 2px;
     }
     .online{
-        background-color: green;
+        color: green;
     }
     .offline{
-        background-color: red;
+        color: red;
     }
 }
