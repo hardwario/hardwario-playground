@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { ipcRenderer } from "electron";
+import clientMqtt from "../model/MQTT";
 
 // Import language files
 const i18n = require("../../utils/i18n");
@@ -23,22 +24,21 @@ export default class extends Component {
         this.onUnsubscribeAll = this.onUnsubscribeAll.bind(this);
         this.onUnsubscribeOne = this.onUnsubscribeOne.bind(this);
         this.updateLocalState = this.updateLocalState.bind(this);
+        this.onMqttMessage = this.onMqttMessage.bind(this);
+        this.onMqttStatus = this.onMqttStatus.bind(this);
     }
 
     componentDidMount() {
-        ipcRenderer.send("mqtt:window:subscribe");
-        ipcRenderer.on("mqtt:client:connected", (sender, connected) => {
-            this.setState({ isConnected: connected })
-        })
-        ipcRenderer.on("mqtt:client:message", (sender, message) => {
-            this.updateLocalState(message);
-            this.setState(prev => { return { messages: [...prev.messages, { ...message }] } });
-        })
+        console.log("test");
+        ipcRenderer.on("settings:get", (sender, settings) => {
+            console.log("Konfigurace");
+            this.client = new clientMqtt(settings.mqtt.remoteIp, this.onMqttMessage, this.onMqttStatus);
+            ipcRenderer.removeAllListeners("settings:get");
+        });
+        ipcRenderer.send("settings:get");
     }
     componentWillUnmount() {
-        ipcRenderer.send("mqtt:window:unsubscribe");
-        ipcRenderer.removeAllListeners("mqtt:client:connected");
-        ipcRenderer.removeAllListeners("mqtt:client:message");
+        this.client.disconnect();
     }
 
     render() {
@@ -132,20 +132,31 @@ export default class extends Component {
     }
 
     /* START OF EVENT HANDLERS */
+    onMqttMessage(message) {
+        this.updateLocalState(message);
+        this.setState(prev => { return { messages: [...prev.messages, { ...message }] } });
+    }
+    onMqttStatus(status) {
+        console.log(status);
+        this.setState({ isConnected: status })
+    }
+
     onSubscribe(e) {
         e.preventDefault();
         if (this.state.subscribed_topics.find(item => item == this.state.sub_topic) != null) {
             return;
         }
         this.setState(prev => { return { subscribed_topics: [...prev.subscribed_topics, this.state.sub_topic] } });
-        ipcRenderer.send("mqtt:client:subscribe", this.state.sub_topic);
+        this.client.subscribe(this.state.sub_topic);
+        //ipcRenderer.send("mqtt:client:subscribe", this.state.sub_topic);
     }
     onPublish(e) {
         e.preventDefault();
         if (this.state.pub_topic == "") {
             return;
         }
-        ipcRenderer.send("mqtt:client:publish", { topic: this.state.pub_topic, payload: this.state.pub_payload })
+        //ipcRenderer.send("mqtt:client:publish", { topic: this.state.pub_topic, payload: this.state.pub_payload })
+        this.client.publish(this.state.pub_topic, this.state.pub_payload);
     }
     onAdd(item) {
         this.setState((prevState) => { return { highlighted_messages: [...prevState.highlighted_messages, item] } });
@@ -156,12 +167,14 @@ export default class extends Component {
     }
     onUnsubscribeAll() {
         this.state.subscribed_topics.forEach((topic) => {
-            ipcRenderer.send("mqtt:client:unsubscribe", topic);
+            //ipcRenderer.send("mqtt:client:unsubscribe", topic);
+            this.client.unsubscribe(topic);
         })
         this.setState({ subscribed_topics: [] })
     }
     onUnsubscribeOne(topic) {
-        ipcRenderer.send("mqtt:client:unsubscribe", topic);
+        //ipcRenderer.send("mqtt:client:unsubscribe", topic);
+        this.client.unsubscribe(topic);
         this.setState(prev => {
             return { subscribed_topics: prev.subscribed_topics.filter((item) => item != topic) }
         })

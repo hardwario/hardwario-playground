@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { ipcRenderer } from "electron";
+import clientMqtt from "../model/MQTT";
 
 // Import language files
 const i18n = require("../../utils/i18n");
@@ -11,6 +12,7 @@ export default class extends Component {
 
         this.state = {
             gatewayStatus: false,
+            mqttStatus: false,
             name: "usb-dongle",
             nodes: [],
             pairing: false,
@@ -23,61 +25,36 @@ export default class extends Component {
         this.nodeRemove = this.nodeRemove.bind(this);
         this.setEditId = this.setEditId.bind(this);
         this.renameInputKeyPress = this.renameInputKeyPress.bind(this);
+        this.onMqttMessage = this.onMqttMessage.bind(this);
+        this.onMqttStatus = this.onMqttStatus.bind(this);
         this.onGatewayStatus = this.onGatewayStatus.bind(this);
     }
 
     componentDidMount() {
+        ipcRenderer.on("settings:get", (sender, settings) => {
+            this.client = new clientMqtt(settings.mqtt.remoteIp, this.onMqttMessage, this.onMqttStatus);
+            ipcRenderer.removeAllListeners("settings:get");
+        });
         ipcRenderer.on("gateway:status", this.onGatewayStatus);
-        ipcRenderer.on("mqtt:client:connected", (sender, mqttStatus) => {
 
-            if (mqttStatus) {
-
-                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/nodes");
-                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/attach");
-                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/detach");
-                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/alias/set/ok");
-                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/alias/remove/ok");
-                ipcRenderer.send("mqtt:client:subscribe", "gateway/" + this.state.name + "/pairing-mode");
-                this.get_nodes();
-            }
-            else if (!mqttStatus || !gatewayStatus) {
-                this.setState({ nodes: [], pairing: false });
-            }
-        });
-        ipcRenderer.on("mqtt:client:message", (sender, message) => {
-            let payload = JSON.parse(message.payload);
-
-            if (message.topic == "gateway/" + this.state.name + "/nodes") {
-                this.setState(prev => { return { nodes: payload } })
-            }
-            else if (message.topic == "gateway/" + this.state.name + "/pairing-mode") {
-                this.setState(prev => { return { pairing: payload == "start" } })
-            }
-            else {
-                this.get_nodes();
-            }
-        });
-        this.get_nodes();
+        ipcRenderer.send("settings:get");
         ipcRenderer.send("gateway:status");
     }
 
     componentWillUnmount() {
-        ipcRenderer.send("mqtt:window:unsubscribe");
+        this.client.disconnect();
         ipcRenderer.removeListener("gateway:status", this.onGatewayStatus);
-        ipcRenderer.removeAllListeners("mqtt:client:connected");
-        ipcRenderer.removeAllListeners("mqtt:client:message");
     }
 
-
     render() {
-        const { gatewayStatus } = this.state;
+        const { gatewayStatus, mqttStatus, nodes } = this.state;
 
         return (
             <div id="radiomanager" >
                 <div className="col-xs-12">
                     <header className="h4">{i18n.__("radioManager")}</header>
                     <div className="form-group">
-                        <button disabled={!gatewayStatus} type="button" className={"btn " + (this.state.pairing ? "btn-danger" : "btn-success")} onClick={this.pairringToggle}>
+                        <button disabled={!gatewayStatus || !mqttStatus} type="button" className={"btn " + (this.state.pairing ? "btn-danger" : "btn-success")} onClick={this.pairringToggle}>
                             {i18n.__(this.state.pairing ? "pairingStop" : "pairingStart")}
                         </button>
                     </div>
@@ -91,7 +68,7 @@ export default class extends Component {
                         </thead>
                         <tbody>
                             {
-                                this.state.nodes.map((item, index) => {
+                                nodes.map((item, index) => {
                                     return (
                                         <tr key={index}>
                                             <td>{item.id}</td>
@@ -114,20 +91,42 @@ export default class extends Component {
     }
 
     /* START OF EVENT HANDLERS */
-    onGatewayStatus(sender, gatewayStatus) {
-        console.log("Gateway status", gatewayStatus);
-        this.setState({ gatewayStatus });
-        if (gatewayStatus) {
-            this.setState({ nodes: [], pairing: false });
-            ipcRenderer.send("mqtt:window:subscribe");
+    onMqttMessage(message) {
+        let payload = JSON.parse(message).payload;
+        if (message.topic == "gateway/" + this.state.name + "/nodes") {
+            this.setState(prev => { return { nodes: payload } })
+        }
+        else if (message.topic == "gateway/" + this.state.name + "/pairing-mode") {
+            this.setState(prev => { return { pairing: payload == "start" } })
         }
         else {
-            ipcRenderer.send("mqtt:window:unsubscribe");
+            this.get_nodes();
         }
     }
 
+    onMqttStatus(status) {
+        this.setState({ mqttStatus: status });
+        if (status) {
+            this.client.subscribe("gateway/" + this.state.name + "/nodes");
+            this.client.subscribe("gateway/" + this.state.name + "/attach");
+            this.client.subscribe("gateway/" + this.state.name + "/detach");
+            this.client.subscribe("gateway/" + this.state.name + "/alias/set/ok");
+            this.client.subscribe("gateway/" + this.state.name + "/alias/remove/ok");
+            this.client.subscribe("gateway/" + this.state.name + "/pairing-mode");
+            this.get_nodes();
+        }
+    }
+
+    onGatewayStatus(sender, gatewayStatus) {
+        if (gatewayStatus && this.gatewayStatus == false) {
+            this.setState({ nodes: [], pairing: false });
+        }
+
+        this.setState({ gatewayStatus });
+    }
+
     get_nodes() {
-        ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/nodes/get" });
+        this.client.publish("gateway/" + this.state.name + "/nodes/get");
     }
 
     pairringToggle(e) {
@@ -135,15 +134,15 @@ export default class extends Component {
         const { pairing } = this.state;
 
         if (this.state.pairing) {
-            this.setState({ pairing: !pairing }, () => ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/pairing-mode/stop" }))
+            this.setState({ pairing: !pairing }, () => this.client.publish("gateway/" + this.state.name + "/pairing-mode/stop"));
         }
         else {
-            this.setState({ pairing: !pairing }, () => ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/pairing-mode/start" }))
+            this.setState({ pairing: !pairing }, () => this.client.publish("gateway/" + this.state.name + "/pairing-mode/start"));
         }
     }
 
     nodeRemove(item) {
-        ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/nodes/remove", payload: JSON.stringify(item.id) });
+        this.client.publish("gateway/" + this.state.name + "/nodes/remove", JSON.stringify(item.id));
     }
 
     setEditId(item) {
@@ -157,7 +156,7 @@ export default class extends Component {
     renameInputKeyPress(event) {
         if (event.key === "Enter") {
             if (this.state.editValue != event.target.value) {
-                ipcRenderer.send("mqtt:client:publish", { topic: "gateway/" + this.state.name + "/alias/set", payload: JSON.stringify({ id: this.state.editId, alias: event.target.value }) });
+                this.client.publish("gateway/" + this.state.name + "/alias/set", JSON.stringify({ id: this.state.editId, alias: event.target.value }));
             }
             this.setState(prev => { return { editId: null } });
         }

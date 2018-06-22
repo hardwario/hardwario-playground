@@ -5,6 +5,7 @@
   "mqttLog": "MQTT Log",
   "radioManager": "Radio manager",
   "settings": "Settings",
+  "flasher": "Flasher",
   "subscribeMode": "Subscribe mode",
   "publishMode": "Publish mode",
   "topic": "Topic",

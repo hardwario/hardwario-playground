@@ -31,7 +31,7 @@ module.exports = {
       },
       {
         test: /\.jsx?$/,
-        use: [{ loader: "babel-loader" }]
+        use: ["babel-loader", "shebang-loader"]
       },
       {
         test: /\.(jpe?g|png|gif)$/,

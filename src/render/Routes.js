@@ -28,12 +28,13 @@ const Routes = () => {
         <HashRouter>
             <div id="app">
                 <Navbar>
-                    <NavLink exact to="/">{i18n.__("home")}</NavLink>
+                    {/*<NavLink exact to="/">{i18n.__("home")}</NavLink>*/}
                     <NavLink to="/nodered">{i18n.__("nodered")}</NavLink>
                     <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                     <NavLink to="/mqttlog">{i18n.__("mqttLog")}</NavLink>
                     <NavLink to="/radiomanager">{i18n.__("radioManager")}</NavLink>
                     <NavLink to="/settings">{i18n.__("settings")}</NavLink>
+                    <NavLink to="/flasher">{i18n.__("flasher")}</NavLink>
                 </Navbar>
                 <main>
                     <Route path="/settings" component={Settings} />
@@ -41,7 +42,7 @@ const Routes = () => {
                     <Route path="/mqttlog" component={MqttLog} />
                     <Route path="/dashboard" component={Dashboard} />
                     <Route path="/nodered" component={NodeRED} />
-                    <Route path="/" exact component={Home} />
+                    <Route path="/" exact component={NodeRED} />
                 </main>
                 <HintBar />
             </div>
