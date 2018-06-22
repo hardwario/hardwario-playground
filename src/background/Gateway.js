@@ -2,7 +2,7 @@
 
 const SerialPort = require("serialport");
 var mqtt = require("mqtt");
-const { ipcMain } = require("electron");
+const { ipcMain, BrowserWindow } = require("electron");
 
 const DefaultDevice = "/dev/ttyUSB0";
 const DefaultMqttUrl = "mqtt://127.0.0.1:1883";
@@ -11,6 +11,8 @@ let gateway;
 let windowList = [];
 let devices = [];
 let intervalCheck;
+
+intervalCheck = setInterval(port_list, 250);
 
 const gateway_topics = [
   "/nodes/get",
@@ -327,27 +329,24 @@ class Gateway {
 }
 
 function findWindow(id) {
-  return windowList.find((item) => item.id == id);
+  //BrowserWindow.getAllWindows()[0].webContents
+  return BrowserWindow.getAllWindows().find((item) => item.webContents.id == id);
 }
 
 function setup(device = DefaultDevice, mqttUrl = DefaultMqttUrl, getStatus) {
   console.log("Setting up gateway")
+
   gateway = new Gateway(device, mqttUrl, getStatus);
 }
 
 function notifyAll(topic, data) {
   let newList = [];
-  windowList.forEach((view) => {
+  BrowserWindow.getAllWindows().forEach((view) => {
     try {
-      view.send(topic, data);
-      newList.push(view);
+      view.webContents.send(topic, data);
     }
     catch (error) {
       // Window no longer exists
-    }
-    windowList = newList;
-    if (windowList.length == 0) {
-      clearInterval(intervalCheck);
     }
   });
 }
@@ -381,11 +380,12 @@ ipcMain.on("gateway:disconnect", (event, data) => {
 
 ipcMain.on("gateway:status", (event, data) => {
   notifyAll("gateway:status", gateway == null ? false : gateway.connected);
+  notifyAll("gateway:list", devices);
 });
 
 // Take reference for window to send async requests
-ipcMain.on("gateway:window:subscribe", (event, data) => 
-{
+/*
+ipcMain.on("gateway:window:subscribe", (event, data) => {
   var window = findWindow(event.sender.id);
   if (window == null) {
     windowList.push(event.sender);
@@ -411,5 +411,5 @@ ipcMain.on("gateway:window:unsubscribe", (event, data) => {
   }
   console.log(windowList.length);
 })
-
+*/
 module.exports = { setup, Gateway }

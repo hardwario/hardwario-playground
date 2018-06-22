@@ -10,7 +10,6 @@ const { getSettings } = require("./src/utils/Settings");
 const NodeREDWorker = require("./src/background/NodeREDWorker");
 const HomeDirectory = require("./src/background/HomeDirectory");
 const MqttBroker = require("./src/background/MqttBroker");
-const MqttClient = require("./src/background/MqttClient");
 const CustomMenu = require("./src/utils/Menu");
 const Settings = require("./src/background/Settings");
 const Gateway = require("./src/background/Gateway");

@@ -6,7 +6,13 @@ const i18n = require("../../utils/i18n");
 export default class extends Component {
     constructor(props) {
         super(props);
-        this.state = { ports: [], selectedPort: "", gatewayStatus: false };
+        this.state = {
+            ports: [],
+            selectedPort: "",
+            gatewayStatus: false,
+            noderedStatus: false,
+            brokerStatus: false
+        };
     }
 
     componentDidMount() {
@@ -15,18 +21,9 @@ export default class extends Component {
         ipcRenderer.on("nodered:status", (sender, noderedStatus) => { this.setState({ noderedStatus }); });
         ipcRenderer.on("broker:status", (sender, brokerStatus) => { this.setState({ brokerStatus }); });
 
-
-
-        ipcRenderer.send("gateway:window:subscribe");
         ipcRenderer.send("gateway:status");
         ipcRenderer.send("nodered:status");
         ipcRenderer.send("broker:status");
-    }
-
-    componentWillUnmount() {
-        ipcRenderer.removeAllListeners("gateway:list");
-        ipcRenderer.removeAllListeners("gateway:status");
-        ipcRenderer.send("gateway:window:unsubscribe");
     }
 
     render() {

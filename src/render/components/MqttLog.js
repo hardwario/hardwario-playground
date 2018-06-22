@@ -133,6 +133,7 @@ export default class extends Component {
 
     /* START OF EVENT HANDLERS */
     onMqttMessage(message) {
+        console.log("new message", message);
         this.updateLocalState(message);
         this.setState(prev => { return { messages: [...prev.messages, { ...message }] } });
     }
