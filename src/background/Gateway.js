@@ -12,7 +12,7 @@ let windowList = [];
 let devices = [];
 let intervalCheck;
 
-intervalCheck = setInterval(port_list, 250);
+intervalCheck = setInterval(port_list, 1000);
 
 const gateway_topics = [
   "/nodes/get",
@@ -118,7 +118,15 @@ class Gateway {
 
   _device_readline(line) {
     console.log("Gateway device readline:", line)
-    let msg = JSON.parse(line);
+    let msg;
+
+    try {
+        msg = JSON.parse(line);
+    } catch (error) {
+        console.error(error);
+        return;
+    }
+
     let topic = msg[0];
     let payload = msg[1];
 
@@ -161,7 +169,7 @@ class Gateway {
         alias = this._alias.id[id];
       }
 
-      this.pub("node/" + alias + topic.substr(12), payload);
+      this.pub("node/" + alias + topic, payload);
     }
   }
 
@@ -366,8 +374,11 @@ async function port_list() {
   }
 }
 
-ipcMain.on("gateway:connect", (event, data) => {
-  setup(data, DefaultMqttUrl, (portStatus) => { notifyAll("gateway:status", portStatus); console.log("notifying all gateway odpojena asi", portStatus, windowList.length); });
+ipcMain.on("gateway:connect", (event, device) => {
+  setup(device, DefaultMqttUrl, (portStatus) => {
+        notifyAll("gateway:status", portStatus);
+        console.log("notifying all gateway odpojena asi", portStatus, windowList.length);
+    });
 
   notifyAll("gateway:status", gateway == null || !gateway.connected ? false : true);
   notifyAll("gateway:list", devices);
