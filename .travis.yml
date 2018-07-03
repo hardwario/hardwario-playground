@@ -1,0 +1,57 @@
+language: node_js
+
+node_js:
+  - node
+
+os:
+  - linux
+  - osx
+
+before_install:
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install electron-installer-dmg -g ; fi
+  - npm install node-pre-gyp -g
+  - npm install electron-packager -g
+
+install:
+  - npm install
+
+script:
+  - >
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      npm run package-linux;
+      mkdir -p deploy;
+      cd builds;
+      zip -r ../deploy/bch-playground-linux-x64.zip bch-playground-linux-x64;
+    fi
+
+  - >
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      npm run package-osx;
+      ls -lha builds/bch-playground-darwin-x64;
+      electron-installer-dmg builds/bch-playground-darwin-x64/bch-playground.app bch-playground-macos;
+      mkdir -p deploy;
+      mv bch-playground-macos.dmg deploy;
+    fi
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+      - libzmqpp-dev
+      - bc
+
+cache:
+  directories:
+    - node_modules
+
+deploy:
+  provider: releases
+  file: deploy/*.zip
+  file_glob: true
+  skip_cleanup: true
+  api_key: ${GITHUB_KEY}
+  on:
+    tags: true
