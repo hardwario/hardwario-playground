@@ -62,7 +62,7 @@ module.exports = {
       chunks: false,
       children: false
     },
-    setup() {
+    after() {
       spawn(
         "electron",
         ["."],
