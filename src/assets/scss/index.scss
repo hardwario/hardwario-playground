@@ -1,8 +1,6 @@
 $hintbar-height: 30px;
-
 // GLOBAL APP STYLES
 @import "./Routes";
-
 // COMPONENTS AND CONTAINERS STYLES
 @import "./Home";
 @import "./Navbar";
@@ -12,8 +10,7 @@ $hintbar-height: 30px;
 @import "./Settings";
 @import "./RadioManager";
 @import "./HintBar";
-
+@import "./Firmware";
 body {
-
     overflow: hidden;
 }

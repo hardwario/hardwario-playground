@@ -12,6 +12,7 @@ const HomeDirectory = require("./src/background/HomeDirectory");
 const MqttBroker = require("./src/background/MqttBroker");
 const CustomMenu = require("./src/utils/Menu");
 const Settings = require("./src/background/Settings");
+const Firmware = require("./src/background/Firmware");
 const Gateway = require("./src/background/Gateway");
 
 let windows = [];
@@ -25,6 +26,7 @@ if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) |
 HomeDirectory.setup(dev)
 MqttBroker.setup();
 NodeREDWorker.setup();
+Firmware.setup();
 
 function createWindow() {
   let mainWindow;

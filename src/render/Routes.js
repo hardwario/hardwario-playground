@@ -10,6 +10,7 @@ import Settings from "./components/Settings";
 import HintBar from "./components/HintBar";
 import RadioManager from "./components/RadioManager";
 import Navbar from "./components/Navbar";
+import Firmware from "./components/Firmware";
 
 // Import SCSS
 import "../assets/scss/index.scss";
@@ -26,7 +27,7 @@ ipcRenderer.send("settings:get");
 const Routes = () => {
     return (
         <HashRouter>
-            <div id="app">
+            <div id="app" >
                 <Navbar>
                     <NavLink exact to="/">{i18n.__("home")}</NavLink>
                     <NavLink to="/node-red">{i18n.__("node-red")}</NavLink>
@@ -42,6 +43,7 @@ const Routes = () => {
                     <Route path="/mqttlog" component={MqttLog} />
                     <Route path="/dashboard" component={Dashboard} />
                     <Route path="/node-red" component={NodeRED} />
+                    <Route path="/firmware" component={Firmware} />
                     <Route path="/" exact component={Home} />
                 </main>
                 <HintBar />
