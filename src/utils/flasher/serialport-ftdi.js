@@ -77,19 +77,26 @@ class SerialPortFtdi {
 
   boot_sequence() {
     return new Promise((resolve, reject) => {
-      this._ser.set({ rts: false, dtr: false }).then(() => {
-        sleep.msleep(100);
-        this._ser.set({ rts: true, dtr: false }).then(() => {
+      this._ser.set({ rts: false, dtr: false })
+        .then(() => {
           sleep.msleep(100);
-          this._ser.set({ rts: false, dtr: true }).then(() => {
-            sleep.msleep(100);
-            this._ser.set({ rts: true, dtr: true }).then(resolve);
-          })
+          return this._ser.set({ rts: true, dtr: false })
         })
-      });
+        .then(() => {
+          sleep.msleep(100);
+          return this._ser.set({  rts: true, dtr: true })
+        })
+        .then(()=>{
+          return this._ser.set({  rts: false, dtr: true })
+        })
+        .then(()=>{
+          sleep.msleep(100);
+          return this._ser.set({  rts: true, dtr: true })
+        })
+       .then(resolve)
+       .catch(reject);
     });
   }
-
 }
 
 function port_list(callback) {
