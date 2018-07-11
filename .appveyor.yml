@@ -1,0 +1,34 @@
+environment:
+  nodejs_version: "10"
+
+platform:
+  - x86
+
+init:
+  - git config --global core.autocrlf true
+
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:nodejs_version
+  # install modules
+  - npm install node-pre-gyp -g
+  - npm install electron-packager -g
+  - npm install
+
+build_script:
+  - npm run package-win
+  - cd builds
+  - 7z a bch-playground-win32-ia32.zip bch-playground-win32-ia32
+
+artifacts:
+  - path: builds/bch-playground-win32-ia32.zip
+    name: bch-playground-win32-ia32
+
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: 4cB5zdGSNXfNYzHtKibmbocO8WNtWe1g8090t4dUOuL7Y4u6/xjwv/0IwzrIWFK6
+  artifact: builds/bch-playground-win32-ia32.zip
+  force_update: true
+  on:
+    appveyor_repo_tag: true
