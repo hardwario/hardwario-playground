@@ -11,10 +11,9 @@ export default class extends Component {
         return (
             <div id="navbar" >
                 <aside className={this.state.visible ? "fade-in" : "fade-out"}>
-                    <navbar >
+                    <nav>
                         {children}
-
-                    </navbar>
+                    </nav>
                     <img src={require("../../assets/images/logo.png")} style={{ margin: 10, width: 120, alignSelf: "center" }} />
                 </aside>
             </div>
