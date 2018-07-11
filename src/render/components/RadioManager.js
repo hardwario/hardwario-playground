@@ -20,10 +20,13 @@ export default class extends Component {
             editValue: ""
         };
 
+        this.textInput = React.createRef();
+
         this.get_nodes = this.get_nodes.bind(this);
         this.pairringToggle = this.pairringToggle.bind(this);
         this.nodeRemove = this.nodeRemove.bind(this);
         this.setEditId = this.setEditId.bind(this);
+        this.saveAlias = this.saveAlias.bind(this);
         this.renameInputKeyPress = this.renameInputKeyPress.bind(this);
         this.onMqttMessage = this.onMqttMessage.bind(this);
         this.onMqttStatus = this.onMqttStatus.bind(this);
@@ -33,21 +36,26 @@ export default class extends Component {
     componentDidMount() {
         ipcRenderer.on("settings:get", (sender, settings) => {
             this.client = new clientMqtt(settings.mqtt.remoteIp, this.onMqttMessage, this.onMqttStatus);
+
             ipcRenderer.removeAllListeners("settings:get");
+
+            ipcRenderer.send("gateway:status");
         });
+
         ipcRenderer.on("gateway:status", this.onGatewayStatus);
 
         ipcRenderer.send("settings:get");
-        ipcRenderer.send("gateway:status");
     }
 
     componentWillUnmount() {
-        this.client.disconnect();
+        if (this.client) this.client.disconnect();
+
         ipcRenderer.removeListener("gateway:status", this.onGatewayStatus);
     }
 
     render() {
         const { gatewayStatus, mqttStatus, nodes } = this.state;
+        const self = this;
 
         return (
             <div id="radiomanager" >
@@ -68,16 +76,32 @@ export default class extends Component {
                         <tbody>
                             {
                                 nodes.map((item, index) => {
+                                    if (this.state.editId == item.id)
+                                    {
+                                        return (
+                                            <tr key={index}>
+                                                <td>{item.id}</td>
+                                                <td>
+                                                    <input type="text" autoFocus className="form-control" defaultValue={item.alias} ref={this.textInput} onKeyPress={this.renameInputKeyPress} />
+                                                </td>
+                                                <td>
+                                                    <button onClick={() => self.saveAlias() } className="btn btn-success">{__("save")}</button>
+                                                    <button onClick={() => self.setState({ editId: null }) } className="btn btn-warning">{__("cancel")}</button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    }
+
                                     return (
                                         <tr key={index}>
                                             <td>{item.id}</td>
                                             <td>
-                                                {this.state.editId == item.id ?
-                                                    <input type="text" className="form-control" defaultValue={item.alias} onKeyPress={this.renameInputKeyPress} /> :
-                                                    item.alias}
+                                                {item.alias}
                                             </td>
-                                            <td>{this.state.editId != item.id ? <button onClick={() => this.setEditId(item)} className="btn btn-warning">{__("rename")}</button> : ""}
-                                                <button onClick={() => this.nodeRemove(item)} className="btn btn-danger">{__("remove")}</button></td>
+                                            <td>
+                                                <button onClick={() => self.setState({ editId: item.id }) } className="btn btn-warning">{__("rename")}</button>
+                                                <button onClick={() => this.nodeRemove(item)} className="btn btn-danger">{__("remove")}</button>
+                                            </td>
                                         </tr>
                                     )
                                 })
@@ -118,7 +142,14 @@ export default class extends Component {
     }
 
     onGatewayStatus(sender, gatewayStatus) {
-        if (gatewayStatus && this.gatewayStatus == false) {
+
+        if (gatewayStatus && this.state.gatewayStatus == false) {
+            this.setState({ nodes: [], pairing: false });
+
+            setTimeout(this.get_nodes, 500);
+        }
+        else if (!gatewayStatus)
+        {
             this.setState({ nodes: [], pairing: false });
         }
 
@@ -126,7 +157,9 @@ export default class extends Component {
     }
 
     get_nodes() {
-        this.client.publish("gateway/" + this.state.name + "/nodes/get");
+        if (this.client) {
+            this.client.publish("gateway/" + this.state.name + "/nodes/get");
+        }
     }
 
     pairringToggle(e) {
@@ -153,12 +186,18 @@ export default class extends Component {
         this.setState(prev => { return { editValue: event.target.value } });
     }
 
+    saveAlias() {
+        let value = this.textInput.current.value;
+
+        if (this.state.editValue != value) {
+            this.client.publish("gateway/" + this.state.name + "/alias/set", JSON.stringify({ id: this.state.editId, alias: value }));
+        }
+        this.setState({ editId: null });
+    }
+
     renameInputKeyPress(event) {
         if (event.key === "Enter") {
-            if (this.state.editValue != event.target.value) {
-                this.client.publish("gateway/" + this.state.name + "/alias/set", JSON.stringify({ id: this.state.editId, alias: event.target.value }));
-            }
-            this.setState(prev => { return { editId: null } });
+            this.saveAlias();
         }
     }
     /* END OF EVENT HANDLERS */
