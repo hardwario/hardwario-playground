@@ -7,7 +7,7 @@ const { ipcMain, BrowserWindow } = require("electron");
 const DefaultDevice = "/dev/ttyUSB0";
 const DefaultMqttUrl = "mqtt://127.0.0.1:1883";
 
-let gateway;
+let gateway = null;
 let windowList = [];
 let devices = [];
 let intervalCheck;
@@ -63,6 +63,11 @@ class Gateway {
     this._mqtt.on("connect", this._mqtt_on_connect.bind(this));
     this._mqtt.on("message", this._mqtt_on_message.bind(this));
     this._mqtt.on("disconnect", this._mqtt_on_disconnect.bind(this));
+  }
+
+  disconnect() {
+    this._ser.close((error) => {});
+    this._mqtt.end(true);
   }
 
   _mqtt_on_connect() {
@@ -341,12 +346,6 @@ function findWindow(id) {
   return BrowserWindow.getAllWindows().find((item) => item.webContents.id == id);
 }
 
-function setup(device = DefaultDevice, mqttUrl = DefaultMqttUrl, getStatus) {
-  console.log("Setting up gateway")
-
-  gateway = new Gateway(device, mqttUrl, getStatus);
-}
-
 function notifyAll(topic, data) {
   let newList = [];
   BrowserWindow.getAllWindows().forEach((view) => {
@@ -374,25 +373,36 @@ async function port_list() {
   }
 }
 
-ipcMain.on("gateway:connect", (event, device) => {
-  setup(device, DefaultMqttUrl, (portStatus) => {
-        notifyAll("gateway:status", portStatus);
-        console.log("notifying all gateway odpojena asi", portStatus, windowList.length);
+function setup() {
+    ipcMain.on("gateway:connect", (event, device) => {
+        console.log("on gateway:connect", device);
+
+        if (gateway) {
+            gateway.disconnect();
+        }
+
+        gateway = new Gateway(device, DefaultMqttUrl, (portStatus) => {
+            notifyAll("gateway:status", portStatus);
+            console.log("notifying all gateway odpojena asi", portStatus, windowList.length);
+        });
+
+        notifyAll("gateway:status", gateway == null || !gateway.connected ? false : true);
+        notifyAll("gateway:list", devices);
     });
 
-  notifyAll("gateway:status", gateway == null || !gateway.connected ? false : true);
-  notifyAll("gateway:list", devices);
-});
+    ipcMain.on("gateway:disconnect", (event, data) => {
+        if (gateway) {
+            gateway.disconnect();
+        }
+    });
 
-ipcMain.on("gateway:disconnect", (event, data) => {
-  gateway = null;
-  notifyAll("gateway:status", gateway == null || !gateway.connected ? false : true)
-});
+    ipcMain.on("gateway:status", (event, data) => {
+        notifyAll("gateway:status", gateway == null ? false : gateway.connected);
+        notifyAll("gateway:list", devices);
+    });
+}
 
-ipcMain.on("gateway:status", (event, data) => {
-  notifyAll("gateway:status", gateway == null ? false : gateway.connected);
-  notifyAll("gateway:list", devices);
-});
+
 
 // Take reference for window to send async requests
 /*
