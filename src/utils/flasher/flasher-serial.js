@@ -499,7 +499,7 @@ function flash(device, firmware_path, reporthook = null) {
 
         s.connect()
         .then(() => {
-            return s.erase(firmware.length, (a, b) => { reporthook('erasse', a, b) });
+            return s.erase(firmware.length, (a, b) => { reporthook('erase', a, b) });
         })
         .then(() => {
             return s.write(firmware, (a, b) => { reporthook('write', a, b) });
