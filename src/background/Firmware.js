@@ -1,13 +1,12 @@
 "use strict";
-
 const SerialPort = require("serialport");
 const { app, dialog , ipcMain} = require("electron");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
 const yaml = require("js-yaml")
-var request = require('request');
-var rprogress = require('request-progress');
+const request = require('request');
+const rprogress = require('request-progress');
 
 const { flash, port_list } = require("./../utils/flasher/flasher-serial");
 const FIRMWARE_YML_URL = "https://bcf.bigclown.cloud/firmware.yml";

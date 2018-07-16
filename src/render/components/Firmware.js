@@ -197,7 +197,7 @@ export default class extends Component {
         <label>Download</label>
         </div>
         <div className="col-10">
-            <Progress value={this.state.download} striped/>
+            <Progress value={this.state.download} striped color="info"/>
         </div>
     </div>
     ): <label>&nbsp;</label>}
@@ -207,7 +207,7 @@ export default class extends Component {
         <label>Erase</label>
         </div>
         <div className="col-10">
-            <Progress value={this.state.erase} striped/>
+            <Progress value={this.state.erase}  striped striped color="danger"/>
         </div>
     </div>
 
@@ -216,7 +216,7 @@ export default class extends Component {
         <label>Write</label>
         </div>
         <div className="col-10">
-            <Progress value={this.state.write} striped/>
+            <Progress value={this.state.write} striped color="warning"/>
         </div>
     </div>
 
@@ -225,7 +225,7 @@ export default class extends Component {
         <label>Verify</label>
         </div>
         <div className="col-10">
-            <Progress value={this.state.verify} striped/>
+            <Progress value={this.state.verify} striped color="success"/>
         </div>
     </div>
 
