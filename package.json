@@ -32,14 +32,12 @@
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^1.1.5",
     "html-webpack-plugin": "^3.2.0",
-    "js-yaml": "^3.12.0",
     "node-sass": "^4.9.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-router-dom": "^4.3.1",
     "react-select": "^1.2.1",
     "reactstrap": "^6.2.0",
-    "request-progress": "^3.0.0",
     "sass-loader": "^7.0.3",
     "shebang-loader": "0.0.1",
     "style-loader": "^0.21.0",
@@ -54,6 +52,8 @@
     "node-red": "*",
     "node-red-dashboard": "*",
     "serialport": "^6.2.0",
-    "sleep": "^5.1.1"
+    "sleep": "^5.1.1",
+    "js-yaml": "^3.12.0",
+    "request-progress": "^3.0.0"
   }
 }
