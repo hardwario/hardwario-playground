@@ -3,6 +3,8 @@ import { render } from "react-dom";
 import { ipcRenderer } from "electron";
 import "bootstrap/dist/css/bootstrap.css";
 
+import 'react-select/dist/react-select.css';
+
 // Import router
 import Router from "./render/Routes";
 import Routes from "./render/Routes";
