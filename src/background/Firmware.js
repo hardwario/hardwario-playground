@@ -70,13 +70,15 @@ function getFirmware(name) {
     }
 }
 
-function downloadFirmware(name, version, reporthook) {
+function downloadFirmware(url, reporthook, name=null) {
     return new Promise((resolve, reject) => {
-        console.log('downloadFirmware', name, version);
+        console.log('downloadFirmware', url);
 
-        name = name.replace(/\//g, '___');
+        if (!name) {
+            name = url.replace(/[^\d\w-_\.]/g, '_');
+        }
 
-        let firmware_bin = path.join(getFirmwarePath(), name + "-" + version.name + ".bin");
+        let firmware_bin = path.join(getFirmwarePath(), name);
 
         if (!fs.existsSync(firmware_bin)) {
 
@@ -84,7 +86,7 @@ function downloadFirmware(name, version, reporthook) {
 
             reporthook({percent: 1});
 
-            rprogress(request(version.url))
+            rprogress(request(url))
                 .on('progress', reporthook)
                 .on('error', function (err) {
                     fs.unlink(firmware_bin);
@@ -118,7 +120,7 @@ function setup() {
 
     let progress_payload = {};
 
-    ipcMain.on("firmware:run-flash", (event, payload) => {
+    ipcMain.on("firmware:run-flash", async (event, payload) => {
         console.log('firmware:run-flash', payload);
 
         progress_payload.erase = 0;
@@ -133,41 +135,70 @@ function setup() {
             return event.sender.send("firmware:error", "Unknown firmware");
         }
 
-        let firmware = getFirmware(payload.firmware);
+        let firmware_bin;
 
-        if (!firmware) {
-            return event.sender.send("firmware:error", "Unknown firmware");
-        }
+        if (fs.existsSync(payload.firmware)){
+            firmware_bin = payload.firmware;
 
-        let version;
+        } else if (payload.firmware.startsWith("https://")) {
 
-        if (payload.version == "latest") {
-            version = firmware.versions[0];
+            try {
+                firmware_bin = await downloadFirmware(payload.firmware, (state) => {
+                    event.sender.send("firmware:download", state);
+                });
+
+            } catch (error) {
+                return event.sender.send("firmware:error", "Download problem " + error.toString());
+            }
+
         } else {
-            for (let i in firmware.versions) {
-                if (payload.version == firmware.versions[i].name) {
-                    version = firmware.versions[i]
+            let firmware = getFirmware(payload.firmware);
+
+            if (!firmware) {
+                return event.sender.send("firmware:error", "Unknown firmware");
+            }
+
+            let version;
+
+            if (payload.version == "latest") {
+                version = firmware.versions[0];
+            } else {
+                for (let i in firmware.versions) {
+                    if (payload.version == firmware.versions[i].name) {
+                        version = firmware.versions[i]
+                    }
                 }
+            }
+
+            if (!version) {
+                return event.sender.send("firmware:error", "Unknown firmware version");
+            }
+
+            try {
+
+                let name = firmware.name + "-" + version.name + ".bin"
+                name = name.replace(/\//g, '___');
+
+                firmware_bin = await downloadFirmware(version.url, (state) => {
+                    event.sender.send("firmware:download", state);
+                }, name);
+
+            } catch (error) {
+                return event.sender.send("firmware:error", "Download problem " + error.toString());
             }
         }
 
-        if (!version) {
-            return event.sender.send("firmware:error", "Unknown firmware version");
+        if (!firmware_bin) {
+            return event.sender.send("firmware:error", "Unknown firmware bin");
         }
+        console.log(firmware_bin);
 
-        downloadFirmware(firmware.name, version, (state) => {
-            event.sender.send("firmware:download", state);
-            console.log(state);
-        })
-        .then((firmware_bin)=>{
-            console.log(firmware_bin);
-            return flash(payload.port, firmware_bin, (type, progress, progress_max) =>{
+        flash(payload.port, firmware_bin, (type, progress, progress_max) =>{
                 console.log(type, progress, progress_max);
 
                 progress_payload[type] = (progress / progress_max) * 100 ;
 
                 event.sender.send("firmware:progress", progress_payload);
-            });
         })
         .then(() => {
             event.sender.send("firmware:done");
@@ -177,6 +208,7 @@ function setup() {
 
             event.sender.send("firmware:error", e.toString());
         });
+
     });
 
     ipcMain.on("firmware:get-port-list", (event, payload) => {

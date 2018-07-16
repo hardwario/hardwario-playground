@@ -24,7 +24,8 @@ export default class extends Component {
             list: [],
             firmware: null,
             download: 0,
-            version: null
+            version: null,
+            custom: {name:null}
         };
 
         this.ipcProgressUpdate = this.ipcProgressUpdate.bind(this);
@@ -37,6 +38,7 @@ export default class extends Component {
         this.ipcDownload = this.ipcDownload.bind(this);
         this.formFirmwareSelectOnChange = this.formFirmwareSelectOnChange.bind(this);
         this.formVersionSelectOnChange = this.formVersionSelectOnChange.bind(this);
+        this.formFirmwareSelectonInputChange = this.formFirmwareSelectonInputChange.bind(this);
     }
 
     componentDidMount() {
@@ -111,22 +113,34 @@ export default class extends Component {
         e.preventDefault();
         e.stopPropagation();
 
-        dialog.showOpenDialog({properties: ['openFile']}, function (file) {
+        dialog.showOpenDialog({properties: ['openFile'], filters: [{name: '.bin', extensions: ['bin']}]}, function (file) {
             console.log(file);
             if (file !== undefined) {
-                this.setState({ file: file[0] });
+                // this.setState({ file: file[0] });
+                this.setState({ custom: {name: file[0] } });
+                this.setState({ firmware: this.state.custom });
             }
         }.bind(this));
     }
 
     flash() {
+        let params = {firmware: this.state.firmware.name, port: this.state.port};
+        if (this.state.version) {
+            params.version = this.state.version.name;
+        }
+        ipcRenderer.send("firmware:run-flash", params);
         this.setState({ erase: 0, write: 0, verify: 0, error: null, done: false, isRun: true, download: 0 });
-
-        ipcRenderer.send("firmware:run-flash", {firmware: this.state.firmware.name, version: this.state.version.name, file: this.state.file, port: this.state.port});
     }
 
     formFirmwareSelectOnChange(firmware) {
+        console.log(firmware);
         this.setState({ firmware, version: {name: "latest"} });
+    }
+
+    formFirmwareSelectonInputChange(input) {
+        if (!input || input.startsWith("https://") || (input.endsWith(".bin") && input != ".bin")) {
+            this.setState({ custom: {name: input} });
+        }
     }
 
     formVersionSelectOnChange(version) {
@@ -142,7 +156,7 @@ export default class extends Component {
             <label htmlFor="formFirmwareSelect">Firmware</label>
             <Select
             labelKey="name"
-            options={this.state.list}
+            options={[...this.state.list, this.state.custom]}
             placeholder="Choose firmware ..."
             searchable={true}
             onChange={this.formFirmwareSelectOnChange}
@@ -150,7 +164,10 @@ export default class extends Component {
             optionRenderer={(item, index)=>{
                 return (<span> {item.name} </span>);
             }}
+            onInputChange={this.formFirmwareSelectonInputChange}
+            style={{"paddingLeft":"-10px"}}
             />
+            <button color="primary" size="sm" style={{"position":"absolute", "right":-14, "top":36, "cursor":"pointer"}} onClick={this.openDialogBin} >...</button>
         </div>
 
         <div className="form-group col-2">
@@ -158,7 +175,7 @@ export default class extends Component {
             <Select
                 labelKey="name"
                 placeholder="Choose version ..."
-                options={this.state.firmware ? [{name: "latest"}, ...(this.state.firmware.versions)] : []}
+                options={this.state.firmware && this.state.firmware.versions ? [{name: "latest"}, ...(this.state.firmware.versions)] : []}
                 value={this.state.version}
                 onChange={this.formVersionSelectOnChange}
                 disabled={!this.state.firmware}
