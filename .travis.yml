@@ -19,7 +19,7 @@ install:
 script:
   - >
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      npm run package-linux;
+      npm run pack-linux64;
       mkdir -p deploy;
       cd builds;
       zip --quiet -r bch-playground-linux-x64.zip bch-playground-linux-x64;
@@ -29,7 +29,7 @@ script:
 
   - >
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      npm run package-osx;
+      npm run pack-osx;
       ls -lha builds/bch-playground-darwin-x64;
       electron-installer-dmg builds/bch-playground-darwin-x64/bch-playground.app bch-playground-macos;
       mkdir -p deploy;

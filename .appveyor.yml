@@ -16,19 +16,18 @@ install:
   - npm install
 
 build_script:
-  - npm run package-win
+  - if "%platform%" == "x86" npm run pack-win32
   - cd builds
-  - 7z a bch-playground-win32-ia32.zip bch-playground-win32-ia32
+  - if "%platform%" == "x86" 7z a bch-playground-win.zip bch-playground-win32-ia32
 
 artifacts:
-  - path: builds/bch-playground-win32-ia32.zip
-    name: bch-playground-win32-ia32
+  - path: builds/*.zip
 
 deploy:
 - provider: GitHub
   auth_token:
     secure: 4cB5zdGSNXfNYzHtKibmbocO8WNtWe1g8090t4dUOuL7Y4u6/xjwv/0IwzrIWFK6
-  artifact: builds/bch-playground-win32-ia32.zip
+  artifact: builds/*.zip
   force_update: true
   on:
     appveyor_repo_tag: true
