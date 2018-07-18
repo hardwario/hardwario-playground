@@ -19,15 +19,16 @@ build_script:
   - if "%platform%" == "x86" npm run pack-win32
   - cd builds
   - if "%platform%" == "x86" 7z a bch-playground-win.zip bch-playground-win32-ia32
+  - cd ..
 
 artifacts:
-  - path: builds/*.zip
+  - path: builds/bch-playground-win.zip
 
 deploy:
 - provider: GitHub
   auth_token:
     secure: 4cB5zdGSNXfNYzHtKibmbocO8WNtWe1g8090t4dUOuL7Y4u6/xjwv/0IwzrIWFK6
-  artifact: builds/*.zip
+  artifact: builds/bch-playground-win.zip
   force_update: true
   on:
     appveyor_repo_tag: true
