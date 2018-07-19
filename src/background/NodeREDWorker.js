@@ -18,7 +18,7 @@ async function setup() {
     if (!reachable) {
         userDir = app.getPath("userData");
         status = true;
-        
+
         if (!fs.existsSync(path.join(userDir, flowFile))) {
             fs.writeFileSync(path.join(userDir, flowFile), fs.readFileSync(path.join(__dirname, "..", "assets", "nodered", flowFileStarting)));
         }
@@ -26,7 +26,7 @@ async function setup() {
         var settings = {
             uiPort: listenPort,
             verbose: true,
-            httpAdminRoot: "/admin",
+            httpAdminRoot: "/",
             httpNodeRoot: "/",
             userDir,
             flowFile,
