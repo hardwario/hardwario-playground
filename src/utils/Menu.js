@@ -2,35 +2,7 @@ const { app, Menu, BrowserWindow } = require("electron");
 const path = require("path")
 const url = require("url")
 
-const development = [
-    {
-        label: 'Edit',
-        submenu: [
-            { role: 'undo' },
-            { role: 'redo' },
-            { type: 'separator' },
-            { role: 'cut' },
-            { role: 'copy' },
-            { role: 'paste' },
-            { role: 'pasteandmatchstyle' },
-            { role: 'delete' },
-            { role: 'selectall' }
-        ]
-    },
-    {
-        label: 'View',
-        submenu: [
-            { role: 'reload' },
-            { role: 'forcereload' },
-            { role: 'toggledevtools' },
-            { type: 'separator' },
-            { role: 'resetzoom' },
-            { role: 'zoomin' },
-            { role: 'zoomout' },
-            { type: 'separator' },
-            { role: 'togglefullscreen' }
-        ]
-    },
+const menuItems = [
     {
         role: 'window',
         submenu: [
@@ -45,36 +17,21 @@ const development = [
         ]
     },
     {
-        role: 'help',
+        label: 'Edit',
         submenu: [
-            {
-                label: 'Learn More',
-                click() { require('electron').shell.openExternal('https://electronjs.org') }
-            }
+            { role: 'undo' },
+            { role: 'redo' },
+            { type: 'separator' },
+            { role: 'cut'},
+            { role: 'copy' },
+            { role: 'paste' },
+            { role: 'pasteandmatchstyle' },
+            { role: 'delete' },
+            { role: 'selectall' }
         ]
-    }
-]
-
-if (process.platform === 'darwin') {
-    development.unshift({
-        label: app.getName(),
-        submenu: [
-            { role: 'about' },
-            { type: 'separator' },
-            { role: 'services', submenu: [] },
-            { type: 'separator' },
-            { role: 'hide' },
-            { role: 'hideothers' },
-            { role: 'unhide' },
-            { type: 'separator' },
-            { role: 'quit' }
-        ]
-    })
-}
-
-const production = [
+    },
     {
-        role: "window",
+        label: 'View',
         submenu: [
             {
                 label: "Open new window",
@@ -82,15 +39,30 @@ const production = [
                     app.emit("app:window:new");
                 }
             },
-            { role: 'minimize' },
-            { role: 'close' }
+            { role: 'reload' },
+            { role: 'forcereload' },
+            { role: 'toggledevtools' },
+            { type: 'separator' },
+            { role: 'resetzoom' },
+            { role: 'zoomin' },
+            { role: 'zoomout' },
+            { type: 'separator' },
+            { role: 'togglefullscreen' }
         ]
     }
-
-];
+    // {
+    //     role: 'help',
+    //     submenu: [
+    //         {
+    //             label: 'Learn More',
+    //             click() { require('electron').shell.openExternal('https://electronjs.org') }
+    //         }
+    //     ]
+    // }
+]
 
 if (process.platform === 'darwin') {
-    production.unshift({
+    menuItems.unshift({
         label: app.getName(),
         submenu: [
             { role: 'about' },
@@ -100,8 +72,9 @@ if (process.platform === 'darwin') {
     })
 }
 
+
 function setup(productionMenu = false) {
-    const menu = Menu.buildFromTemplate(productionMenu ? production : development);
+    const menu = Menu.buildFromTemplate(menuItems);
     Menu.setApplicationMenu(menu);
 }
 

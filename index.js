@@ -6,6 +6,8 @@ const path = require("path");
 const url = require("url");
 const { getSettings } = require("./src/utils/Settings");
 
+require('electron-context-menu')({});
+
 // Import background workers
 const NodeREDWorker = require("./src/background/NodeREDWorker");
 const HomeDirectory = require("./src/background/HomeDirectory");
@@ -22,12 +24,6 @@ let dev = false;
 if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath)) {
   dev = true;
 }
-
-HomeDirectory.setup(dev)
-MqttBroker.setup();
-NodeREDWorker.setup();
-Gateway.setup();
-Firmware.setup();
 
 function createWindow() {
   let mainWindow;
@@ -75,19 +71,30 @@ function createWindow() {
   windows.push(mainWindow);
 }
 
-app.on("ready", createWindow);
+// Quit when all windows are closed.
+app.on("window-all-closed", () => {
+    //if (process.platform !== "darwin") {
+    app.quit();
+    //}
+});
 
 app.on("app:window:new", createWindow);
 
-// Quit when all windows are closed.
-app.on("window-all-closed", () => {
-  //if (process.platform !== "darwin") {
-  app.quit();
-  //}
-});
+app.on("ready", createWindow);
 
 app.on("activate", () => {
   if (windows.length == 0) {
     createWindow();
   }
 });
+
+HomeDirectory.setup(dev);
+MqttBroker.setup();
+Gateway.setup();
+Firmware.setup();
+NodeREDWorker.setup().finally(()=>{
+    for (let i in windows) {
+        windows[i].reload();
+    }
+})
+
