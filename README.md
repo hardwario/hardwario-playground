@@ -23,6 +23,7 @@ This repository contains Playground application.
 
 Feel free to contribute to this application.
 
+
 ## Development
 
 ### Commands
@@ -34,5 +35,18 @@ Feel free to contribute to this application.
 | Package app        | `npm run package` |
 
 ---
+
+
+## Install (not fully tested)
+
+    sudo npm install node-pre-gyp -g
+    sudo npm install electron-packager -g
+    sudo npm install -g electron --unsafe-perm=true --allow-root
+    sudo npm install -g serialport --unsafe-perm=true --allow-root
+    npm install
+
+In case install of serialport fails, run this script (Ubuntu 16.04)
+https://gist.github.com/katopz/8b766a5cb0ca96c816658e9407e83d00
+
 
 Made with &#x2764;&nbsp; by [**HARDWARIO s.r.o.**](https://www.hardwario.com/) in the heart of Europe.
