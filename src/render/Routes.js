@@ -2,9 +2,8 @@ import React from "react";
 import { HashRouter, Route, Switch, NavLink } from "react-router-dom";
 import { ipcRenderer } from "electron";
 
-import Home from "./components/Home";
-import NodeRED from "./components/NodeRED";
-import Dashboard from "./components/Dashboard";
+import { RouteIframe } from "./components/Route";
+
 import MqttLog from "./components/MqttLog";
 import Settings from "./components/Settings";
 import HintBar from "./components/HintBar";
@@ -41,11 +40,12 @@ const Routes = () => {
                     <Route path="/settings" component={Settings} />
                     <Route path="/radiomanager" component={RadioManager} />
                     <Route path="/mqttlog" component={MqttLog} />
-                    <Route path="/dashboard" component={Dashboard} />
-                    <Route path="/node-red" component={NodeRED} />
+                    <RouteIframe path="/node-red" src="http://localhost:1880/" />
+                    <RouteIframe path="/dashboard" src="http://localhost:1880/ui" />
                     <Route path="/firmware" component={Firmware} />
-                    <Route path="/" exact component={Home} />
+                    <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />
                 </main>
+
                 <HintBar />
             </div>
         </HashRouter>

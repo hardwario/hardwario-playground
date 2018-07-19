@@ -4,8 +4,6 @@ $hintbar-height: 30px;
 // COMPONENTS AND CONTAINERS STYLES
 @import "./Home";
 @import "./Navbar";
-@import "./NodeRED";
-@import "./Dashboard";
 @import "./MqttLog";
 @import "./Settings";
 @import "./RadioManager";
@@ -13,4 +11,10 @@ $hintbar-height: 30px;
 @import "./Firmware";
 body {
     overflow: hidden;
+}
+
+iframe.route {
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
