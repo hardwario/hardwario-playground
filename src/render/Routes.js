@@ -40,7 +40,7 @@ const Routes = () => {
                     <Route path="/settings" component={Settings} />
                     <Route path="/radiomanager" component={RadioManager} />
                     <Route path="/mqttlog" component={MqttLog} />
-                    <RouteIframe path="/node-red" src="http://localhost:1880/" />
+                    <RouteIframe path="/node-red" src="http://localhost:1880/" id="node-red" />
                     <RouteIframe path="/dashboard" src="http://localhost:1880/ui" />
                     <Route path="/firmware" component={Firmware} />
                     <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />

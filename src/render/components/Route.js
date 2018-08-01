@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { ipcRenderer } from "electron";
 import { withRouter } from "react-router-dom";
 import PropTypes from 'prop-types'
 
@@ -13,13 +14,28 @@ class RouteIframeComponent extends Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {visible: true};
+    }
+
+    componentDidMount() {
+        if (this.props.id) {
+            ipcRenderer.on("iframe:" + this.props.id + ":visible", (sender, visible)=>{ console.log("iframe:" + this.props.id + ":visible", visible); this.setState({visible}); });
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.props.id) {
+            ipcRenderer.removeAllListeners("iframe:" + this.props.id + ":visible");
+        }
     }
 
     render() {
         const { location, path, src } = this.props
 
-        return (
-            <iframe src={src} style={{display: location.pathname == path ? "block" : "none"}} className="route"></iframe>
+        return (this.state.visible ?
+            <iframe src={src} style={{display: location.pathname == path ? "block" : "none"}} className="route" id={this.props.id} ></iframe>
+            : null
         )
     }
 }

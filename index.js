@@ -62,7 +62,32 @@ function createWindow() {
     }
   });
 
+  let timer = null;
+
+  mainWindow.on('close', (e) => {
+    if (timer) {
+        clearTimeout(timer);
+    }
+
+    timer = setTimeout(()=>{
+
+        dialog.showMessageBox(mainWindow, {
+            type: "warning",
+            buttons: ["Cancel", "Close without Saving"],
+            title: "Warning",
+            message: "Node-RED contains unsaved changes"
+        }, (response)=>{
+            if (response == 1) {
+                mainWindow.send("iframe:node-red:visible", false);
+                timer = setTimeout(()=>{mainWindow.close()}, 100);
+            }
+        });
+
+    }, 1000);
+  })
+
   mainWindow.on("closed", function () {
+    if (timer) clearTimeout(timer);
     const index = windows.indexOf(mainWindow);
     windows.splice(index, 1);
     mainWindow = null;
@@ -71,8 +96,20 @@ function createWindow() {
   windows.push(mainWindow);
 }
 
+HomeDirectory.setup(dev);
+MqttBroker.setup();
+Gateway.setup();
+Firmware.setup();
+NodeREDWorker.setup().finally(()=>{
+    for (let i in windows) {
+        windows[i].reload();
+    }
+})
+
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
+    console.log("window-all-closed");
+
     //if (process.platform !== "darwin") {
     app.quit();
     //}
@@ -87,14 +124,3 @@ app.on("activate", () => {
     createWindow();
   }
 });
-
-HomeDirectory.setup(dev);
-MqttBroker.setup();
-Gateway.setup();
-Firmware.setup();
-NodeREDWorker.setup().finally(()=>{
-    for (let i in windows) {
-        windows[i].reload();
-    }
-})
-
