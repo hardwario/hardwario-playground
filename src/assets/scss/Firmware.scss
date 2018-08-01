@@ -3,3 +3,11 @@
     position: relative;
     margin: 5px;
 }
+
+.openDialogBtn {
+    position: absolute;
+    right: -14px;
+    top: 36px;
+    cursor: pointer;
+    z-index: 5;
+}

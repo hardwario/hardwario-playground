@@ -167,7 +167,7 @@ export default class extends Component {
             onInputChange={this.formFirmwareSelectonInputChange}
             style={{"paddingLeft":"-10px"}}
             />
-            <button color="primary" size="sm" style={{"position":"absolute", "right":-14, "top":36, "cursor":"pointer"}} onClick={this.openDialogBin} >...</button>
+            <button color="primary" size="sm" className="openDialogBtn" onClick={this.openDialogBin} >...</button>
         </div>
 
         <div className="form-group col-2">
