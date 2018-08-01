@@ -59,7 +59,18 @@ function loadFirmwareYaml(ymlpath) {
 
     let list = yaml.safeLoad(fs.readFileSync(ymlpath, { encoding: "utf8" })) || [];
 
-    return list.sort((a,b)=>{ return a.name.localeCompare(b.name) });
+    return list.sort((a,b)=>{
+        let wa = a.name.indexOf("wireless") > -1;
+        let wb = b.name.indexOf("wireless") > -1;
+
+        if (wa && !wb) {
+            return -1;
+        } else if (!wa && wb) {
+            return 1;
+        }
+
+        return a.name.localeCompare(b.name)
+    });
 }
 
 function getFirmware(name) {
