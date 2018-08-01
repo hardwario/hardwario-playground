@@ -4,6 +4,22 @@ const { ipcRenderer } = require("electron");
 const { dialog } = require('electron').remote;
 import Select from 'react-select';
 
+const youtubeUrlRegex = /^(?:(?:https?:)?\/\/)?(?:www\.)?(?:m\.)?(?:youtu(?:be)?\.com\/(?:v\/|embed\/|watch(?:\/|\?v=))|youtu\.be\/)((?:\w|-){11})(?:\S+)?$/;
+
+function isYoutubeUrl(url) {
+    return !!String(url).match(youtubeUrlRegex);
+}
+
+function getYoutubeVideoUrl(url) {
+    var match = youtubeUrlRegex.exec(url);
+
+    if (match) {
+        return "https://www.youtube.com/embed/" + match[1];
+    }
+
+    return null;
+}
+
 export default class extends Component {
 
     constructor(props) {
@@ -260,7 +276,7 @@ export default class extends Component {
     </Alert> : null }
 
     {this.state.firmware ?
-    <div className="row">
+    <div className="row firmware-detail">
 
         <div className="form-group col-7">
 
@@ -287,11 +303,13 @@ export default class extends Component {
         </div>
 
         <div className="form-group col-5">
-            {this.state.firmware.images ? <img style={{width: "100%"}} src={this.state.firmware.images[0].url} alt={this.state.firmware.images[0].title} /> : null}
+            {this.state.firmware.images ? <img src={this.state.firmware.images[0].url} alt={this.state.firmware.images[0].title} /> : null}
 
             {this.state.firmware.video ? <div>
                 <br />
-                <iframe src="https://www.youtube.com/embed/6kU-_ldaGOw" frameBorder="0" allow="encrypted-media" allowFullScreen="1"></iframe>
+                {isYoutubeUrl(this.state.firmware.video) ?
+                <iframe src={getYoutubeVideoUrl(this.state.firmware.video)} frameBorder="0" allow="encrypted-media" allowFullScreen="1"></iframe>
+                : <a href={this.state.firmware.video} target="_blank">{this.state.firmware.video}</a>}
             </div> : null}
         </div>
 
