@@ -34,17 +34,17 @@ export default class extends Component {
     }
 
     componentDidMount() {
-        ipcRenderer.on("settings:get", (sender, settings) => {
-            this.client = new clientMqtt(settings.mqtt.remoteIp, this.onMqttMessage, this.onMqttStatus);
+        ipcRenderer.on("settings/value/mqtt.ip", (sender, mqttIp) => {
+            this.client = new clientMqtt(mqttIp, this.onMqttMessage, this.onMqttStatus);
 
-            ipcRenderer.removeAllListeners("settings:get");
+            ipcRenderer.removeAllListeners("settings/value/mqtt.ip");
 
             ipcRenderer.send("gateway:status");
         });
 
         ipcRenderer.on("gateway:status", this.onGatewayStatus);
 
-        ipcRenderer.send("settings:get");
+        ipcRenderer.send("settings/get", "mqtt.ip");
     }
 
     componentWillUnmount() {

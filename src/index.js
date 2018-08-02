@@ -6,15 +6,22 @@ import 'react-select/dist/react-select.css';
 
 import Routes from "./render/Routes";
 
+// Import language files
+const i18n = require("./utils/i18n");
+
 // Creates div where React will be attached
 let root = document.createElement("div");
 root.id = "root";
 document.body.appendChild(root);
 
-ipcRenderer.on("settings:get", (sender, settings) => {
+ipcRenderer.on("settings/value/language", (sender, language) => {
+    i18n.setup(language);
+
+    ipcRenderer.removeAllListeners("settings/value/language");
+
     render(Routes(), document.getElementById("root"));
-    ipcRenderer.removeAllListeners("settings:get");
 });
-ipcRenderer.send("settings:get");
+
+ipcRenderer.send("settings/get", "language");
 
 render(<div>Loading...</div>, document.getElementById("root"));

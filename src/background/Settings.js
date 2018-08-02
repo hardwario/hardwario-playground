@@ -1,11 +1,27 @@
 const { ipcMain } = require("electron");
-const { getSettings, setSettings } = require("../utils/Settings");
+const ConfigStore = require("../utils/ConfigStore");
 
-ipcMain.on("settings:get", (event, data) => {
-    event.sender.send("settings:get", getSettings());
+var settings = new ConfigStore("settings.json", {
+    "language": "en",
+    "mqtt.ip": "127.0.0.1"
 });
 
-ipcMain.on("settings:set", (event, data) => {
-    console.log("data", data);
-    setSettings(data);
-});
+function setup() {
+    ipcMain.on("settings/get", (event, key) => {
+        console.log("settings/get", key, settings.get(key));
+        event.sender.send("settings/value/" + key , settings.get(key) )
+    });
+
+    ipcMain.on("settings/getAll", (event, dummy) => {
+        event.sender.send("settings/all" , settings.getAll() )
+    });
+
+    ipcMain.on("settings:set", (event, data) => {
+        console.log("data", data);
+        // setSettings(data);
+    });
+}
+
+module.exports = {
+    setup
+}

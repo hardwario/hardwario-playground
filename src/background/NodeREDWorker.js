@@ -24,10 +24,14 @@ function setup() {
         const reachable = await isPortReachable(listenPort);
 
         if (!reachable) {
-            userDir = app.getPath("userData");
+            userDir =  path.join(app.getPath("userData"), "node-red");
+
+            if (!fs.existsSync(userDir)) {
+                fs.mkdirSync(userDir);
+            }
 
             if (!fs.existsSync(path.join(userDir, flowFile))) {
-                fs.writeFileSync(path.join(userDir, flowFile), fs.readFileSync(path.join(__dirname, "..", "assets", "nodered", flowFileStarting)));
+                fs.writeFileSync(path.join(userDir, flowFile), fs.readFileSync(path.join(__dirname, "..", "assets", "node-red", flowFileStarting)));
             }
 
             var settings = {

@@ -17,12 +17,6 @@ import "../assets/scss/index.scss";
 // Import language files
 const i18n = require("../utils/i18n");
 
-ipcRenderer.on("settings:get", (sender, settings) => {
-    i18n.setup(settings.app.languages[0]);
-    ipcRenderer.removeAllListeners("settings:get");
-});
-ipcRenderer.send("settings:get");
-
 const Routes = () => {
     return (
         <HashRouter>

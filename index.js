@@ -4,15 +4,14 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
 const path = require("path");
 const url = require("url");
-const { getSettings } = require("./src/utils/Settings");
 
 require('electron-context-menu')({});
 
+const CustomMenu = require("./src/utils/Menu");
+
 // Import background workers
 const NodeREDWorker = require("./src/background/NodeREDWorker");
-const HomeDirectory = require("./src/background/HomeDirectory");
 const MqttBroker = require("./src/background/MqttBroker");
-const CustomMenu = require("./src/utils/Menu");
 const Settings = require("./src/background/Settings");
 const Firmware = require("./src/background/Firmware");
 const Gateway = require("./src/background/Gateway");
@@ -96,7 +95,7 @@ function createWindow() {
   windows.push(mainWindow);
 }
 
-HomeDirectory.setup(dev);
+Settings.setup();
 MqttBroker.setup();
 Gateway.setup();
 Firmware.setup();

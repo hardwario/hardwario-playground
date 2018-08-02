@@ -12,14 +12,14 @@ export default class extends Component {
     }
 
     componentDidMount() {
-        ipcRenderer.on("settings:get", (sender, settings) => {
+        ipcRenderer.on("settings/all", (sender, settings) => {
             this.setState({ settings });
         });
-        ipcRenderer.send("settings:get");
+        ipcRenderer.send("settings/getAll");
     }
 
     componentWillUnmount() {
-        ipcRenderer.removeAllListeners("settings:get");
+        ipcRenderer.removeAllListeners("settings/all");
     }
 
     render() {

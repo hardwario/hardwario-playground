@@ -29,13 +29,12 @@ export default class extends Component {
     }
 
     componentDidMount() {
-        console.log("test");
-        ipcRenderer.on("settings:get", (sender, settings) => {
-            console.log("Konfigurace");
-            this.client = new clientMqtt(settings.mqtt.remoteIp, this.onMqttMessage, this.onMqttStatus);
-            ipcRenderer.removeAllListeners("settings:get");
+        ipcRenderer.on("settings/value/mqtt.ip", (sender, mqttIp) => {
+            this.client = new clientMqtt(mqttIp, this.onMqttMessage, this.onMqttStatus);
+
+            ipcRenderer.removeAllListeners("settings/value/mqtt.ip");
         });
-        ipcRenderer.send("settings:get");
+        ipcRenderer.send("settings/get", "mqtt.ip");
     }
     componentWillUnmount() {
         this.client.disconnect();
