@@ -29,7 +29,7 @@ export default class extends Component {
 
         return (
             <div id="settings">
-                <ul>{
+                {/* <ul>{
                     Object.keys(this.state.settings).map((item, index) => {
                         var sub = Object.keys(this.state.settings[item]);
                         return (
@@ -65,7 +65,7 @@ export default class extends Component {
                         )
                     })
                 }</ul>
-                <button className="btn" onClick={() => ipcRenderer.send("settings:set", this.state.settings)}>{i18n.__("save")}</button>
+                <button className="btn" onClick={() => ipcRenderer.send("settings:set", this.state.settings)}>{i18n.__("save")}</button> */}
             </div>
         )
     }

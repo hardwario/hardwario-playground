@@ -4,7 +4,7 @@ import { ipcRenderer } from "electron";
 import "bootstrap/dist/css/bootstrap.css";
 import 'react-select/dist/react-select.css';
 
-import Routes from "./render/Routes";
+import App from "./render/App";
 
 // Import language files
 const i18n = require("./utils/i18n");
@@ -19,7 +19,7 @@ ipcRenderer.on("settings/value/language", (sender, language) => {
 
     ipcRenderer.removeAllListeners("settings/value/language");
 
-    render(Routes(), document.getElementById("root"));
+    render(<App />, document.getElementById("root"));
 });
 
 ipcRenderer.send("settings/get", "language");

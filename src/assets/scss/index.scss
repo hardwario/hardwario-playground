@@ -1,4 +1,3 @@
-$hintbar-height: 30px;
 // GLOBAL APP STYLES
 @import "./Routes";
 // COMPONENTS AND CONTAINERS STYLES
@@ -7,8 +6,8 @@ $hintbar-height: 30px;
 @import "./MqttLog";
 @import "./Settings";
 @import "./RadioManager";
-@import "./HintBar";
 @import "./Firmware";
+@import "./GatewayList";
 body {
     overflow: hidden;
 }

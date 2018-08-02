@@ -3,14 +3,11 @@
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    padding-bottom: $hintbar-height;
     >main {
         width: 100%;
         background-color: rgb(255, 255, 255);
         position: relative;
         overflow: auto;
     }
-    >footer {
-
-    }
+    >footer {}
 }
