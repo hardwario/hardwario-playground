@@ -78,16 +78,9 @@ export default class extends Component {
 
                             <nav className="bottom">
                                 <div className="item">
-                                    Status:
-                                    <ul>
-                                        <li className={this.state.noderedStatus ? "online" : "offline"}>
-                                            {i18n.__("node-red")}
-                                        </li>
-
-                                        <li className={this.state.brokerStatus ? "online" : "offline"}>
-                                            {i18n.__("mqtt")}
-                                        </li>
-                                    </ul>
+                                    Status:<br/>
+                                    &nbsp;&nbsp;<span className={this.state.noderedStatus ? "online" : "offline"}>{i18n.__("node-red")}</span><br/>
+                                    &nbsp;&nbsp;<span className={this.state.brokerStatus ? "online" : "offline"}>{i18n.__("mqtt")}</span>
                                 </div>
                                 <a href="#" className={this.state.gatewayStatus ? "online" : "offline"} onClick={this.clickOnGateway} >Gateway</a>
                             </nav>
@@ -102,7 +95,6 @@ export default class extends Component {
                         <RouteIframe path="/dashboard" src="http://localhost:1880/ui" />
                         <Route path="/firmware" component={Firmware} />
                         <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />
-
 
                         {this.state.gatewayListVisble ? <GatewayList /> : null}
                     </main>
