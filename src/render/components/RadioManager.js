@@ -39,10 +39,10 @@ export default class extends Component {
 
             ipcRenderer.removeAllListeners("settings/value/mqtt.ip");
 
-            ipcRenderer.send("gateway:status");
+            ipcRenderer.send("gateway/status/get");
         });
 
-        ipcRenderer.on("gateway:status", this.onGatewayStatus);
+        ipcRenderer.on("gateway/status", this.onGatewayStatus);
 
         ipcRenderer.send("settings/get", "mqtt.ip");
     }
@@ -50,7 +50,7 @@ export default class extends Component {
     componentWillUnmount() {
         if (this.client) this.client.disconnect();
 
-        ipcRenderer.removeListener("gateway:status", this.onGatewayStatus);
+        ipcRenderer.removeListener("gateway/status", this.onGatewayStatus);
     }
 
     render() {

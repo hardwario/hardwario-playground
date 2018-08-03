@@ -23,11 +23,10 @@ export default class extends Component {
             visible: true,
             gatewayListVisble: false,
 
-            gatewayStatus: false,
-            noderedStatus: false,
-            brokerStatus: false
+            gatewayStatus: "offline",
+            noderedStatus: "offline",
+            brokerStatus: "offline"
         };
-
 
         this.clickOnGateway = this.clickOnGateway.bind(this);
         this.clickOnMain = this.clickOnMain.bind(this);
@@ -35,16 +34,18 @@ export default class extends Component {
 
     componentDidMount() {
         ipcRenderer.on("gateway/status", (sender, gatewayStatus) => { this.setState({ gatewayStatus }); });
-        ipcRenderer.on("nodered:status", (sender, noderedStatus) => { this.setState({ noderedStatus }); });
-        ipcRenderer.on("broker:status", (sender, brokerStatus) => { this.setState({ brokerStatus }); });
+        ipcRenderer.on("nodered/status", (sender, noderedStatus) => { this.setState({ noderedStatus }); });
+        ipcRenderer.on("broker/status", (sender, brokerStatus) => { this.setState({ brokerStatus }); });
 
-        ipcRenderer.send("gateway:status");
-        ipcRenderer.send("nodered:status");
-        ipcRenderer.send("broker:status");
+        ipcRenderer.send("gateway/status/get");
+        ipcRenderer.send("nodered/status/get");
+        ipcRenderer.send("broker/status/get");
     }
 
     componentWillUnmount() {
-
+        ipcRenderer.removeAllListeners("gateway/status");
+        ipcRenderer.removeAllListeners("nodered/status");
+        ipcRenderer.removeAllListeners("broker/status");
     }
 
     clickOnGateway(e) {
@@ -79,10 +80,10 @@ export default class extends Component {
                             <nav className="bottom">
                                 <div className="item">
                                     Status:<br/>
-                                    &nbsp;&nbsp;<span className={this.state.noderedStatus ? "online" : "offline"}>{i18n.__("node-red")}</span><br/>
-                                    &nbsp;&nbsp;<span className={this.state.brokerStatus ? "online" : "offline"}>{i18n.__("mqtt")}</span>
+                                    &nbsp;&nbsp;<span className={this.state.noderedStatus}>Node-Red</span><br/>
+                                    &nbsp;&nbsp;<span className={this.state.brokerStatus}>MQTT</span>
                                 </div>
-                                <a href="#" className={this.state.gatewayStatus ? "online" : "offline"} onClick={this.clickOnGateway} >Gateway</a>
+                                <a href="#" className={this.state.gatewayStatus} onClick={this.clickOnGateway} >Gateway</a>
                             </nav>
                         </aside>
                     </div>

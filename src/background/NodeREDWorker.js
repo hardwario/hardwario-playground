@@ -13,10 +13,10 @@ const flowFileStarting = "starting-flows.json";
 let userDir;
 
 function setup() {
-    let status = false;
+    let status = "offline";
 
-    ipcMain.on("nodered:status", (event, data) => {
-        event.sender.send("nodered:status", status);
+    ipcMain.on("nodered/status/get", (event, data) => {
+        event.sender.send("nodered/status", status);
     });
 
     return new Promise(async (resolve, reject) => {
@@ -52,12 +52,14 @@ function setup() {
 
             RED.start().then(function () {
                 server.listen(listenPort, "127.0.0.1", ()=>{
-                    status = true;
+                    status = "online";
 
                     resolve();
                 });
             });
         } else {
+            status = "external";
+
             reject();
         }
     });

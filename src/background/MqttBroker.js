@@ -7,7 +7,7 @@ const { ipcMain } = require("electron");
 const DefaultMqttPort = 1883;
 
 let server;
-let status = false;
+let status = "offline";
 
 async function setup(port) {
     const reachable = await isPortReachable(port || DefaultMqttPort);
@@ -23,12 +23,15 @@ async function setup(port) {
 
         server.on("ready", function () {
             console.log("MQTT Mosca server is up and running");
+            status = "online";
         });
+    } else {
+        status = "external";
     }
 }
 
-ipcMain.on("broker:status", (event, data) => {
-    event.sender.send("broker:status", status);
+ipcMain.on("broker/status/get", (event, data) => {
+    event.sender.send("broker/status", status);
 });
 
 module.exports = { setup }

@@ -2,11 +2,9 @@
 const { Gateway, port_list } = require("./../utils/Gateway");
 const { ipcMain, BrowserWindow } = require("electron");
 
-const DefaultDevice = "/dev/ttyUSB0";
 const DefaultMqttUrl = "mqtt://127.0.0.1:1883";
 
 let gateway = null;
-
 
 function notifyAll(topic, data) {
     let newList = [];
@@ -34,8 +32,7 @@ function setup() {
         }
 
         gateway = new Gateway(device, DefaultMqttUrl, (status) => {
-            notifyAll("gateway/status", status == "connected");
-            notifyAll("gateway:status", status == "connected");
+            notifyAll("gateway/status", status == "connected" ? "online" : "offline");
         });
     });
 
@@ -46,8 +43,8 @@ function setup() {
         }
     });
 
-    ipcMain.on("gateway:status", (event, data) => {
-        notifyAll("gateway:status", gateway == null ? false : gateway.isConnected());
+    ipcMain.on("gateway/status/get", (event, data) => {
+        notifyAll("gateway/status", gateway == null ? "offline" : gateway.isConnected() ? "online" : "offline");
     });
 
     ipcMain.on("gateway/port-list/get", (event, data) => {
@@ -58,35 +55,4 @@ function setup() {
 
 }
 
-
-
-// Take reference for window to send async requests
-/*
-ipcMain.on("gateway:window:subscribe", (event, data) => {
-  var window = findWindow(event.sender.id);
-  if (window == null) {
-    windowList.push(event.sender);
-  }
-  if (windowList.length == 1) {
-    intervalCheck = setInterval(port_list, 250);
-  }
-})
-
-// Take off reference for window to send async requests
-ipcMain.on("gateway:window:unsubscribe", (event, data) => {
-  var window = findWindow(event.sender.id);
-  console.log("Odstranovani");
-  if (window != null) {
-    var index = windowList.indexOf(window);
-    if (index > -1) {
-      console.log("Odstranovani");
-      windowList.splice(index, 1);
-    }
-  }
-  if (windowList.length == 0) {
-    clearInterval(intervalCheck);
-  }
-  console.log(windowList.length);
-})
-*/
 module.exports = { setup, Gateway }
