@@ -143,6 +143,8 @@ export default class extends Component {
 
     onGatewayStatus(sender, gatewayStatus) {
 
+        gatewayStatus = gatewayStatus == "online";
+
         if (gatewayStatus && this.state.gatewayStatus == false) {
             this.setState({ nodes: [], pairing: false });
 

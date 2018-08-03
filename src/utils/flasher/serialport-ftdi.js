@@ -70,7 +70,7 @@ class SerialPortFtdi {
     return new Promise((resolve, reject) => {
       this._ser.set({ rts: true, dtr: false }).then(() => {
         sleep.msleep(100);
-        this._ser.set({ rts: true, dtr: true }).then(resolve);
+        this._ser.set({ rts: true, dtr: true }).then(resolve).catch(reject);
       });
     })
   }

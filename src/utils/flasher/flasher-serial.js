@@ -78,13 +78,14 @@ class Flash_Serial {
           (async() => {
             for (let i = 0; i < 3; i++) {
               try {
-                await this._connect();
+                await this._connect().catch(reject);
 
                 return resolve();
               } catch (error) {
                 console.log('connect error', error);
               }
             }
+            throw "Connection error";
           }).bind(this)();
         })
         .catch(reject);
@@ -111,7 +112,7 @@ class Flash_Serial {
           return this._ser.write(buffer);
         })
         .then(() => {
-          return this._ser.read(buffer, 0, 1);
+          return this._read(buffer, 1);
         })
         .then((length) => {
           if ((length == 1) && (buffer.readUInt8() == ACK)) {
@@ -119,6 +120,9 @@ class Flash_Serial {
           } else {
             reject("start bootloader expect ACK");
           }
+        })
+        .catch(()=>{
+            reject("Error start bootloader");
         });
     });
   }
@@ -138,7 +142,8 @@ class Flash_Serial {
           } else {
             reject('fail get_version');
           }
-        });
+        })
+        .catch(reject);
 
     });
   }
@@ -158,7 +163,8 @@ class Flash_Serial {
           } else {
             reject('fail get_ID');
           }
-        });
+        })
+        .catch(reject);
 
     });
   }
@@ -198,16 +204,26 @@ class Flash_Serial {
     });
   }
 
-  _read(readBuffer, length) {
+  _read(readBuffer, length, timeout=1000) {
     return new Promise((resolve, reject) => {
 
       let read_length = 0;
 
       (async() => {
 
+        let timer = setTimeout(()=>{
+            console.log("timeout");
+            this._ser.close();
+        }, timeout);
+
         while (read_length < length) {
-          read_length += await this._ser.read(readBuffer, read_length, length - read_length);
+          read_length += await this._ser.read(readBuffer, read_length, length - read_length).catch((e)=>{
+            clearTimeout(timer);
+            reject(e);
+          });
         }
+
+        clearTimeout(timer);
 
         resolve(read_length);
 
@@ -256,8 +272,8 @@ class Flash_Serial {
             console.log(l, length);
             reject('Bad receive length');
           }
-        });
-
+        })
+        .catch(reject);
     });
   }
 
