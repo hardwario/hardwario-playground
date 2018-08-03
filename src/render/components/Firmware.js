@@ -103,6 +103,7 @@ export default class extends Component {
     }
 
     ipcProgressUpdate(sender, payload) {
+        console.log("ipcProgressUpdate", payload);
         this.setState(payload);
     }
 

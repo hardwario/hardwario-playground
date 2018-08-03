@@ -208,9 +208,12 @@ function setup() {
         flash(payload.port, firmware_bin, (type, progress, progress_max) =>{
                 console.log(type, progress, progress_max);
 
-                progress_payload[type] = (progress / progress_max) * 100 ;
+                let percent = Math.round((progress / progress_max) * 100);
 
-                event.sender.send("firmware:progress", progress_payload);
+                if (progress_payload[type] != percent) {
+                    progress_payload[type] = percent;
+                    event.sender.send("firmware:progress", progress_payload);
+                }
         })
         .then(() => {
             event.sender.send("firmware:done");
