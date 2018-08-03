@@ -30,11 +30,11 @@ function getFirmwareYmlPath() {
 function updateFirmwareYaml() {
     return new Promise((resolve, reject) => {
 
-        let filepath = path.join(getFirmwarePath(), "new_firmware.yml");
+        let filepath = getFirmwareYmlPath() + ".download";
 
         let file = fs.createWriteStream(filepath);
 
-        request(FIRMWARE_YML_URL)
+        request(FIRMWARE_YML_URL, null, ()=>{})
         .on('error', function (err) {
             fs.unlink(filepath);
             reject(err);
@@ -93,11 +93,11 @@ function downloadFirmware(url, reporthook, name=null) {
 
         if (!fs.existsSync(firmware_bin)) {
 
-            let file = fs.createWriteStream(firmware_bin);
+            let file = fs.createWriteStream(firmware_bin + ".download");
 
             reporthook({percent: 1});
 
-            rprogress(request(url))
+            rprogress(request(url), null, ()=>{})
                 .on('progress', reporthook)
                 .on('error', function (err) {
                     fs.unlink(firmware_bin);
@@ -111,6 +111,7 @@ function downloadFirmware(url, reporthook, name=null) {
 
                 file.on('finish', ()=>{
                     file.close(()=>{
+                        fs.rename(firmware_bin + ".download", firmware_bin);
                         resolve(firmware_bin);
                     });
                 });

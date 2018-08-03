@@ -115,14 +115,22 @@ export default class extends Component {
         if ((this.state.port === "") && (ports.length > 0)) {
             this.setState({port:ports[0].comName});
         }
+
+        this.timer = setTimeout(() => {
+            ipcRenderer.send("firmware:get-port-list");
+        }, 1000);
     }
 
     ipcError(sender, error) {
         this.setState({error: error, isRun: false});
+
+        ipcRenderer.send("firmware:get-port-list");
     }
 
     ipcDone(sender, payload) {
         this.setState({done: true, isRun: false});
+
+        ipcRenderer.send("firmware:get-port-list");
     }
 
     openDialogBin(e) {
@@ -140,11 +148,18 @@ export default class extends Component {
     }
 
     flash() {
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+
         let params = {firmware: this.state.firmware.name, port: this.state.port};
+
         if (this.state.version) {
             params.version = this.state.version.name;
         }
+
         ipcRenderer.send("firmware:run-flash", params);
+
         this.setState({ erase: 0, write: 0, verify: 0, error: null, done: false, isRun: true, download: 0 });
     }
 
