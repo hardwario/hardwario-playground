@@ -16,9 +16,9 @@ function setup() {
         event.sender.send("settings/all" , settings.getAll() )
     });
 
-    ipcMain.on("settings:set", (event, data) => {
-        console.log("data", data);
-        // setSettings(data);
+    ipcMain.on("settings/set", (event, data) => {
+        console.log("settings/set", data);
+        settings.set(data.key, data.value);
     });
 }
 
