@@ -7,13 +7,15 @@ const i18n = require("../../utils/i18n");
 export default class extends Component {
     constructor(props) {
         super(props);
-        this.state = { settings: null };
+        this.state = {};
+        this.settings = {};
         this._handleInput = this._handleInput.bind(this);
     }
 
     componentDidMount() {
         ipcRenderer.on("settings/all", (sender, settings) => {
-            this.setState({ settings });
+            this.setState({ ...settings });
+            this.settings = settings;
         });
         ipcRenderer.send("settings/getAll");
     }
@@ -22,13 +24,29 @@ export default class extends Component {
         ipcRenderer.removeAllListeners("settings/all");
     }
 
+    save() {
+        alert("Docasne nefunguje");
+    }
+
     render() {
-        if (this.state.settings == null) {
+        if (this.state === {}) {
             return null;
         }
 
         return (
             <div id="settings">
+
+            <div className="form-group">
+                <label>{i18n.__("Languages")}</label>
+                <select className="form-control mb-2"  value={this.state.language} onChange={(e) => this.setState({ language: e.target.value })}>
+                    {
+                        ["en", "cs"].map((lang, index) => <option value={lang} key={index}>{lang}</option>)
+                    }
+                </select>
+            </div>
+
+            <button className="btn" onClick={this.save}>{i18n.__("Save")}</button>
+
                 {/* <ul>{
                     Object.keys(this.state.settings).map((item, index) => {
                         var sub = Object.keys(this.state.settings[item]);
