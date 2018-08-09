@@ -4,12 +4,11 @@ const { app, dialog , ipcMain} = require("electron");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
-const yaml = require("js-yaml")
 const request = require('request');
 const rprogress = require('request-progress');
 
 const { flash, port_list } = require("./../utils/flasher/flasher-serial");
-const FIRMWARE_YML_URL = "https://bcf.bigclown.cloud/firmware.yml";
+const FIRMWARE_JSON_URL = "https://firmware.bigclown.com/json";
 
 let firmware_list = [];
 
@@ -23,18 +22,18 @@ function getFirmwarePath() {
     return cachepath;
 }
 
-function getFirmwareYmlPath() {
-    return path.join(getFirmwarePath(), "firmware.yml");
+function getFirmwareJsonPath() {
+    return path.join(getFirmwarePath(), "firmware.json");
 }
 
-function updateFirmwareYaml() {
+function updateFirmwareJson() {
     return new Promise((resolve, reject) => {
 
-        let filepath = getFirmwareYmlPath() + ".download";
+        let filepath = getFirmwareJsonPath() + ".download";
 
         let file = fs.createWriteStream(filepath);
 
-        request(FIRMWARE_YML_URL, null, ()=>{})
+        request(FIRMWARE_JSON_URL, null, ()=>{})
         .on('error', function (err) {
             fs.unlink(filepath);
             reject(err);
@@ -43,9 +42,9 @@ function updateFirmwareYaml() {
 
         file.on('finish', ()=>{
             file.close(()=>{
-                let list = loadFirmwareYaml(filepath);
+                let list = loadFirmwareJson(filepath);
                 if (list != null) {
-                    fs.rename(filepath, getFirmwareYmlPath());
+                    fs.rename(filepath, getFirmwareJsonPath());
                     firmware_list = list;
                     resolve();
                 }
@@ -54,23 +53,25 @@ function updateFirmwareYaml() {
     });
 }
 
-function loadFirmwareYaml(ymlpath) {
-    if (!fs.existsSync(ymlpath)) return null
+function loadFirmwareJson(jsonpath) {
+    if (!fs.existsSync(jsonpath)) return null
 
-    let list = yaml.safeLoad(fs.readFileSync(ymlpath, { encoding: "utf8" })) || [];
+    let payload = JSON.parse(fs.readFileSync(jsonpath, { encoding: "utf8" })) || [];
 
-    return list.sort((a,b)=>{
-        let wa = a.name.indexOf("wireless") > -1;
-        let wb = b.name.indexOf("wireless") > -1;
+    return payload['list'];
 
-        if (wa && !wb) {
-            return -1;
-        } else if (!wa && wb) {
-            return 1;
-        }
+    // return list.sort((a,b)=>{
+    //     let wa = a.name.indexOf("wireless") > -1;
+    //     let wb = b.name.indexOf("wireless") > -1;
 
-        return a.name.localeCompare(b.name)
-    });
+    //     if (wa && !wb) {
+    //         return -1;
+    //     } else if (!wa && wb) {
+    //         return 1;
+    //     }
+
+    //     return a.name.localeCompare(b.name)
+    // });
 }
 
 function getFirmware(name) {
@@ -124,10 +125,10 @@ function downloadFirmware(url, reporthook, name=null) {
 
 function setup() {
 
-    updateFirmwareYaml()
+    updateFirmwareJson()
         .catch((err)=>{
             console.error(err);
-            firmware_list = loadFirmwareYaml(getFirmwareYmlPath()) || [];
+            firmware_list = loadFirmwareJson(getFirmwareJsonPath()) || [];
         });
 
     let progress_payload = {};
