@@ -12,7 +12,6 @@ let status = "offline";
 async function setup(port) {
     const reachable = await isPortReachable(port || DefaultMqttPort);
     if (!reachable) {
-        status = true;
         server = new mosca.Server({ port: port || DefaultMqttPort });
         server.on("clientConnected", function (client) {
             console.log("MQTT client connected", client.id);

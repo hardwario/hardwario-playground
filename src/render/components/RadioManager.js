@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { ipcRenderer } from "electron";
 import clientMqtt from "../model/MQTT";
+import GatewayPortList from "./GatewayPortList";
 
 // Import language files
 const i18n = require("../../utils/i18n");
@@ -60,6 +61,8 @@ export default class extends Component {
         return (
             <div id="radiomanager" >
                 <div className="col-xs-12">
+                    <GatewayPortList/>
+
                     <div className="form-group">
                         <button disabled={!gatewayStatus || !mqttStatus} type="button" className={"btn " + (this.state.pairing ? "btn-danger" : "btn-success")} onClick={this.pairringToggle}>
                             {i18n.__(this.state.pairing ? "pairingStop" : "pairingStart")}

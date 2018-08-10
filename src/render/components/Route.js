@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { ipcRenderer } from "electron";
-import { withRouter } from "react-router-dom";
+import { withRouter, Route } from "react-router-dom";
 import PropTypes from 'prop-types'
 
 class RouteIframeComponent extends Component {

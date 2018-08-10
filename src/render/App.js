@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { HashRouter, Route, Switch, NavLink } from "react-router-dom";
 import { ipcRenderer } from "electron";
 
-import { RouteIframe } from "./components/Route";
+import { RouteIframe, RouteWithProps } from "./components/Route";
 
 import MqttLog from "./components/MqttLog";
 import Settings from "./components/Settings";
@@ -21,18 +21,15 @@ export default class extends Component {
         super(props);
         this.state = {
             visible: true,
-            gatewayListVisble: false,
-
             gatewayStatus: "offline",
             noderedStatus: "offline",
             brokerStatus: "offline"
         };
-
-        this.clickOnGateway = this.clickOnGateway.bind(this);
-        this.clickOnMain = this.clickOnMain.bind(this);
     }
 
     componentDidMount() {
+        console.log("App:componentDidMount");
+
         ipcRenderer.on("gateway/status", (sender, gatewayStatus) => { this.setState({ gatewayStatus }); });
         ipcRenderer.on("nodered/status", (sender, noderedStatus) => { this.setState({ noderedStatus }); });
         ipcRenderer.on("broker/status", (sender, brokerStatus) => { this.setState({ brokerStatus }); });
@@ -43,20 +40,11 @@ export default class extends Component {
     }
 
     componentWillUnmount() {
+        console.log("App:componentWillUnmount");
+
         ipcRenderer.removeAllListeners("gateway/status");
         ipcRenderer.removeAllListeners("nodered/status");
         ipcRenderer.removeAllListeners("broker/status");
-    }
-
-    clickOnGateway(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        this.setState({gatewayListVisble: !this.state.gatewayListVisble})
-    }
-
-    clickOnMain(e) {
-        this.setState({gatewayListVisble: false})
     }
 
     render() {
@@ -81,9 +69,9 @@ export default class extends Component {
                                 <div className="item">
                                     Status:<br/>
                                     &nbsp;&nbsp;<span className={this.state.noderedStatus}>Node-Red</span><br/>
-                                    &nbsp;&nbsp;<span className={this.state.brokerStatus}>MQTT</span>
+                                    &nbsp;&nbsp;<span className={this.state.brokerStatus}>MQTT</span><br/>
+                                    &nbsp;&nbsp;<span className={this.state.gatewayStatus}>Gateway</span>
                                 </div>
-                                <a href="#" className={this.state.gatewayStatus} onClick={this.clickOnGateway} >Gateway</a>
                             </nav>
                         </aside>
                     </div>
@@ -96,8 +84,6 @@ export default class extends Component {
                         <RouteIframe path="/dashboard" src="http://localhost:1880/ui" />
                         <Route path="/firmware" component={Firmware} />
                         <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />
-
-                        {this.state.gatewayListVisble ? <GatewayList /> : null}
                     </main>
                 </div>
             </HashRouter>

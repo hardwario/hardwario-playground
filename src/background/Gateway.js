@@ -47,6 +47,10 @@ function setup() {
         notifyAll("gateway/status", gateway == null ? "offline" : gateway.isConnected() ? "online" : "offline");
     });
 
+    ipcMain.on("gateway/device/get", (event, data) => {
+        event.sender.send("gateway/device", gateway == null ? "" : gateway.getDevice());
+    });
+
     ipcMain.on("gateway/port-list/get", (event, data) => {
         port_list((ports)=>{
             event.sender.send("gateway/port-list", ports);

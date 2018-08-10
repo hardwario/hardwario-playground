@@ -91,6 +91,10 @@ export default class extends Component {
         ipcRenderer.removeListener("firmware:list", this.ipcList);
 
         ipcRenderer.removeListener("firmware:download", this.ipcDownload);
+
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
     }
 
     ipcDownload(sender, payload) {
