@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { ipcRenderer } from "electron";
 import clientMqtt from "../model/MQTT";
-import GatewayPortList from "./GatewayPortList";
+import { Button, FormGroup, Label } from 'reactstrap';
 
 // Import language files
 const i18n = require("../../utils/i18n");
@@ -18,7 +18,10 @@ export default class extends Component {
             nodes: [],
             pairing: false,
             editId: null,
-            editValue: ""
+            editValue: "",
+
+            ports: [],
+            selectedPort: ""
         };
 
         this.textInput = React.createRef();
@@ -32,39 +35,126 @@ export default class extends Component {
         this.onMqttMessage = this.onMqttMessage.bind(this);
         this.onMqttStatus = this.onMqttStatus.bind(this);
         this.onGatewayStatus = this.onGatewayStatus.bind(this);
+
+        this.ipcPortListUpdate = this.ipcPortListUpdate.bind(this);
+        this.ipcGatewayDevice = this.ipcGatewayDevice.bind(this);
+        this.buttonOnClick = this.buttonOnClick.bind(this);
     }
 
     componentDidMount() {
+        console.log("RadioManager:componentDidMount");
+
         ipcRenderer.on("settings/value/mqtt.ip", (sender, mqttIp) => {
+
             this.client = new clientMqtt(mqttIp, this.onMqttMessage, this.onMqttStatus);
 
             ipcRenderer.removeAllListeners("settings/value/mqtt.ip");
-
-            ipcRenderer.send("gateway/status/get");
         });
 
         ipcRenderer.on("gateway/status", this.onGatewayStatus);
 
+        ipcRenderer.on("gateway/port-list", this.ipcPortListUpdate);
+
+        ipcRenderer.on("gateway/device", this.ipcGatewayDevice);
+
+        ipcRenderer.send("gateway/device/get");
+
+        ipcRenderer.send("gateway/status/get");
+
         ipcRenderer.send("settings/get", "mqtt.ip");
+
+        ipcRenderer.send("gateway/port-list/get");
     }
 
     componentWillUnmount() {
+        console.log("RadioManager:componentWillUnmount");
+
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+
         if (this.client) this.client.disconnect();
 
         ipcRenderer.removeListener("gateway/status", this.onGatewayStatus);
+
+        ipcRenderer.removeListener("gateway/port-list", this.ipcPortListUpdate);
+
+        ipcRenderer.removeListener("gateway/device", this.ipcGatewayDevice);
+
+        ipcRenderer.removeAllListeners("settings/value/mqtt.ip");
+    }
+
+    ipcPortListUpdate(sender, ports) {
+        console.log("GatewayPortList:ipcPortListUpdate", ports);
+
+        let change = false;
+
+        if (this.state.ports.length == ports.length){
+            for (let i=0, l=ports.length; i < l; i++) {
+                if (this.state.ports[i] != ports[i].comName) {
+                    change = true;
+                    break;
+                }
+            }
+        } else {
+            change = true;
+        }
+
+        if (change) {
+            if ((this.state.selectedPort == "") && (ports.length > 0)) {
+                this.setState({ selectedPort: ports[0].comName });
+            }
+
+            this.setState({ ports })
+        }
+
+        if (this.timer) {
+            clearTimeout(this.timer);
+        }
+
+        this.timer = setTimeout(() => {
+            ipcRenderer.send("gateway/port-list/get");
+        }, 1000);
+    }
+
+    ipcGatewayDevice(sender, device) {
+        if (this.state.selectedPort != device){
+            this.setState({selectedPort: device});
+        }
+    }
+
+    buttonOnClick() {
+        if (this.state.gatewayStatus) {
+            ipcRenderer.send("gateway/disconnect");
+            return;
+        }
+
+        if (this.state.selectedPort == "") return;
+
+        ipcRenderer.send("gateway/connect", this.state.selectedPort)
     }
 
     render() {
-        const { gatewayStatus, mqttStatus, nodes } = this.state;
         const self = this;
 
         return (
             <div id="radiomanager" >
                 <div className="col-xs-12">
-                    <GatewayPortList/>
+
+                    <div className="gatewayPortList form-inline">
+                        <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                            <Label className="mr-sm-2">Radio USB Dongle </Label>
+                            <select className="form-control" value={this.state.selectedPort} onChange={(e) => this.setState({ selectedPort: e.target.value })}>
+                                {
+                                    this.state.ports.map((port, index) => <option value={port.comName} key={index}>{port.comName}</option>)
+                                }
+                            </select>
+                        </FormGroup>
+                        <Button disabled={this.state.ports.length == 0} color={this.state.gatewayStatus ? "danger": "success"} onClick={this.buttonOnClick} >{this.state.gatewayStatus ? "Disconnect" : "Connect"}</Button>
+                    </div>
 
                     <div className="form-group">
-                        <button disabled={!gatewayStatus || !mqttStatus} type="button" className={"btn " + (this.state.pairing ? "btn-danger" : "btn-success")} onClick={this.pairringToggle}>
+                        <button disabled={!this.state.gatewayStatus || !this.state.mqttStatus} type="button" className={"btn " + (this.state.pairing ? "btn-danger" : "btn-success")} onClick={this.pairringToggle}>
                             {i18n.__(this.state.pairing ? "pairingStop" : "pairingStart")}
                         </button>
                     </div>
@@ -78,7 +168,7 @@ export default class extends Component {
                         </thead>
                         <tbody>
                             {
-                                nodes.map((item, index) => {
+                                this.state.nodes.map((item, index) => {
                                     if (this.state.editId == item.id)
                                     {
                                         return (
@@ -132,7 +222,14 @@ export default class extends Component {
     }
 
     onMqttStatus(status) {
+        console.log("onMqttStatus", status);
+
+        if (this.state.mqttStatus == status) {
+            return;
+        }
+
         this.setState({ mqttStatus: status });
+
         if (status) {
             this.client.subscribe("gateway/" + this.state.name + "/nodes");
             this.client.subscribe("gateway/" + this.state.name + "/attach");
@@ -147,6 +244,10 @@ export default class extends Component {
     onGatewayStatus(sender, gatewayStatus) {
 
         gatewayStatus = gatewayStatus == "online";
+
+        if (this.state.gatewayStatus == gatewayStatus) {
+            return;
+        }
 
         if (gatewayStatus && this.state.gatewayStatus == false) {
             this.setState({ nodes: [], pairing: false });
@@ -205,5 +306,4 @@ export default class extends Component {
             this.saveAlias();
         }
     }
-    /* END OF EVENT HANDLERS */
 }

@@ -30,9 +30,21 @@ export default class extends Component {
     componentDidMount() {
         console.log("App:componentDidMount");
 
-        ipcRenderer.on("gateway/status", (sender, gatewayStatus) => { this.setState({ gatewayStatus }); });
-        ipcRenderer.on("nodered/status", (sender, noderedStatus) => { this.setState({ noderedStatus }); });
-        ipcRenderer.on("broker/status", (sender, brokerStatus) => { this.setState({ brokerStatus }); });
+        ipcRenderer.on("gateway/status", (sender, gatewayStatus) => {
+            if (this.state.gatewayStatus != gatewayStatus) {
+                this.setState({ gatewayStatus });
+            }
+        });
+        ipcRenderer.on("nodered/status", (sender, noderedStatus) => {
+            if (this.state.noderedStatus != noderedStatus) {
+                this.setState({ noderedStatus });
+            }
+        });
+        ipcRenderer.on("broker/status", (sender, brokerStatus) => {
+            if (this.state.brokerStatus != brokerStatus) {
+                this.setState({ brokerStatus });
+            }
+        });
 
         ipcRenderer.send("gateway/status/get");
         ipcRenderer.send("nodered/status/get");
@@ -52,7 +64,7 @@ export default class extends Component {
             <HashRouter>
                 <div id="app" >
 
-                    <div id="navbar" >
+                    <div id="navbar" key="navbar">
                         <aside className={this.state.visible ? "fade-in" : "fade-out"}>
                             <img src={require("../assets/images/logo.png")} className="logo" />
                             <nav>
@@ -68,7 +80,7 @@ export default class extends Component {
                             <nav className="bottom">
                                 <div className="item">
                                     Status:<br/>
-                                    &nbsp;&nbsp;<span className={this.state.noderedStatus}>Node-Red</span><br/>
+                                    &nbsp;&nbsp;<span className={this.state.noderedStatus} key>Node-Red</span><br/>
                                     &nbsp;&nbsp;<span className={this.state.brokerStatus}>MQTT</span><br/>
                                     &nbsp;&nbsp;<span className={this.state.gatewayStatus}>Gateway</span>
                                 </div>
@@ -76,7 +88,7 @@ export default class extends Component {
                         </aside>
                     </div>
 
-                    <main>
+                    <main key="main">
                         <Route path="/settings" component={Settings}/>
                         <Route path="/radiomanager" component={RadioManager} />
                         <Route path="/mqttlog" component={MqttLog}/>
