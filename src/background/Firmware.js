@@ -44,7 +44,7 @@ function updateFirmwareJson() {
             file.close(()=>{
                 let list = loadFirmwareJson(filepath);
                 if (list != null) {
-                    fs.rename(filepath, getFirmwareJsonPath());
+                    fs.renameSync(filepath, getFirmwareJsonPath());
                     firmware_list = list;
                     resolve();
                 }
@@ -112,7 +112,7 @@ function downloadFirmware(url, reporthook, name=null) {
 
                 file.on('finish', ()=>{
                     file.close(()=>{
-                        fs.rename(firmware_bin + ".download", firmware_bin);
+                        fs.renameSync(firmware_bin + ".download", firmware_bin);
                         resolve(firmware_bin);
                     });
                 });
