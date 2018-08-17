@@ -8,7 +8,7 @@ import MqttLog from "./components/MqttLog";
 import Settings from "./components/Settings";
 import RadioManager from "./components/RadioManager";
 import Firmware from "./components/Firmware";
-import GatewayList from "./components/GatewayList";
+import Gateway from "./components/Gateway";
 
 // Import SCSS
 import "../assets/scss/index.scss";
@@ -75,15 +75,11 @@ export default class extends Component {
                                 <NavLink to="/mqttlog">{i18n.__("mqtt")}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
                                 <NavLink to="/settings">{i18n.__("settings")}</NavLink>
+                                <NavLink to="/gateway">{i18n.__("Gateway")}</NavLink>
                             </nav>
 
                             <nav className="bottom">
-                                <div className="item">
-                                    Status:<br/>
-                                    &nbsp;&nbsp;<span className={this.state.noderedStatus} key>Node-Red</span><br/>
-                                    &nbsp;&nbsp;<span className={this.state.brokerStatus}>MQTT</span><br/>
-                                    &nbsp;&nbsp;<span className={this.state.gatewayStatus}>Gateway</span>
-                                </div>
+
                             </nav>
                         </aside>
                     </div>
@@ -95,7 +91,7 @@ export default class extends Component {
                         <RouteIframe path="/node-red" src="http://localhost:1880/" id="node-red" />
                         <RouteIframe path="/dashboard" src="http://localhost:1880/ui" />
                         <Route path="/firmware" component={Firmware} />
-                        <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />
+                        <Route path="/gateway" component={Gateway} />
                     </main>
                 </div>
             </HashRouter>
