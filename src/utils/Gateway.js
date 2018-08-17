@@ -11,7 +11,8 @@ const gateway_topics = [
   "/pairing-mode/start",
   "/pairing-mode/stop",
   "/alias/set",
-  "/alias/remove"
+  "/alias/remove",
+  "/info/get"
 ];
 
 class Gateway {
@@ -42,7 +43,16 @@ class Gateway {
 
     this._ser.on("close", () => {
       this._connected = false;
+      this._alias = null;
+      this._nodes = null
+
       console.log("Gateway odpojena");
+
+      if (this._name) {
+        this.pub("gateway/" + this._name + "/info", null);
+      }
+
+      this._name = null;
 
       callback("disconected")
     });
@@ -186,15 +196,20 @@ class Gateway {
         this.write("/info/get");
         return;
       }
+
       let m = (payload["firmware"] + ":").match(/bcf-gateway-(.*?):/)
+
       if (!m) {
         return;
       }
 
-      this._name = m[1];
+      if (this._name != m[1]) {
 
-      for (let i in gateway_topics) {
-        this._subscribe("gateway/" + this._name + gateway_topics[i]);
+        this._name = m[1];
+
+        for (let i in gateway_topics) {
+          this._subscribe("gateway/" + this._name + gateway_topics[i]);
+        }
       }
 
       if (this._nodes == null) {
