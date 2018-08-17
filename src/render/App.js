@@ -66,13 +66,12 @@ export default class extends Component {
 
                     <div id="navbar" key="navbar">
                         <aside className={this.state.visible ? "fade-in" : "fade-out"}>
-                            <img src={require("../assets/images/logo.png")} className="logo" />
                             <nav>
                                 <NavLink exact to="/">{i18n.__("home")}</NavLink>
-                                <NavLink to="/radiomanager">{i18n.__("radio")}</NavLink>
-                                <NavLink to="/node-red">{i18n.__("node-red")}</NavLink>
+                                <NavLink to="/devices">{i18n.__("Devices")}</NavLink>
+                                <NavLink to="/connect">{i18n.__("Connect")}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
-                                <NavLink to="/mqttlog">{i18n.__("mqtt")}</NavLink>
+                                <NavLink to="/messages">{i18n.__("Messages")}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
                                 <NavLink to="/settings">{i18n.__("settings")}</NavLink>
                                 <NavLink to="/gateway">{i18n.__("Gateway")}</NavLink>
@@ -81,15 +80,18 @@ export default class extends Component {
                             <nav className="bottom">
 
                             </nav>
+
+                            <img src={require("../assets/images/logo.png")} className="logo" />
                         </aside>
                     </div>
 
                     <main key="main">
+                        <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />
                         <Route path="/settings" component={Settings}/>
-                        <Route path="/radiomanager" component={RadioManager} />
-                        <Route path="/mqttlog" component={MqttLog}/>
-                        <RouteIframe path="/node-red" src="http://localhost:1880/" id="node-red" />
+                        <RouteWithProps path="/devices" component={RadioManager} model={this.rm} />
+                        <RouteIframe path="/connect" src="http://localhost:1880/" id="node-red" />
                         <RouteIframe path="/dashboard" src="http://localhost:1880/ui" />
+                        <Route path="/messages" component={MqttLog}/>
                         <Route path="/firmware" component={Firmware} />
                         <Route path="/gateway" component={Gateway} />
                     </main>
