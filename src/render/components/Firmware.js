@@ -1,6 +1,6 @@
 import React, { Component, RaisedButton } from "react";
 import { Button, Alert, Progress } from 'reactstrap';
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, shell } = require("electron");
 const { dialog } = require('electron').remote;
 import Select from 'react-select';
 
@@ -18,6 +18,11 @@ function getYoutubeVideoUrl(url) {
     }
 
     return null;
+}
+
+function openExternal(e) {
+    e.preventDefault()
+    shell.openExternal(e.target.href)
 }
 
 export default class extends Component {
@@ -307,17 +312,17 @@ export default class extends Component {
 
             {this.state.firmware.article ? <div>
             <label>Article</label>
-            <p><a href={this.state.firmware.article} target="_blank">{this.state.firmware.article}</a></p>
+            <p><a href={this.state.firmware.article} onClick={openExternal}>{this.state.firmware.article}</a></p>
             </div> : null }
 
             {this.state.firmware.video ? <div>
             <label>Video</label>
-            <p><a href={this.state.firmware.video} target="_blank">{this.state.firmware.video}</a></p>
+            <p><a href={this.state.firmware.video} onClick={openExternal}>{this.state.firmware.video}</a></p>
             </div> : null }
 
             {this.state.firmware.repository ? <div>
             <label>Repository</label>
-            <p><a href={this.state.firmware.repository} target="_blank">{this.state.firmware.repository}</a></p>
+            <p><a href={this.state.firmware.repository} onClick={openExternal}>{this.state.firmware.repository}</a></p>
             </div> : null }
 
         </div>
@@ -329,7 +334,7 @@ export default class extends Component {
                 <br />
                 {isYoutubeUrl(this.state.firmware.video) ?
                 <iframe src={getYoutubeVideoUrl(this.state.firmware.video)} frameBorder="0" allow="encrypted-media" allowFullScreen="1"></iframe>
-                : <a href={this.state.firmware.video} target="_blank">{this.state.firmware.video}</a>}
+                : <a href={this.state.firmware.video} onClick={openExternal}>{this.state.firmware.video}</a>}
             </div> : null}
         </div>
 
