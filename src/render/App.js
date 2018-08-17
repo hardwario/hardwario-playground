@@ -4,6 +4,8 @@ import { ipcRenderer } from "electron";
 
 import { RouteIframe, RouteWithProps } from "./components/Route";
 
+import RadioManagerModel from "./model/RadioManager";
+
 import MqttLog from "./components/MqttLog";
 import Settings from "./components/Settings";
 import RadioManager from "./components/RadioManager";
@@ -25,6 +27,8 @@ export default class extends Component {
             noderedStatus: "offline",
             brokerStatus: "offline"
         };
+
+        this.rm = new RadioManagerModel();
     }
 
     componentDidMount() {
@@ -46,9 +50,14 @@ export default class extends Component {
             }
         });
 
+        ipcRenderer.on("settings/value/mqtt.ip", (sender, mqttIp) => {
+            this.rm.connect(mqttIp);
+        });
+
         ipcRenderer.send("gateway/status/get");
         ipcRenderer.send("nodered/status/get");
         ipcRenderer.send("broker/status/get");
+        ipcRenderer.send("settings/get", "mqtt.ip");
     }
 
     componentWillUnmount() {
@@ -57,6 +66,7 @@ export default class extends Component {
         ipcRenderer.removeAllListeners("gateway/status");
         ipcRenderer.removeAllListeners("nodered/status");
         ipcRenderer.removeAllListeners("broker/status");
+        ipcRenderer.removeAllListeners("settings/value/mqtt.ip");
     }
 
     render() {
