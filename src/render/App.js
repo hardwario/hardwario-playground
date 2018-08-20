@@ -5,6 +5,7 @@ import { ipcRenderer } from "electron";
 import { RouteIframe, RouteWithProps } from "./components/Route";
 
 import RadioManagerModel from "./model/RadioManager";
+import MqttLogModel from "./model/MqttLog";
 
 import MqttLog from "./components/MqttLog";
 import Settings from "./components/Settings";
@@ -28,7 +29,8 @@ export default class extends Component {
             brokerStatus: "offline"
         };
 
-        this.rm = new RadioManagerModel();
+        this.radiomanager = new RadioManagerModel();
+        this.mqttlog = new MqttLogModel();
     }
 
     componentDidMount() {
@@ -51,7 +53,8 @@ export default class extends Component {
         });
 
         ipcRenderer.on("settings/value/mqtt.ip", (sender, mqttIp) => {
-            this.rm.connect(mqttIp);
+            this.radiomanager.connect("mqtt://" + mqttIp);
+            this.mqttlog.connect("mqtt://" + mqttIp);
         });
 
         ipcRenderer.send("gateway/status/get");
@@ -98,10 +101,10 @@ export default class extends Component {
                     <main key="main">
                         <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />
                         <Route path="/settings" component={Settings}/>
-                        <RouteWithProps path="/devices" component={RadioManager} model={this.rm} />
+                        <RouteWithProps path="/devices" component={RadioManager} model={this.radiomanager} />
                         <RouteIframe path="/connect" src="http://localhost:1880/" id="node-red" />
                         <RouteIframe path="/dashboard" src="http://localhost:1880/ui" />
-                        <Route path="/messages" component={MqttLog}/>
+                        <RouteWithProps path="/messages" component={MqttLog} model={this.mqttlog}/>
                         <Route path="/firmware" component={Firmware} />
                         <Route path="/gateway" component={Gateway} />
                     </main>
