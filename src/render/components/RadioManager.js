@@ -125,7 +125,7 @@ export default class extends Component {
                                             </td>
                                             <td>
                                                 <button onClick={() => self.setState({ editId: item.id }) } className="btn btn-warning">Rename</button>
-                                                <button onClick={() => this.nodeRemove(item)} className="btn btn-danger">Remove"</button>
+                                                <button onClick={() => this.nodeRemove(item)} className="btn btn-danger">Remove</button>
                                             </td>
                                         </tr>
                                     )

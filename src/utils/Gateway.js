@@ -70,7 +70,6 @@ class Gateway {
 
   disconnect() {
     this._ser.close((error) => {});
-    this._mqtt.end(true);
   }
 
   getDevice() {

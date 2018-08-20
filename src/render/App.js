@@ -12,6 +12,7 @@ import Settings from "./components/Settings";
 import RadioManager from "./components/RadioManager";
 import Firmware from "./components/Firmware";
 import Gateway from "./components/Gateway";
+import Devices from "./components/Devices";
 
 // Import SCSS
 import "../assets/scss/index.scss";
@@ -87,7 +88,6 @@ export default class extends Component {
                                 <NavLink to="/messages">{i18n.__("Messages")}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
                                 <NavLink to="/settings">{i18n.__("settings")}</NavLink>
-                                <NavLink to="/gateway">{i18n.__("Gateway")}</NavLink>
                             </nav>
 
                             <nav className="bottom">
@@ -101,12 +101,11 @@ export default class extends Component {
                     <main key="main">
                         <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />
                         <Route path="/settings" component={Settings}/>
-                        <RouteWithProps path="/devices" component={RadioManager} model={this.radiomanager} />
+                        <RouteWithProps path="/devices" component={Devices} model={this.radiomanager} />
                         <RouteIframe path="/connect" src="http://localhost:1880/" id="node-red" />
                         <RouteIframe path="/dashboard" src="http://localhost:1880/ui" />
                         <RouteWithProps path="/messages" component={MqttLog} model={this.mqttlog}/>
                         <Route path="/firmware" component={Firmware} />
-                        <Route path="/gateway" component={Gateway} />
                     </main>
                 </div>
             </HashRouter>

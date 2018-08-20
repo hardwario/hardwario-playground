@@ -1,22 +1,11 @@
 "use strict";
 const { Gateway, port_list } = require("./../utils/Gateway");
 const { ipcMain, BrowserWindow } = require("electron");
+const notifyAll = require("../utils/notifyAll");
 
 const DefaultMqttUrl = "mqtt://127.0.0.1:1883";
 
 let gateway = null;
-
-function notifyAll(topic, data) {
-    let newList = [];
-    BrowserWindow.getAllWindows().forEach((view) => {
-      try {
-        view.webContents.send(topic, data);
-      }
-      catch (error) {
-        // Window no longer exists
-      }
-    });
-}
 
 function setup() {
     ipcMain.on("gateway/connect", (event, device) => {
@@ -40,6 +29,7 @@ function setup() {
         if (gateway) {
             gateway.disconnect();
             gateway = null;
+            notifyAll("gateway/status", "offline");
         }
     });
 
