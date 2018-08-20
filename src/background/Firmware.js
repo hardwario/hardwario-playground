@@ -6,6 +6,7 @@ const os = require("os");
 const fs = require("fs");
 const request = require('request');
 const rprogress = require('request-progress');
+const notifyAll = require("../utils/notifyAll");
 
 const { flash, port_list } = require("./../utils/flasher/flasher-serial");
 const FIRMWARE_JSON_URL = "https://firmware.bigclown.com/json";
@@ -35,7 +36,7 @@ function updateFirmwareJson() {
 
         request(FIRMWARE_JSON_URL, null, ()=>{})
         .on('error', function (err) {
-            fs.unlink(filepath);
+            fs.unlinkSync(filepath);
             reject(err);
         })
         .pipe(file);
@@ -101,7 +102,7 @@ function downloadFirmware(url, reporthook, name=null) {
             rprogress(request(url), null, ()=>{})
                 .on('progress', reporthook)
                 .on('error', function (err) {
-                    fs.unlink(firmware_bin);
+                    fs.unlinkSync(firmware_bin);
 
                     reject(err);
                 })
@@ -126,6 +127,9 @@ function downloadFirmware(url, reporthook, name=null) {
 function setup() {
 
     updateFirmwareJson()
+        .then(()=>{
+            notifyAll("firmware:list", firmware_list);
+        })
         .catch((err)=>{
             console.error(err);
             firmware_list = loadFirmwareJson(getFirmwareJsonPath()) || [];
