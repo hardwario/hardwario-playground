@@ -15,9 +15,9 @@ export default class extends EventEmitter {
     }
 
     connect(url) {
-        if (!url.startsWith("mqtt://")) {
-            url = "mqtt://" + url;
-        }
+        // if (!url.startsWith("mqtt://")) {
+        //     url = "mqtt://" + url;
+        // }
 
         if (this.url == url) return;
 
