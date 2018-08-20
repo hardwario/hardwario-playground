@@ -10,7 +10,7 @@ export default class extends EventEmitter {
         this._subscribed = ["node/#"];
         this._cnt = 0;
         this._messages = [];
-        this._messagesMaxLength = 5;
+        this._messagesMaxLength = 50;
         this._highlighted_messages = {};
     }
 

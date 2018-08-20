@@ -11,8 +11,9 @@ let status = "offline";
 
 async function setup(port) {
     const reachable = await isPortReachable(port || DefaultMqttPort);
+
     if (!reachable) {
-        server = new mosca.Server({ port: port || DefaultMqttPort });
+        server = new mosca.Server({ port: port || DefaultMqttPort }, (e) => { console.log("Mosca", e) });
         server.on("clientConnected", function (client) {
             console.log("MQTT client connected", client.id);
         });
@@ -27,10 +28,10 @@ async function setup(port) {
     } else {
         status = "external";
     }
-}
 
-ipcMain.on("broker/status/get", (event, data) => {
-    event.sender.send("broker/status", status);
-});
+    ipcMain.on("broker/status/get", (event, data) => {
+        event.sender.send("broker/status", status);
+    });
+}
 
 module.exports = { setup }

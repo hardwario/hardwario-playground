@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ReactDOM from "react-dom";
 const i18n = require("../../utils/i18n");
 
 function formatTime(time) {
@@ -19,14 +20,12 @@ export default class extends Component {
             pub_payload: ""
         };
 
-        // this.onAdd = this.onAdd.bind(this);
-        // this.onRemove = this.onRemove.bind(this);
+        this._ref_messages = React.createRef();
+
         this.onClickSubscribe = this.onClickSubscribe.bind(this);
         this.onClickUnsubscribeAll = this.onClickUnsubscribeAll.bind(this);
         this.onClickPublish = this.onClickPublish.bind(this);
-        // this.onUnsubscribeOne = this.onUnsubscribeOne.bind(this);
-        // this.updateLocalState = this.updateLocalState.bind(this);
-
+        this.onClickUnsubscribe = this.onClickUnsubscribe.bind(this);
         this.onConnect = this.onConnect.bind(this);
         this.onMessage = this.onMessage.bind(this);
         this.onSubscribeChange = this.onSubscribeChange.bind(this);
@@ -63,7 +62,12 @@ export default class extends Component {
     }
 
     onClickSubscribe(e) {
+        e.preventDefault();
         this.props.model.subscribe(this.state.sub_topic);
+    }
+
+    onClickUnsubscribe(topic) {
+        this.props.model.unsubscribe(topic);
     }
 
     onClickUnsubscribeAll() {
@@ -94,11 +98,16 @@ export default class extends Component {
         }
     }
 
+    componentDidUpdate() {
+        let el = ReactDOM.findDOMNode(this._ref_messages.current);
+        el.scrollTop = el.scrollHeight;
+    }
+
     render() {
         let  isHighlightedMessages = this.props.model.isHighlightedMessages;
         return (
             <div id="mqttlog">
-                <div className="Console">
+                <div className="Console" ref={this._ref_messages}>
                     <ul>
                         {
                             this.state.highlighted_messages.map((item, index) => {
@@ -171,7 +180,7 @@ export default class extends Component {
                                 return (
                                     <li key={index}>
                                         <div>{topic}</div>
-                                        <div className="ConsoleButton"><button onClick={() => this.onUnsubscribeOne(topic)}>-</button></div>
+                                        <div className="ConsoleButton"><button onClick={() => this.onClickUnsubscribe(topic)}>-</button></div>
                                     </li>
                                 )
                             })
@@ -183,18 +192,4 @@ export default class extends Component {
 
         )
     }
-    onRemove(item) {
-        this.state.highlighted_messages.findIndex((data) => data == item);
-        this.setState((prevState) => { return { highlighted_messages: prevState.highlighted_messages.filter(x => x != item) } });
-    }
-
-    onUnsubscribeOne(topic) {
-        //ipcRenderer.send("mqtt:client:unsubscribe", topic);
-        this.client.unsubscribe(topic);
-        this.setState(prev => {
-            return { subscribed_topics: prev.subscribed_topics.filter((item) => item != topic) }
-        })
-    }
-    /* END OF EVENT HANDLERS */
-
 }
