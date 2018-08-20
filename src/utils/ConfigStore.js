@@ -6,7 +6,7 @@ class ConfigStore {
     constructor(filename, defaults={}) {
         const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 
-        this.path = path.join(userDataPath, filename + '.json');
+        this.path = path.join(userDataPath, filename);
 
         console.log("ConfigStore open", this.path);
 
