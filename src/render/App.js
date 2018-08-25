@@ -83,11 +83,11 @@ export default class extends Component {
                             <nav>
                                 <NavLink exact to="/">{i18n.__("home")}</NavLink>
                                 <NavLink to="/devices">{i18n.__("Devices")}</NavLink>
-                                <NavLink to="/connect">{i18n.__("Connect")}</NavLink>
+                                <NavLink to="/functions">{i18n.__("Functions")}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                                 <NavLink to="/messages">{i18n.__("Messages")}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
-                                <NavLink to="/settings">{i18n.__("settings")}</NavLink>
+                                {/* <NavLink to="/settings">{i18n.__("settings")}</NavLink> */}
                             </nav>
 
                             <nav className="bottom">
@@ -102,7 +102,7 @@ export default class extends Component {
                         <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />
                         <Route path="/settings" component={Settings}/>
                         <RouteWithProps path="/devices" component={Devices} model={this.radiomanager} />
-                        <RouteIframe path="/connect" src="http://localhost:1880/" id="node-red" />
+                        <RouteIframe path="/functions" src="http://localhost:1880/" id="node-red" />
                         <RouteIframe path="/dashboard" src="http://localhost:1880/ui" />
                         <RouteWithProps path="/messages" component={MqttLog} model={this.mqttlog}/>
                         <Route path="/firmware" component={Firmware} />

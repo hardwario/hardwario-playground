@@ -87,7 +87,7 @@ export default class extends Component {
                 <div className="col-xs-12">
                     <div className="form-group">
                         <button disabled={!this.state.gatewayStatus} type="button" className={"btn " + (this.state.pairing ? "btn-danger" : "btn-success")} onClick={this.onCLickPairingBtn}>
-                            {this.state.pairing ? "Pairing stop" : "Pairing start"}
+                            {this.state.pairing ? "Stop pairing" : "Start pairing"}
                         </button>
                     </div>
                     <table className="table table-bordered table-hover">
@@ -111,6 +111,7 @@ export default class extends Component {
                                                 </td>
                                                 <td>
                                                     <button onClick={() => self.saveAlias() } className="btn btn-success">Save</button>
+                                                    &nbsp;
                                                     <button onClick={() => self.setState({ editId: null }) } className="btn btn-warning">Cancel</button>
                                                 </td>
                                             </tr>
@@ -125,6 +126,7 @@ export default class extends Component {
                                             </td>
                                             <td>
                                                 <button onClick={() => self.setState({ editId: item.id }) } className="btn btn-warning">Rename</button>
+                                                &nbsp;
                                                 <button onClick={() => this.nodeRemove(item)} className="btn btn-danger">Remove</button>
                                             </td>
                                         </tr>
