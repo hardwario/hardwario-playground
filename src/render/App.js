@@ -25,9 +25,9 @@ export default class extends Component {
         super(props);
         this.state = {
             visible: true,
-            gatewayStatus: "offline",
-            noderedStatus: "offline",
-            brokerStatus: "offline"
+            gatewayStatus: "unknown",
+            noderedStatus: "unknown",
+            brokerStatus: "unknown"
         };
 
         this.radiomanager = new RadioManagerModel();
@@ -74,6 +74,9 @@ export default class extends Component {
     }
 
     render() {
+        let gwOffline = this.state.gatewayStatus == "offline";
+        let nodeRedOffline = this.state.noderedStatus == "offline";
+        let mqttOffline = this.state.brokerStatus == "offline";
         return (
             <HashRouter>
                 <div id="app" >
@@ -82,10 +85,10 @@ export default class extends Component {
                         <aside className={this.state.visible ? "fade-in" : "fade-out"}>
                             <nav>
                                 <NavLink exact to="/">{i18n.__("home")}</NavLink>
-                                <NavLink to="/devices">{i18n.__("Devices")}</NavLink>
-                                <NavLink to="/functions">{i18n.__("Functions")}</NavLink>
+                                <NavLink to="/devices" title={gwOffline ? "No Radio USB Dongle connected" : null}>{i18n.__("Devices")} {gwOffline ?  <i className="fa fa-warning"></i> : null}</NavLink>
+                                <NavLink to="/functions" title={nodeRedOffline ? "Node-RED is shut down": null}>{i18n.__("Functions")} {nodeRedOffline ? <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
-                                <NavLink to="/messages">{i18n.__("Messages")}</NavLink>
+                                <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
                                 {/* <NavLink to="/settings">{i18n.__("settings")}</NavLink> */}
                             </nav>

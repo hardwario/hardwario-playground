@@ -76,7 +76,7 @@ $navbar-padding-left: 5px;
             color: black;
             border-bottom: 1px solid #666;
         }
-        .active {
+        a.active {
             background-color: #B7261C;
             color: white;
         }
@@ -109,5 +109,12 @@ $navbar-padding-left: 5px;
     }
     .external {
         color: orange;
+    }
+    .fa-warning {
+        color: red;
+        float: right;
+        vertical-align: baseline;
+        padding-top: 3px;
+        font-size: 16px;
     }
 }
