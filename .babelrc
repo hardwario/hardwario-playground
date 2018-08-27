@@ -2,6 +2,7 @@
   "env": {
     "production": {
       "presets": [
+        "env",
         "react"
       ],
       "plugins": [
@@ -11,6 +12,7 @@
     },
     "development": {
       "presets": [
+        "env",
         "react"
       ],
       "plugins": [
