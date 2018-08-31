@@ -11,7 +11,7 @@ const notifyAll = require("../utils/notifyAll");
 const { flash, port_list } = require("./../utils/flasher/flasher-serial");
 const FIRMWARE_JSON_URL = "https://firmware.bigclown.com/json";
 
-let firmware_list = [];
+var firmware_list = [];
 
 function getFirmwarePath() {
     let cachepath = path.join(app.getPath("userData"), "firmware");
@@ -124,6 +124,9 @@ function downloadFirmware(url, reporthook, name=null) {
     });
 }
 
+var progress_payload = {};
+var flash_lock = false;
+
 function setup() {
 
     updateFirmwareJson()
@@ -135,21 +138,32 @@ function setup() {
             firmware_list = loadFirmwareJson(getFirmwareJsonPath()) || [];
         });
 
-    let progress_payload = {};
 
     ipcMain.on("firmware:run-flash", async (event, payload) => {
         console.log('firmware:run-flash', payload);
+
+        if (flash_lock){
+            event.sender.send("firmware:error", "In progress in another window");
+            return;
+        }
+
+        flash_lock = true;
 
         progress_payload.erase = 0;
         progress_payload.write = 0;
         progress_payload.verify = 0;
 
+        function sendErrorAndUnlock(msg) {
+            flash_lock = false;
+            event.sender.send("firmware:error", msg);
+        }
+
         if (!payload.port) {
-            return event.sender.send("firmware:error", "Unknown port");
+            return sendErrorAndUnlock("Unknown port");
         }
 
         if (!payload.firmware) {
-            return event.sender.send("firmware:error", "Unknown firmware");
+            return sendErrorAndUnlock("Unknown firmware");
         }
 
         let firmware_bin;
@@ -165,14 +179,14 @@ function setup() {
                 });
 
             } catch (error) {
-                return event.sender.send("firmware:error", "Download problem " + error.toString());
+                return sendErrorAndUnlock("Download problem " + error.toString());
             }
 
         } else {
             let firmware = getFirmware(payload.firmware);
 
             if (!firmware) {
-                return event.sender.send("firmware:error", "Unknown firmware");
+                return sendErrorAndUnlock("Unknown firmware");
             }
 
             let version;
@@ -188,7 +202,7 @@ function setup() {
             }
 
             if (!version) {
-                return event.sender.send("firmware:error", "Unknown firmware version");
+                return sendErrorAndUnlock("Unknown firmware version");
             }
 
             try {
@@ -201,12 +215,12 @@ function setup() {
                 }, name);
 
             } catch (error) {
-                return event.sender.send("firmware:error", "Download problem " + error.toString());
+                return sendErrorAndUnlock("Download problem " + error.toString());
             }
         }
 
         if (!firmware_bin) {
-            return event.sender.send("firmware:error", "Unknown firmware bin");
+            return sendErrorAndUnlock("Unknown firmware bin");
         }
         console.log(firmware_bin);
 
@@ -222,11 +236,12 @@ function setup() {
         })
         .then(() => {
             event.sender.send("firmware:done");
+            flash_lock = false;
         })
         .catch((e) => {
             console.log('catch', e.toString());
 
-            event.sender.send("firmware:error", e.toString());
+            sendErrorAndUnlock(e.toString());
         });
 
     });
@@ -238,9 +253,7 @@ function setup() {
     });
 
     ipcMain.on("firmware:get-list", (event, payload) => {
-        port_list((ports)=>{
-            event.sender.send("firmware:list", firmware_list || []);
-        });
+        event.sender.send("firmware:list", firmware_list || []);
     });
 }
 

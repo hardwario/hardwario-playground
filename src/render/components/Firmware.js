@@ -158,6 +158,10 @@ export default class extends Component {
     }
 
     flash() {
+        if (this.state.isRun) {
+            return;
+        }
+
         if (this.timer) {
             clearTimeout(this.timer);
         }
@@ -168,9 +172,9 @@ export default class extends Component {
             params.version = this.state.version.name;
         }
 
-        ipcRenderer.send("firmware:run-flash", params);
-
         this.setState({ erase: 0, write: 0, verify: 0, error: null, done: false, isRun: true, download: 0 });
+
+        ipcRenderer.send("firmware:run-flash", params);
     }
 
     formFirmwareSelectOnChange(firmware) {

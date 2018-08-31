@@ -8,7 +8,7 @@ function notifyAll(topic, data) {
         view.webContents.send(topic, data);
       }
       catch (error) {
-        // Window no longer exists
+          console.error("notifyAll", error)
       }
     });
 }

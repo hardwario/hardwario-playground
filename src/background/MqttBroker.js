@@ -13,7 +13,13 @@ async function setup(port) {
     const reachable = await isPortReachable(port || DefaultMqttPort);
 
     if (!reachable) {
-        server = new mosca.Server({ port: port || DefaultMqttPort }, (e) => { console.log("Mosca", e) });
+        try {
+            server = new mosca.Server({ port: port || DefaultMqttPort }, (e) => { console.log("Mosca", e) });
+        } catch (error) {
+            console.error("Mosca", error);
+            status = "external";
+            return;
+        }
         server.on("clientConnected", function (client) {
             console.log("MQTT client connected", client.id);
         });
