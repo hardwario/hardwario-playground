@@ -126,7 +126,7 @@ class Gateway {
             }
 
         } else if (typ == "node") {
-            if (t[0] in this._alias.name) {
+            if ((this._alias != null) && (t[0] in this._alias.name)) {
                 t[0] = this._alias.name[t[0]]
             }
             console.log("test", t, payload);
