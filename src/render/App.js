@@ -102,7 +102,7 @@ export default class extends Component {
                     </div>
 
                     <main key="main">
-                        <RouteIframe path="/" exact src="https://www.bigclown.com/doc/" />
+                        <RouteIframe path="/" exact src="https://start.bigclown.com/" />
                         <Route path="/settings" component={Settings}/>
                         <RouteWithProps path="/devices" component={Devices} model={this.radiomanager} />
                         <RouteIframe path="/functions" src="http://localhost:1880/" id="node-red" />
