@@ -225,7 +225,7 @@ function setup() {
         console.log(firmware_bin);
 
         flash(payload.port, firmware_bin, (type, progress, progress_max) =>{
-                console.log(type, progress, progress_max);
+                // console.log(type, progress, progress_max);
 
                 let percent = Math.round((progress / progress_max) * 100);
 
@@ -239,9 +239,17 @@ function setup() {
             flash_lock = false;
         })
         .catch((e) => {
-            console.log('catch', e.toString());
+            let msg = e.toString();
 
-            sendErrorAndUnlock(e.toString());
+            console.log('catch', JSON.stringify(msg));
+
+            if (msg == "Error: Error Resource temporarily unavailable Cannot lock port") {
+                return sendErrorAndUnlock("If you flash the gateway, please disconnect it first from the Devices tab.");
+            } else if (msg ==  "Error: bad file descriptor") {
+                return sendErrorAndUnlock("Device has been probably disconnect.")
+            }
+
+            return sendErrorAndUnlock("Please try to press FLASH FIRMWARE again.");
         });
 
     });
