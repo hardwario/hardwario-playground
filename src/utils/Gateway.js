@@ -142,6 +142,9 @@ class Gateway {
             msg = JSON.parse(line);
         } catch (error) {
             console.error(error);
+            if (line.indexOf("/info") > 0) {
+                this.write("/info/get");
+            }
             return;
         }
 
@@ -155,6 +158,8 @@ class Gateway {
         } else if (topic[0] == "#") {
             // log messages
         } else {
+
+            if (this._alias == null) return;
 
             let id = topic.substr(0, 12);
             topic = topic.substr(12);
