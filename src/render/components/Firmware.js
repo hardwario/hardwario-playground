@@ -241,13 +241,13 @@ export default class extends Component {
         <label>Device</label>
 
         <select className="form-control mb-2" id="formDeviceSelect" disabled={this.state.isRun} value={this.state.port} onChange={(e) => this.setState({ port: e.target.value })}>
+            {this.state.ports.length == 0 ? <option>(no device available)</option> : null }
             {
-                this.state.ports.map((port, index) => <option value={port.comName} key={index}>{port.comName} {port.serialNumber ? " " + port.serialNumber : null}</option>)
+                this.state.ports.map((port, index) => <option value={port.comName} key={index}>{port.comName}{port.serialNumber ? " " + port.serialNumber : null}</option>)
             }
         </select>
 
-
-        <Button color="danger" className="col-12" disabled={this.state.isRun || (!this.state.file && !this.state.firmware)} onClick={this.flash}>FLASH FIRMWARE</Button>
+        <Button color="danger" className="col-12" disabled={this.state.isRun || (!this.state.file && !this.state.firmware)} onClick={this.flash}>Flash firmware</Button>
     </div>
 
     <div className="col-9">

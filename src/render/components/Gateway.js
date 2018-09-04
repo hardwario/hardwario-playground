@@ -108,8 +108,9 @@ export default class extends Component {
                     <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
                         <Label className="mr-sm-2">Radio USB Dongle </Label>
                         <select className="form-control" value={this.state.selectedPort} onChange={(e) => this.setState({ selectedPort: e.target.value })}>
+                            {this.state.ports.length == 0 ? <option>(no device available)</option> : null }
                             {
-                                this.state.ports.map((port, index) => <option value={port.comName} key={index}>{port.comName}</option>)
+                                this.state.ports.map((port, index) => <option value={port.comName} key={index}>{port.comName}{port.serialNumber ? " " + port.serialNumber : null}</option>)
                             }
                         </select>
                     </FormGroup>
