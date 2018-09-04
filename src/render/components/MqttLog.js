@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 const i18n = require("../../utils/i18n");
 
 function formatTime(time) {
-    return time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+    return  time.toTimeString().split(' ')[0];
 }
 
 export default class extends Component {
@@ -14,6 +14,7 @@ export default class extends Component {
             messages: props.model.getMesages(),
             subscribed_topics: props.model.getSubscribed(),
             isConnected: props.model.isConnect(),
+            highlighted_messages: props.model.getHighlightedMessages(),
             checkbox: false,
             sub_topic: "",
             pub_topic: "",
@@ -37,6 +38,8 @@ export default class extends Component {
         this.props.model.on('message', this.onMessage);
         this.props.model.on('subscribe', this.onSubscribeChange);
         this.props.model.on('unsubscribe', this.onSubscribeChange);
+        let el = ReactDOM.findDOMNode(this._ref_messages.current);
+        el.scrollTop = el.scrollHeight;
     }
     componentWillUnmount() {
         console.log("RadioManager:componentWillUnmount");
@@ -107,7 +110,7 @@ export default class extends Component {
         let  isHighlightedMessages = this.props.model.isHighlightedMessages;
         return (
             <div id="mqttlog">
-                <div className="Console" ref={this._ref_messages}>
+                {this.state.highlighted_messages.length > 0 ? <div className="Console">
                     <ul>
                         {
                             this.state.highlighted_messages.map((item, index) => {
@@ -115,13 +118,15 @@ export default class extends Component {
                                     <li key={item.key}>
                                         <div>{formatTime(item.time)}&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
                                         <div>{item.payload}</div>
-                                        <div className="ConsoleButton"><button onClick={() => this.onClickRemove(item)}>-</button></div>
+                                        <div className="ConsoleButton"><i  title="remove" onClick={() => this.onClickRemove(item)} className="fa fa-remove" aria-hidden="true"></i></div>
                                     </li>
                                 )
                             })
                         }
                     </ul>
-                    {this.state.highlighted_messages.length > 0 ? <hr /> : null}
+                </div> : null}
+
+                <div className="Console" ref={this._ref_messages} style={{height: "300px"}}>
                     <ul >
                         {
                             this.state.messages.map((item, index) => {
@@ -130,7 +135,7 @@ export default class extends Component {
                                         <div>{formatTime(item.time)}&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
                                         <div>{item.payload}</div>
                                         <div className="ConsoleButton">
-                                            {isHighlightedMessages(item.topic) ? null :<button onClick={() => this.onClickAdd(item)}>+</button>}
+                                            {isHighlightedMessages(item.topic) ? null :<i title="pinned topic" onClick={() => this.onClickAdd(item)} className="fa fa-thumb-tack" aria-hidden="true"></i>}
                                         </div>
                                     </li>)
                             })

@@ -3,7 +3,6 @@
     .Console {
         border: 2px solid gray;
         border-radius: 4px;
-        height: 300px;
         overflow-y: auto;
         &>ul {
             margin: 1px;
@@ -15,9 +14,12 @@
             min-height: 35px;
             display: flex;
             align-items: center;
-            .ConsoleButton{
+            .ConsoleButton {
                 margin-left: auto;
             }
+        }
+        .fa {
+            cursor: pointer;
         }
     }
     hr {
