@@ -1,10 +1,20 @@
 {
-  "name": "playground",
-  "version": "0.3.0",
+  "name": "bigclown-playground",
+  "productName": "Bigclown Playground",
+  "author": {
+    "name": "Karel Blavka HARDWARIO s.r.o.",
+    "email": "karel.blavka@hardwario.com",
+    "url": "https://github.com/blavka"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bigclownlabs/bch-playground.git"
+  },
+  "license": "MIT",
+  "version": "0.9.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "install": "electron-rebuild",
     "dev": "webpack-dev-server --hot --host 0.0.0.0 --config=./webpack.dev.config.js",
     "clean": "rm -rf ./builds ./dist",
     "webpack": "webpack --config webpack.build.config.js",
@@ -13,10 +23,59 @@
     "pack-win32": "npm run webpack && electron-packager ./ bch-playground --platform=win32 --arch=ia32 --icon=./src/assets/icons/icon.ico --out=builds --asar --win32metadata.CompanyName='HARDWARIO s.r.o.' --win32metadata.ProductName='BigClown playground' --overwrite ",
     "pack-win64": "npm run webpack && electron-packager ./ bch-playground --platform=win32 --arch=x64 --icon=./src/assets/icons/icon.ico --out=builds --asar --win32metadata.CompanyName='HARDWARIO s.r.o.' --win32metadata.ProductName='BigClown playground' --overwrite ",
     "pack-linux32": "npm run webpack && electron-packager ./ bch-playground --platform=linux --arch=ia32 --icon=./src/assets/icons/icon.png --out=builds  --overwrite",
-    "pack-linux64": "npm run webpack && electron-packager ./ bch-playground --platform=linux --arch=x64 --icon=./src/assets/icons/icon.png --out=builds  --overwrite"
+    "pack-linux64": "npm run webpack && electron-packager ./ bch-playground --platform=linux --arch=x64 --icon=./src/assets/icons/icon.png --out=builds  --overwrite",
+    "package-linux": "npm run webpack && electron-builder build --linux",
+    "package-win": "npm run webpack && electron-builder build --win --ia32",
+    "package-mac": "npm run webpack && electron-builder build --mac"
   },
-  "author": "",
-  "license": "MIT",
+  "postinstall": "electron-builder install-app-deps",
+  "build": {
+    "productName": "Bigclown Playground",
+    "appId": "com.electron.${name}",
+    "files": [
+      "dist/",
+      "node_modules/",
+      "src/",
+      "index.js",
+      "menu.js",
+      "package.json",
+      "resources/icon.*"
+    ],
+    "dmg": {
+      "contents": [{
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "publisherName": "HARDWARIO s.r.o."
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "AppImage"
+      ],
+      "category": "Utility"
+    },
+    "directories": {
+      "buildResources": "resources",
+      "output": "release"
+    }
+  },
   "devDependencies": {
     "ajv": "^6.5.2",
     "babel-core": "^6.26.3",
@@ -32,9 +91,9 @@
     "css-loader": "^1.0.0",
     "deep-equal": "^1.0.1",
     "electron": "^2.0.6",
+    "electron-builder": "^20.28.3",
     "electron-json-config": "^1.5.3",
     "electron-packager": "^12.1.0",
-    "electron-rebuild": "^1.8.2",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^2.0.0",
     "html-webpack-plugin": "^3.2.0",
@@ -68,6 +127,7 @@
     "request": "^2.87.0",
     "request-progress": "^3.0.0",
     "serialport": "^7.0.2",
-    "sleep": "^5.2.3"
+    "sleep": "^5.2.3",
+    "ubidots-nodered": "^1.1.0"
   }
 }
