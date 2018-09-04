@@ -4,6 +4,7 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
 const path = require("path");
 const url = require("url");
+const fs = require("fs");
 
 require('electron-context-menu')({});
 
@@ -93,6 +94,12 @@ function createWindow() {
   });
 
   windows.push(mainWindow);
+}
+
+let userDataPath = app.getPath("userData");
+
+if (!fs.existsSync(userDataPath)) {
+    fs.mkdirSync(userDataPath)
 }
 
 Settings.setup();
