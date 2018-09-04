@@ -1,10 +1,10 @@
 {
   "name": "bigclown-playground",
-  "productName": "Bigclown Playground",
+  "productName": "BigClown Playground",
   "author": {
-    "name": "Karel Blavka HARDWARIO s.r.o.",
+    "name": "HARDWARIO s.r.o.",
     "email": "karel.blavka@hardwario.com",
-    "url": "https://github.com/blavka"
+    "url": "https://github.com/bigclownlabs"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "package-mac": "npm run webpack && electron-builder build --mac"
   },
   "build": {
-    "productName": "Bigclown Playground",
+    "productName": "BigClown Playground",
     "appId": "com.electron.bigclown-playground",
     "files": [
       "dist/",
