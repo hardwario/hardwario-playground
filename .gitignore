@@ -6,3 +6,4 @@ package-lock.json
 # BUILD #
 builds/
 dist/
+release/
