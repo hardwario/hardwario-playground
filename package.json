@@ -28,10 +28,9 @@
     "package-win": "npm run webpack && electron-builder build --win --ia32",
     "package-mac": "npm run webpack && electron-builder build --mac"
   },
-  "postinstall": "electron-builder install-app-deps",
   "build": {
     "productName": "Bigclown Playground",
-    "appId": "com.electron.${name}",
+    "appId": "com.electron.bigclown-playground",
     "files": [
       "dist/",
       "node_modules/",
@@ -74,7 +73,8 @@
     "directories": {
       "buildResources": "resources",
       "output": "release"
-    }
+    },
+    "publish": null
   },
   "devDependencies": {
     "ajv": "^6.5.2",

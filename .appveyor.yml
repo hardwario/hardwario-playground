@@ -12,23 +12,25 @@ install:
   - ps: Install-Product node $env:nodejs_version
   # install modules
   - npm install node-pre-gyp -g
-  - npm install electron-packager -g
+  - npm install electron-builder -g
   - npm install
 
 build_script:
-  - if "%platform%" == "x86" npm run pack-win32
-  - cd builds
-  - if "%platform%" == "x86" 7z a bch-playground-win.zip bch-playground-win32-ia32
-  - cd ..
+  - if "%platform%" == "x86" npm run package-win
+  - dir release
 
 artifacts:
-  - path: builds/bch-playground-win.zip
+  - path: release\*.exe
+
+cache:
+  - node_modules
+  - '%USERPROFILE%\.electron'
 
 deploy:
 - provider: GitHub
   auth_token:
     secure: 4cB5zdGSNXfNYzHtKibmbocO8WNtWe1g8090t4dUOuL7Y4u6/xjwv/0IwzrIWFK6
-  artifact: builds/bch-playground-win.zip
+  artifact: release\*.exe
   force_update: true
   on:
     appveyor_repo_tag: true
