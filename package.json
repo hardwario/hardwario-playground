@@ -19,18 +19,16 @@
     "clean": "rm -rf ./builds ./dist",
     "webpack": "webpack --config webpack.build.config.js",
     "prod": "npm run webpack && electron --noDevServer .",
-    "pack-osx": "npm run webpack && electron-packager ./ bch-playground --platform=darwin --arch=x64 --icon=./src/assets/icons/icon.icns --out=builds --overwrite",
-    "pack-win32": "npm run webpack && electron-packager ./ bch-playground --platform=win32 --arch=ia32 --icon=./src/assets/icons/icon.ico --out=builds --asar --win32metadata.CompanyName='HARDWARIO s.r.o.' --win32metadata.ProductName='BigClown playground' --overwrite ",
-    "pack-win64": "npm run webpack && electron-packager ./ bch-playground --platform=win32 --arch=x64 --icon=./src/assets/icons/icon.ico --out=builds --asar --win32metadata.CompanyName='HARDWARIO s.r.o.' --win32metadata.ProductName='BigClown playground' --overwrite ",
-    "pack-linux32": "npm run webpack && electron-packager ./ bch-playground --platform=linux --arch=ia32 --icon=./src/assets/icons/icon.png --out=builds  --overwrite",
-    "pack-linux64": "npm run webpack && electron-packager ./ bch-playground --platform=linux --arch=x64 --icon=./src/assets/icons/icon.png --out=builds  --overwrite",
-    "package-linux": "npm run webpack && electron-builder build --linux",
-    "package-win": "npm run webpack && electron-builder build --win --ia32",
+    "package-linux32": "npm run webpack && electron-builder build --linux --ia32",
+    "package-linux64": "npm run webpack && electron-builder build --linux --x64",
+    "package-win32": "npm run webpack && electron-builder build --win --ia32",
+    "package-win64": "npm run webpack && electron-builder build --win --x64",
     "package-mac": "npm run webpack && electron-builder build --mac"
   },
   "build": {
     "productName": "BigClown Playground",
     "appId": "com.electron.bigclown-playground",
+    "artifactName": "bigclown-playground-${version}-${os}-${arch}.${ext}",
     "files": [
       "dist/",
       "node_modules/",
@@ -40,19 +38,11 @@
       "package.json",
       "resources/icon.*"
     ],
-    "dmg": {
-      "contents": [{
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
+    "directories": {
+      "buildResources": "resources",
+      "output": "release"
     },
+    "publish": null,
     "mac": {
       "category": "public.app-category.utilities"
     },
@@ -66,15 +56,31 @@
     "linux": {
       "target": [
         "deb",
+        "zip",
         "AppImage"
       ],
       "category": "Utility"
     },
-    "directories": {
-      "buildResources": "resources",
-      "output": "release"
+    "appImage": {
+      "systemIntegration": "doNotAsk"
     },
-    "publish": null
+    "nsis": {
+      "artifactName": "bigclown-playground-${version}-${os}-setup-${arch}.${ext}"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    }
   },
   "devDependencies": {
     "ajv": "^6.5.2",

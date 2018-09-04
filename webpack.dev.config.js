@@ -49,7 +49,7 @@ module.exports = {
   target: "electron-renderer",
   plugins: [
     new HtmlWebpackPlugin({
-      title: "BigClown Playground"
+      title: "BigClown Playground " + process.env.npm_package_version
     }),
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("development")

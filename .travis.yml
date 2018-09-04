@@ -1,15 +1,39 @@
 language: node_js
 
 node_js:
-  - node
+  - "8"
 
 os:
   - linux
   - osx
 
+env:
+  matrix:
+  - BINARY_BUILDER="true" TRAVIS_NODE_VERSION="8"
+  - BINARY_BUILDER="true" TRAVIS_NODE_VERSION="8" ARCH="x86"
+
+matrix:
+  exclude:
+  - os: osx
+    env: BINARY_BUILDER="true" TRAVIS_NODE_VERSION="8" ARCH="x86"
+
 before_install:
+  # download node if testing x86 architecture
+  - nvm install $TRAVIS_NODE_VERSION
+  - >
+    if [[ "$ARCH" == "x86" ]]; then
+      BASE_URL=$(node -p "'https://nodejs.org/dist/' + process.version");
+      X86_FILE=$(node -p "'node-' + process.version + '-' + process.platform + '-x86'");
+      wget $BASE_URL/$X86_FILE.tar.gz;
+      tar -xf $X86_FILE.tar.gz;
+      nvm deactivate;
+      export PATH=`pwd`/$X86_FILE/bin:$PATH;
+    fi;
+
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then npm install electron-installer-dmg -g ; fi
+  - node --version
+  - node -p 'process.platform + "@" + process.arch'
+  - npm --version
   - npm install node-pre-gyp -g
   - npm install electron-builder -g
 
@@ -19,7 +43,11 @@ install:
 script:
   - >
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      npm run package-linux;
+      if [[ "$ARCH" == "x86" ]]; then
+        npm run package-linux32;
+      else
+        npm run package-linux64;
+      fi
     fi
 
   - >
@@ -33,8 +61,13 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-      - libzmqpp-dev
+      - g++-4.8-multilib
+      - gcc-multilib
+      - libzmq-dev
+      - libzmq-dev:i386
+      - libkrb5-dev
       - bc
+      - bsdtar
 
 cache:
   directories:
