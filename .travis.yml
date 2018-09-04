@@ -48,6 +48,13 @@ script:
       else
         npm run package-linux64;
       fi
+      cp release/*.deb .
+      rename -v "s/linux/ubuntu/" *.deb
+      mv *.deb release
+
+      cp release/*.zip .
+      rename -v "s/linux/ubuntu/" *.zip
+      mv *.zip release
     fi
 
   - >
@@ -68,6 +75,7 @@ addons:
       - libkrb5-dev
       - bc
       - bsdtar
+      - zlib1g:i386
 
 cache:
   directories:
@@ -81,6 +89,7 @@ deploy:
     - release/*.deb
     - release/*.AppImage
     - release/*.dmg
+    - release/*.zip
   file_glob: true
   skip_cleanup: true
   api_key: ${GITHUB_KEY}

@@ -11,7 +11,7 @@
     "url": "git@github.com:bigclownlabs/bch-playground.git"
   },
   "license": "MIT",
-  "version": "0.9.0",
+  "version": "0.9.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -44,9 +44,11 @@
     },
     "publish": null,
     "mac": {
+      "artifactName": "bigclown-playground-${version}-macos-${arch}.${ext}",
       "category": "public.app-category.utilities"
     },
     "win": {
+      "artifactName": "bigclown-playground-${version}-windows-${arch}.${ext}",
       "target": [
         "nsis",
         "portable"
@@ -54,10 +56,10 @@
       "publisherName": "HARDWARIO s.r.o."
     },
     "linux": {
+      "artifactName": "bigclown-playground-${version}-linux-${arch}.${ext}",
       "target": [
         "deb",
-        "zip",
-        "AppImage"
+        "zip"
       ],
       "category": "Utility"
     },
@@ -68,8 +70,7 @@
       "artifactName": "bigclown-playground-${version}-${os}-setup-${arch}.${ext}"
     },
     "dmg": {
-      "contents": [
-        {
+      "contents": [{
           "x": 130,
           "y": 220
         },
