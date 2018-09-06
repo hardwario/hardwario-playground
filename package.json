@@ -11,7 +11,7 @@
     "url": "git@github.com:bigclownlabs/bch-playground.git"
   },
   "license": "MIT",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "prod": "npm run webpack && electron --noDevServer .",
     "package-linux32": "npm run webpack && electron-builder build --linux --ia32",
     "package-linux64": "npm run webpack && electron-builder build --linux --x64",
+    "package-linux-appimage": "npm run webpack && electron-builder build --linux AppImage",
     "package-win32": "npm run webpack && electron-builder build --win --ia32",
     "package-win64": "npm run webpack && electron-builder build --win --x64",
     "package-mac": "npm run webpack && electron-builder build --mac"
@@ -59,7 +60,7 @@
       "artifactName": "bigclown-playground-${version}-linux-${arch}.${ext}",
       "target": [
         "deb",
-        "zip"
+        "tar.gz"
       ],
       "category": "Utility"
     },
@@ -70,8 +71,7 @@
       "artifactName": "bigclown-playground-${version}-${os}-setup-${arch}.${ext}"
     },
     "dmg": {
-      "contents": [
-        {
+      "contents": [{
           "x": 130,
           "y": 220
         },
