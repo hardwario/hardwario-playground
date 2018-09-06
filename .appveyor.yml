@@ -9,6 +9,8 @@ init:
   - git config --global core.autocrlf true
 
 install:
+  - nuget install secure-file -ExcludeVersion
+  - secure-file\tools\secure-file -decrypt hardwario-cert.p12.enc -out hardwario-cert.p12 -secret %enc_secret%
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   # install modules
