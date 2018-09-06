@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
-const i18n = require("../../utils/i18n");
+import copy from 'copy-to-clipboard';
 
 function formatTime(time) {
     return  time.toTimeString().split(' ')[0];
@@ -101,6 +101,13 @@ export default class extends Component {
         }
     }
 
+    onClickCopyTopic(message) {
+        copy(message.topic, {
+            debug: true,
+            message: 'Press #{key} to copy',
+          });
+    }
+
     componentDidUpdate() {
         let el = ReactDOM.findDOMNode(this._ref_messages.current);
         el.scrollTop = el.scrollHeight;
@@ -116,7 +123,7 @@ export default class extends Component {
                             this.state.highlighted_messages.map((item, index) => {
                                 return (
                                     <li key={item.key}>
-                                        <div>{formatTime(item.time)}&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
+                                        <div>{formatTime(item.time)}&nbsp;<i title="Copy topic to Clipboard" onClick={() => this.onClickCopyTopic(item)} className="fa fa-clipboard" aria-hidden="true"></i>&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
                                         <div>{item.payload}</div>
                                         <div className="ConsoleButton"><i  title="remove" onClick={() => this.onClickRemove(item)} className="fa fa-remove" aria-hidden="true"></i></div>
                                     </li>
@@ -132,7 +139,7 @@ export default class extends Component {
                             this.state.messages.map((item, index) => {
                                 return (
                                     <li key={item.key}>
-                                        <div>{formatTime(item.time)}&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
+                                        <div>{formatTime(item.time)}&nbsp;<i title="Copy topic to Clipboard" onClick={() => this.onClickCopyTopic(item)} className="fa fa-clipboard" aria-hidden="true"></i>&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
                                         <div>{item.payload}</div>
                                         <div className="ConsoleButton">
                                             {isHighlightedMessages(item.topic) ? null :<i title="pinned topic" onClick={() => this.onClickAdd(item)} className="fa fa-thumb-tack" aria-hidden="true"></i>}
@@ -145,7 +152,7 @@ export default class extends Component {
                 <form>
                     <div className="form-group">
                         <label className="control-label col-xs-1">
-                            {this.state.checkbox ? i18n.__("publishMode") : i18n.__("subscribeMode")}
+                            {this.state.checkbox ? "Publish mode" : "Subscribe mode"}
                         </label>
                         <div className="col-xs-2">
                             <label className="switch">
@@ -156,28 +163,28 @@ export default class extends Component {
                     </div>
                     {this.state.checkbox ?
                         <div className="form-group">
-                            <label className="control-label col-xs-1">{i18n.__("payload")}</label>
+                            <label className="control-label col-xs-1">Payload</label>
                             <div className="col-xs-8">
-                                <input className="form-control" value={this.state.pub_topic} onChange={(e) => this.setState({ pub_topic: e.target.value })} type="text" placeholder={i18n.__("enterTopicToPublish")} />
-                                <input className="form-control" value={this.state.pub_payload} onChange={(e) => this.setState({ pub_payload: e.target.value })} type="text" placeholder={i18n.__("enterMessageToPublish")} />
+                                <input className="form-control" value={this.state.pub_topic} onChange={(e) => this.setState({ pub_topic: e.target.value })} type="text" placeholder="Enter topic to publish" />
+                                <input className="form-control" value={this.state.pub_payload} onChange={(e) => this.setState({ pub_payload: e.target.value })} type="text" placeholder="Enter message to publish" />
                             </div>
                             <div className="col-xs-2">
-                                <button disabled={!this.state.isConnected} onClick={this.onClickPublish} className="btn btn-default">{i18n.__("publish")}</button>
+                                <button disabled={!this.state.isConnected} onClick={this.onClickPublish} className="btn btn-default">Publish</button>
                             </div>
                         </div>
                         :
                         <div className="form-group">
-                            <label className="control-label col-xs-1">{i18n.__("topic")}</label>
+                            <label className="control-label col-xs-1">Topic</label>
                             <div className="col-xs-8">
-                                <input className="form-control" placeholder={i18n.__("enterTopicToSubscribe")} value={this.state.sub_topic} onChange={(e) => this.setState({ sub_topic: e.target.value })} type="text" />
+                                <input className="form-control" placeholder="Enter topic to subscribe" value={this.state.sub_topic} onChange={(e) => this.setState({ sub_topic: e.target.value })} type="text" />
                             </div>
                             <div className="col-xs-2">
-                                <button disabled={!this.state.isConnected} onClick={this.onClickSubscribe} className="btn btn-default">{i18n.__("subscribe")}</button>
+                                <button disabled={!this.state.isConnected} onClick={this.onClickSubscribe} className="btn btn-default">Subscribe</button>
                             </div>
                         </div>
                     }
                 </form>
-                <header className="h4">{i18n.__("subscribedTopics")}</header>
+                <header className="h4">Subscribed topics</header>
                 <div className="Console">
                     <ul>
                         {
@@ -192,7 +199,7 @@ export default class extends Component {
                         }
                     </ul>
                 </div>
-                <button disabled={!this.state.isConnected} onClick={this.onClickUnsubscribeAll} className="btn btn-danger">{i18n.__("unSubscribeAll")}</button>
+                <button disabled={!this.state.isConnected} onClick={this.onClickUnsubscribeAll} className="btn btn-danger">Unsubscribe all</button>
             </div>
 
         )
