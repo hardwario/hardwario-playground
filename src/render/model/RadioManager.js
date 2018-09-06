@@ -1,5 +1,14 @@
 const EventEmitter = require('events');
 const mqtt = require("mqtt");
+const gateway_topics = [
+    "/info",
+    "/nodes",
+    "/attach",
+    "/detach",
+    "/alias/set/ok",
+    "/alias/remove/ok",
+    "/pairing-mode"
+];
 
 export default class extends EventEmitter {
 
@@ -34,20 +43,29 @@ export default class extends EventEmitter {
 
             this.mqttConnect = true;
 
-            this.client.subscribe("gateway/" + this.name + "/info");
-            this.client.subscribe("gateway/" + this.name + "/nodes");
-            this.client.subscribe("gateway/" + this.name + "/attach");
-            this.client.subscribe("gateway/" + this.name + "/detach");
-            this.client.subscribe("gateway/" + this.name + "/alias/set/ok");
-            this.client.subscribe("gateway/" + this.name + "/alias/remove/ok");
-            this.client.subscribe("gateway/" + this.name + "/pairing-mode");
+            for (let i = 0; i < gateway_topics.length; i++) {
+                this.client.subscribe("gateway/" + this.name + gateway_topics[i]);
+            }
 
             this.emit('mqttConnect', true);
 
             this.publish("gateway/all/info/get");
+
+            setTimeout(()=>{
+                if (!this.gatewayConnect) {
+                    this.emit("connect", this.gatewayConnect);
+                }
+            }, 1000);
         });
 
         this.client.on("disconnect", () => {
+
+            this.emit('mqttConnect', false);
+
+            for (let i = 0; i < gateway_topics.length; i++) {
+                this.client.unsubscribe("gateway/" + this.name + gateway_topics[i]);
+            }
+
             this._disconnect();
         });
 
