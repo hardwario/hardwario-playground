@@ -57,7 +57,12 @@ class Gateway {
 
             this._name = null;
 
-            callback("disconected")
+            callback("disconected");
+
+            this._mqtt.end();
+        });
+        this._ser.on("error", (e) => {
+            console.error(e);
         });
 
         const parser = this._ser.pipe(new SerialPort.parsers.Readline({ delimiter: "\n" }));
@@ -72,7 +77,9 @@ class Gateway {
     }
 
     disconnect() {
-        this._ser.close((error) => { });
+        this._ser.binding.write(Buffer.from('["/pairing-mode/stop", null]\n')).then(()=>{
+            this._ser.close();
+        });
     }
 
     getDevice() {
@@ -353,6 +360,7 @@ class Gateway {
     }
 
     write(topic, payload = null, callback = null) {
+        if (!this._connected) return;
         this._ser.write(JSON.stringify([topic, payload]) + "\n");
         this._ser.drain(callback);
     }
