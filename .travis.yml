@@ -49,6 +49,7 @@ script:
         npm run package-linux64;
         npm run package-linux-appimage;
       fi
+
       cp release/*.deb .
       rename -v "s/linux/ubuntu/" *.deb
       mv *.deb release
@@ -57,9 +58,11 @@ script:
       rename -v "s/linux/ubuntu/" *.tar.gz
       mv *.tar.gz release
 
-      cp release/*.AppImage .
-      rename -v "s/linux/ubuntu/" *.AppImage
-      mv *.AppImage release
+      if [[ "$ARCH" == "x64" ]]; then
+        cp release/*.AppImage .
+        rename -v "s/linux/ubuntu/" *.AppImage
+        mv *.AppImage release
+      fi
     fi
 
   - >
