@@ -16,7 +16,7 @@ const gateway_topics = [
 ];
 
 class Gateway {
-    constructor(device, mqttUrl, callback) {
+    constructor(device, mqttUrl, callback, onError) {
         this._device = device;
         this._connected = false;
         this._name = null;
@@ -38,6 +38,13 @@ class Gateway {
             this._ser.flush(function () {
                 this._ser.write("\n");
                 this.write("/info/get");
+
+                this._timeout = setTimeout(()=>{
+                    if (!this._connected) return;
+                    if (onError) onError("There is no answer from the device. Please, make sure the device is the Radio Dongle and has the correct firmware.");
+                    this._ser.close();
+                }, 1000);
+
             }.bind(this));
         }.bind(this));
 
@@ -45,6 +52,8 @@ class Gateway {
             this._connected = false;
             this._alias = null;
             this._nodes = null
+
+            if (this._timeout) clearTimeout(this._timeout);
 
             console.log("Gateway odpojena");
 
@@ -77,9 +86,10 @@ class Gateway {
     }
 
     disconnect() {
+        if (!this._connected) return;
         this._ser.binding.write(Buffer.from('["/pairing-mode/stop", null]\n')).then(()=>{
             this._ser.close();
-        });
+        }).catch(console.log);
     }
 
     getDevice() {
@@ -148,9 +158,10 @@ class Gateway {
         try {
             msg = JSON.parse(line);
         } catch (error) {
-            console.error(error);
             if (line.indexOf("/info") > 0) {
                 this.write("/info/get");
+            }else{
+                console.log("Gateway readline " + error);
             }
             return;
         }
@@ -216,6 +227,11 @@ class Gateway {
 
             if (!m) {
                 return;
+            }
+
+            if (this._timeout) {
+                clearTimeout(this._timeout);
+                this._timeout = null;
             }
 
             if (this._name != m[1]) {

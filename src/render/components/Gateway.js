@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, FormGroup, Label } from 'reactstrap';
+import { Button, FormGroup, Label, Alert } from 'reactstrap';
 const { ipcRenderer } = require("electron");
 
 export default class extends Component {
@@ -77,10 +77,10 @@ export default class extends Component {
         }, 1000);
     }
 
-    ipcGatewayStatus(sender, status) {
-        let gatewayOnline = status == "online";
+    ipcGatewayStatus(sender, payload) {
+        let gatewayOnline = payload.status == "online";
         if (this.state.status != gatewayOnline) {
-            this.setState({ gatewayOnline });
+            this.setState({ gatewayOnline, error: payload.error });
         }
     }
 
@@ -104,9 +104,10 @@ export default class extends Component {
     render() {
         return (
             <div id="gateway" >
+                {this.state.error ? <Alert color="danger">{this.state.error}</Alert> : null}
                 <div className="gatewayPortList form-inline">
                     <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
-                        <Label className="mr-sm-2">Radio USB Dongle </Label>
+                        <Label className="mr-sm-2">Radio Dongle </Label>
                         <select className="form-control" value={this.state.selectedPort} onChange={(e) => this.setState({ selectedPort: e.target.value })}>
                             {this.state.ports.length == 0 ? <option>(no device available)</option> : null }
                             {

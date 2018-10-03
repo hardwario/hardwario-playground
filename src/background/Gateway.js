@@ -6,13 +6,20 @@ const notifyAll = require("../utils/notifyAll");
 const DefaultMqttUrl = "mqtt://127.0.0.1:1883";
 
 let gateway = null;
+let error_msg = null;
+
+function makeStatus() {
+    return {
+        status: gateway == null ? "offline" : gateway.isConnected() ? "online" : "offline",
+        error: error_msg
+    }
+}
 
 function setup() {
     ipcMain.on("gateway/connect", (event, device) => {
         console.log("on gateway:connect", device);
 
         if (gateway) {
-
             if (device == gateway.getDevice() && gateway.isConnected()) {
                 return;
             }
@@ -20,8 +27,12 @@ function setup() {
             gateway.disconnect();
         }
 
+        error_msg = null;
+
         gateway = new Gateway(device, DefaultMqttUrl, (status) => {
-            notifyAll("gateway/status", status == "connected" ? "online" : "offline");
+            notifyAll("gateway/status", makeStatus());
+        }, (msg)=>{
+            error_msg = msg;
         });
     });
 
@@ -34,7 +45,7 @@ function setup() {
     });
 
     ipcMain.on("gateway/status/get", (event, data) => {
-        notifyAll("gateway/status", gateway == null ? "offline" : gateway.isConnected() ? "online" : "offline");
+        event.sender.send("gateway/status", makeStatus());
     });
 
     ipcMain.on("gateway/device/get", (event, data) => {
