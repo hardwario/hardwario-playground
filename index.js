@@ -26,6 +26,8 @@ if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) |
 }
 
 function createWindow() {
+  if (!app.isReady()) return;
+  
   let mainWindow;
   mainWindow = new BrowserWindow({
     width: 1000,
@@ -115,10 +117,10 @@ NodeREDWorker.setup().finally(()=>{
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
     console.log("window-all-closed");
-
-    //if (process.platform !== "darwin") {
+    if (process.platform != 'darwin'){
+      console.log("app.quit");
     app.quit();
-    //}
+    }
 });
 
 app.on("app:window:new", createWindow);
