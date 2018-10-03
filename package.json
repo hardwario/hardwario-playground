@@ -71,7 +71,8 @@
       "artifactName": "bigclown-playground-${version}-${os}-setup-${arch}.${ext}"
     },
     "dmg": {
-      "contents": [{
+      "contents": [
+        {
           "x": 130,
           "y": 220
         },
@@ -121,13 +122,16 @@
     "electron-context-menu": "^0.10.0",
     "electron-prompt": "^1.2.0",
     "font-awesome": "^4.7.0",
+    "ip": "^1.1.5",
     "is-port-reachable": "^2.0.0",
     "mosca": "^2.8.3",
     "mqtt": "^2.18.8",
+    "node-arp": "^1.0.6",
     "node-red": "*",
     "node-red-contrib-blynk-ws": "^0.7.1",
     "node-red-contrib-ifttt": "^0.1.0",
     "node-red-dashboard": "*",
+    "ping": "^0.2.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-router-dom": "^4.3.1",

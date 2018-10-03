@@ -16,6 +16,7 @@ const MqttBroker = require("./src/background/MqttBroker");
 const Settings = require("./src/background/Settings");
 const Firmware = require("./src/background/Firmware");
 const Gateway = require("./src/background/Gateway");
+const Home = require("./src/background/Home");
 
 let windows = [];
 
@@ -113,13 +114,14 @@ NodeREDWorker.setup().finally(()=>{
         windows[i].reload();
     }
 })
+Home.setup();
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
     console.log("window-all-closed");
     if (process.platform != 'darwin'){
       console.log("app.quit");
-    app.quit();
+      app.quit();
     }
 });
 

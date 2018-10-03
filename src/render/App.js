@@ -13,6 +13,8 @@ import RadioManager from "./components/RadioManager";
 import Firmware from "./components/Firmware";
 import Gateway from "./components/Gateway";
 import Devices from "./components/Devices";
+import Home from "./components/Home";
+
 
 // Import SCSS
 import "../assets/scss/index.scss";
@@ -37,9 +39,9 @@ export default class extends Component {
     componentDidMount() {
         console.log("App:componentDidMount");
 
-        ipcRenderer.on("gateway/status", (sender, gatewayStatus) => {
-            if (this.state.gatewayStatus != gatewayStatus) {
-                this.setState({ gatewayStatus });
+        ipcRenderer.on("gateway/status", (sender, payload) => {
+            if (this.state.gatewayStatus != payload.status) {
+                this.setState({ gatewayStatus: payload.status });
             }
         });
         ipcRenderer.on("nodered/status", (sender, noderedStatus) => {
@@ -85,7 +87,7 @@ export default class extends Component {
                         <aside className={this.state.visible ? "fade-in" : "fade-out"}>
                             <nav>
                                 <NavLink exact to="/">{i18n.__("home")}</NavLink>
-                                <NavLink to="/devices" title={gwOffline ? "No Radio USB Dongle connected" : null}>{i18n.__("Devices")} {gwOffline ?  <i className="fa fa-warning"></i> : null}</NavLink>
+                                <NavLink to="/devices" title={gwOffline ? "No Radio Dongle connected" : null}>{i18n.__("Devices")} {gwOffline ?  <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/functions" title={nodeRedOffline ? "Node-RED is shut down": null}>{i18n.__("Functions")} {nodeRedOffline ? <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                                 <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
@@ -102,7 +104,7 @@ export default class extends Component {
                     </div>
 
                     <main key="main">
-                        <RouteIframe path="/" exact src="https://start.bigclown.com/" />
+                        <Home path="/" exact/>
                         <Route path="/settings" component={Settings}/>
                         <RouteWithProps path="/devices" component={Devices} model={this.radiomanager} />
                         <RouteIframe path="/functions" src="http://localhost:1880/" id="node-red" />
