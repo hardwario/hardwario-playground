@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "*.js": "javascriptreact"
+    },
+    "[javascriptreact]": {
+
+    },
+    "search.exclude": {
+        "**/.git": true,
+        "**/node_modules": true,
+        "**/builds": true,
+        "**/bower_components": true,
+        "**/tmp": true
+    },
+}
