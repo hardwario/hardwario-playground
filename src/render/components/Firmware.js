@@ -124,7 +124,7 @@ export default class extends Component {
 
         if ((this.state.port === "") && (ports.length > 0)) {
             this.setState({port:ports[0].comName});
-        }
+        } 
 
         this.timer = setTimeout(() => {
             ipcRenderer.send("firmware:get-port-list");
@@ -247,7 +247,7 @@ export default class extends Component {
             }
         </select>
 
-        <Button color="danger" className="col-12" disabled={this.state.isRun || (!this.state.file && !this.state.firmware)} onClick={this.flash}>Flash firmware</Button>
+        <Button color="danger" className="col-12" disabled={!this.state.ports.length || this.state.isRun || (!this.state.file && !this.state.firmware)} onClick={this.flash}>Flash firmware</Button>
     </div>
 
     <div className="col-9">

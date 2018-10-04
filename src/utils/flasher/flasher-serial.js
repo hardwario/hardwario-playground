@@ -45,12 +45,10 @@ class Flash_Serial {
   }
 
   _connect() {
-    console.log('connect');
-
     return new Promise((resolve, reject) => {
       this.start_bootloader()
+        .then(this._ser.clear_buffer)
         .then(() => {
-
           return this.get_version();
         })
         .then((version) => {
@@ -72,23 +70,22 @@ class Flash_Serial {
 
   connect() {
     return new Promise((resolve, reject) => {
+      (async() => {
+        for (let i = 0; i < 10; i++) {
+          console.log("_connect", i);
+          try {
+            await this._ser.open();
+            await this._connect();
 
-      this._ser.open()
-        .then(() => {
-          (async() => {
-            for (let i = 0; i < 3; i++) {
-              try {
-                await this._connect().catch(reject);
-
-                return resolve();
-              } catch (error) {
-                console.log('connect error', error);
-              }
-            }
-            throw "Connection error";
-          }).bind(this)();
-        })
-        .catch(reject);
+            return resolve();
+          } catch (error) {
+            console.log('connect error', error);
+            await this._ser.close().catch(()=>{});
+            sleep.msleep(100);
+          }
+        }
+        reject("Connection error");
+      }).bind(this)();
     });
   }
 
@@ -105,10 +102,10 @@ class Flash_Serial {
 
       this._ser.boot_sequence()
         .then(() => {
-          sleep.msleep(1);
           return this._ser.clear_buffer();
         })
         .then(() => {
+          sleep.msleep(50);
           return this._ser.write(buffer);
         })
         .then(() => {
