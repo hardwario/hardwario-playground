@@ -36,7 +36,6 @@ function updateFirmwareJson() {
 
         request(FIRMWARE_JSON_URL, null, ()=>{})
         .on('error', function (err) {
-            fs.unlinkSync(filepath);
             reject(err);
         })
         .pipe(file);
@@ -102,8 +101,6 @@ function downloadFirmware(url, reporthook, name=null) {
             rprogress(request(url), null, ()=>{})
                 .on('progress', reporthook)
                 .on('error', function (err) {
-                    fs.unlinkSync(firmware_bin);
-
                     reject(err);
                 })
                 .on('end', function () {
