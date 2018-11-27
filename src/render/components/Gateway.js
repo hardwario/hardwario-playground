@@ -1,6 +1,11 @@
 import React, { Component } from "react";
 import { Button, FormGroup, Label, Alert } from 'reactstrap';
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, shell} = require("electron");
+
+function openExternal(e) {
+    e.preventDefault()
+    shell.openExternal(e.target.href)
+}
 
 export default class extends Component {
     constructor(props) {
@@ -116,6 +121,8 @@ export default class extends Component {
                         </select>
                     </FormGroup>
                     <Button disabled={this.state.ports.length == 0} color={this.state.gatewayOnline ? "danger": "success"} onClick={this.buttonOnClick}>{this.state.gatewayOnline ? "Disconnect" : "Connect"}</Button>
+
+                    {this.state.ports.length == 0 ? <div style={{"paddingLeft": "20px"}}> <a onClick={openExternal} href="https://www.bigclown.com/doc/basics/quick-start-guide/#troubleshooting">Can't see your connected device?</a></div> : null}
                 </div>
             </div>
         )
