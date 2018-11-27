@@ -17,6 +17,7 @@ install:
   - npm install node-pre-gyp -g
   - npm install electron-builder -g
   - npm install
+  - npm rebuild node-sass
 
 build_script:
   - if "%platform%" == "x86" npm run package-win32
