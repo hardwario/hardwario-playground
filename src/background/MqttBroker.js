@@ -1,5 +1,6 @@
 "use strict";
-const mosca = require("mosca");
+var aedes = require('aedes')()
+
 const isPortReachable = require("is-port-reachable");
 const { ipcMain } = require("electron");
 
@@ -13,24 +14,22 @@ async function setup(port) {
     const reachable = await isPortReachable(port || DefaultMqttPort);
 
     if (!reachable) {
-        try {
-            server = new mosca.Server({ port: port || DefaultMqttPort }, (e) => { console.log("Mosca", e) });
-        } catch (error) {
-            console.error("Mosca", error);
-            status = "external";
-            return;
-        }
-        server.on("clientConnected", function (client) {
+        var server = require('net').createServer(aedes.handle)
+        var port = 1883
+
+        server.listen(port, function () {
+            console.log("MQTT aedes server is up and running");
+            status = "online";
+        })
+
+        aedes.on("client", function (client) {
             console.log("MQTT client connected", client.id);
         });
-        server.on("clientDisconnected", function (client) {
+
+        aedes.on("clientDisconnect", function (client) {
             console.log("MQTT client disconnected", client.id);
         });
 
-        server.on("ready", function () {
-            console.log("MQTT Mosca server is up and running");
-            status = "online";
-        });
     } else {
         status = "external";
     }
