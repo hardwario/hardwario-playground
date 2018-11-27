@@ -25,7 +25,7 @@ class HomeComponent extends Component {
             console.log('hub_list', hub_list);
             this.setState({ hub_list });
         });
-        ipcRenderer.send("hub/list/get");
+        // ipcRenderer.send("hub/list/get");
     }
 
     componentWillUnmount() {
