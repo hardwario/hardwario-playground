@@ -3,7 +3,7 @@
 # BigClown Playground app
 
 [![Travis](https://img.shields.io/travis/bigclownlabs/bch-playground/master.svg)](https://travis-ci.org/bigclownlabs/bch-playground)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/j90ijfjm7awnydkp/branch/master?svg=true)](https://ci.appveyor.com/project/blavka/bch-playground/branch/master)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/j90ijfjm7awnydkp/branch/master?svg=true)](https://ci.appveyor.com/project/Hardwario/bch-playground/branch/master)
 [![Release](https://img.shields.io/github/release/bigclownlabs/bch-playground.svg)](https://github.com/bigclownlabs/bch-playground/releases)
 [![License](https://img.shields.io/github/license/bigclownlabs/bch-playground.svg)](https://github.com/bigclownlabs/bch-playground/blob/master/LICENSE)
 [![Twitter](https://img.shields.io/twitter/follow/BigClownLabs.svg?style=social&label=Follow)](https://twitter.com/BigClownLabs)
@@ -38,6 +38,20 @@ Feel free to contribute to this application.
 
 
 ## Install (not fully tested)
+
+Node.js v8.x:
+
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+
+    sudo npm install npm -g
+
+
+    sudo apt install node-gyp
+
+
+
 
     sudo npm install node-pre-gyp -g
     sudo npm install electron-packager -g
