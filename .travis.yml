@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - "8"
+  - "10"
 
 os:
   - linux
@@ -9,13 +9,13 @@ os:
 
 env:
   matrix:
-  - BINARY_BUILDER="true" TRAVIS_NODE_VERSION="8"
-  - BINARY_BUILDER="true" TRAVIS_NODE_VERSION="8" ARCH="x86"
+  - BINARY_BUILDER="true" TRAVIS_NODE_VERSION="10"
+  - BINARY_BUILDER="true" TRAVIS_NODE_VERSION="10" ARCH="x86"
 
 matrix:
   exclude:
   - os: osx
-    env: BINARY_BUILDER="true" TRAVIS_NODE_VERSION="8" ARCH="x86"
+    env: BINARY_BUILDER="true" TRAVIS_NODE_VERSION="10" ARCH="x86"
 
 before_install:
   # download node if testing x86 architecture
