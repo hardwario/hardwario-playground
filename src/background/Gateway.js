@@ -1,6 +1,7 @@
 "use strict";
 const { Gateway, port_list } = require("./../utils/Gateway");
-const { ipcMain, BrowserWindow } = require("electron");
+const { ipcMain, BrowserWindow, app } = require("electron");
+const path = require("path");
 const notifyAll = require("../utils/notifyAll");
 
 const DefaultMqttUrl = "mqtt://127.0.0.1:1883";
@@ -16,6 +17,8 @@ function makeStatus() {
 }
 
 function setup() {
+    const cacheDir = path.join(app.getPath("userData"), "cache");
+
     ipcMain.on("gateway/connect", (event, device) => {
         console.log("on gateway:connect", device);
 
@@ -33,7 +36,7 @@ function setup() {
             notifyAll("gateway/status", makeStatus());
         }, (msg)=>{
             error_msg = msg;
-        });
+        }, cacheDir);
     });
 
     ipcMain.on("gateway/disconnect", (event, data) => {
