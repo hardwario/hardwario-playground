@@ -62,6 +62,7 @@
       "artifactName": "bigclown-playground-${version}-linux-${arch}.${ext}",
       "target": [
         "deb",
+        "snap",
         "tar.gz"
       ],
       "category": "Utility"
@@ -130,9 +131,9 @@
     "is-port-reachable": "^2.0.0",
     "mqtt": "^2.18.8",
     "node-arp": "^1.0.6",
-    "node-red": "^0.20.5",
-    "node-red-contrib-blynk-ws": "^0.7.1",
-    "node-red-contrib-ifttt": "^0.1.0",
+    "node-red": "^0.20.7",
+    "node-red-contrib-blynk-ws": "^1.0.0",
+    "node-red-contrib-ifttt": "^0.3.1",
     "node-red-dashboard": "*",
     "ping": "^0.2.2",
     "react": "^16.6.3",
