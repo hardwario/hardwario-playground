@@ -30,6 +30,7 @@ export default class extends Component {
         this.onConnect = this.onConnect.bind(this);
         this.onMessage = this.onMessage.bind(this);
         this.onSubscribeChange = this.onSubscribeChange.bind(this);
+        this.onClickClear = this.onClickClear.bind(this);
     }
 
     componentDidMount() {
@@ -101,6 +102,10 @@ export default class extends Component {
         }
     }
 
+    onClickClear() {
+        this.props.model.clear();
+    }
+
     onClickCopyTopic(message) {
         copy(message.topic, {
             debug: true,
@@ -149,6 +154,9 @@ export default class extends Component {
                         }
                     </ul>
                 </div>
+
+                <button onClick={this.onClickClear} className="btn btn-secondary btn-sm float-right" >Clear</button>
+
                 <form>
                     <div className="form-group">
                         <label className="control-label col-xs-1">
@@ -169,7 +177,7 @@ export default class extends Component {
                                 <input className="form-control" value={this.state.pub_payload} onChange={(e) => this.setState({ pub_payload: e.target.value })} type="text" placeholder="Enter message to publish" />
                             </div>
                             <div className="col-xs-2">
-                                <button disabled={!this.state.isConnected} onClick={this.onClickPublish} className="btn btn-default">Publish</button>
+                                <button disabled={!this.state.isConnected} onClick={this.onClickPublish} className="btn btn-primary btn-sm">Publish</button>
                             </div>
                         </div>
                         :
@@ -179,7 +187,7 @@ export default class extends Component {
                                 <input className="form-control" placeholder="Enter topic to subscribe" value={this.state.sub_topic} onChange={(e) => this.setState({ sub_topic: e.target.value })} type="text" />
                             </div>
                             <div className="col-xs-2">
-                                <button disabled={!this.state.isConnected} onClick={this.onClickSubscribe} className="btn btn-default">Subscribe</button>
+                                <button disabled={!this.state.isConnected} onClick={this.onClickSubscribe} className="btn btn-primary btn-sm">Subscribe</button>
                             </div>
                         </div>
                     }
@@ -199,7 +207,7 @@ export default class extends Component {
                         }
                     </ul>
                 </div>
-                <button disabled={!this.state.isConnected} onClick={this.onClickUnsubscribeAll} className="btn btn-danger">Unsubscribe all</button>
+                <button disabled={!this.state.isConnected} onClick={this.onClickUnsubscribeAll} className="btn btn-danger btn-sm">Unsubscribe all</button>
             </div>
 
         )
