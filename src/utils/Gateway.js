@@ -128,9 +128,25 @@ class Gateway {
         let payload = message.toString();
         console.log("Gateway MQTT message", topic, payload);
 
-        payload = payload.length > 0 ? JSON.parse(message.toString()) : null;
-
         let t = topic.split("/");
+
+        if ((t.length > 3) && (t[t.length - 2] == 'color'))
+        {
+            if (payload.length == 6) {
+                payload = '"#' + payload + '"';
+            }
+            else if ((payload.length == 7) && payload[0] == '#') {
+                payload = '"' + payload + '"';
+            }
+        }
+
+        try {
+            payload = payload.length > 0 ? JSON.parse(payload) : null;
+        } catch (error) {
+            console.error(error.toString());
+            return;
+        }
+
         let typ = t.shift(0);
         if (typ == "gateway") {
             if (topic == "gateway/all/info/get") {
@@ -158,13 +174,12 @@ class Gateway {
             if ((this._alias != null) && (t[0] in this._alias.name)) {
                 t[0] = this._alias.name[t[0]]
             }
-            console.log("test", t, payload);
             this.write(t.join("/"), payload);
         }
     }
 
     _device_readline(line) {
-        console.log("Gateway device readline:", line)
+        console.log("Gateway read:", line)
         let msg;
 
         try {
@@ -214,6 +229,8 @@ class Gateway {
                     }
 
                     this._eeprom_alias_add(id, new_alias);
+
+                    this._subscribe("node/" + new_alias + "/+/+/+/+");
                 }
 
                 this._nodes[id]["info"] = payload;
@@ -370,6 +387,7 @@ class Gateway {
 
     _subscribe(topic) {
         if (this._subscribes.indexOf(topic) == -1) {
+            console.log("Gateway MQTT subscribe: ", topic);
             this._subscribes.push(topic);
             this._mqtt.subscribe(topic);
         }
@@ -378,6 +396,7 @@ class Gateway {
     _unsubscribe(topic) {
         let index = this._subscribes.indexOf(topic);
         if (index != -1) {
+            console.log("Gateway MQTT unsubscribe: ", topic);
             this._subscribes.pop(topic);
             this._mqtt.unsubscribe(topic);
         }
@@ -401,7 +420,9 @@ class Gateway {
 
     write(topic, payload = null, callback = null) {
         if (!this._connected) return;
-        this._ser.write(JSON.stringify([topic, payload]) + "\n");
+        const line = JSON.stringify([topic, payload]);
+        console.log("Gateway write:", line);
+        this._ser.write(line + "\n");
         this._ser.drain(callback);
     }
 
