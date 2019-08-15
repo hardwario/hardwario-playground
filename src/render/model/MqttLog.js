@@ -109,6 +109,11 @@ export default class extends EventEmitter {
         return this._messages;
     }
 
+    clear() {
+        this._messages = [];
+        this.emit("message", null);
+    }
+
     getHighlightedMessages() {
         return Object.values(this._highlighted_messages);
     }

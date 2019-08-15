@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { HashRouter, Route, Switch, NavLink } from "react-router-dom";
-import { ipcRenderer } from "electron";
+import { ipcRenderer, shell } from "electron";
 
 import { RouteIframe, RouteWithProps } from "./components/Route";
 
@@ -21,6 +21,11 @@ import "../assets/scss/index.scss";
 
 // Import language files
 const i18n = require("../utils/i18n");
+
+function openExternal(e) {
+    e.preventDefault()
+    shell.openExternal(e.target.href || e.target.parentNode.href)
+}
 
 export default class extends Component {
     constructor(props) {
@@ -86,27 +91,29 @@ export default class extends Component {
                     <div id="navbar" key="navbar">
                         <aside className={this.state.visible ? "fade-in" : "fade-out"}>
                             <nav>
-                                <NavLink exact to="/">{i18n.__("home")}</NavLink>
-                                <NavLink to="/devices" title={gwOffline ? "No Radio Dongle connected" : null}>{i18n.__("Devices")} {gwOffline ?  <i className="fa fa-warning"></i> : null}</NavLink>
+                                {/* <NavLink exact to="/">{i18n.__("home")}</NavLink> */}
+                                <NavLink to="/" exact title={gwOffline ? "No Radio Dongle connected" : null}>{i18n.__("Devices")} {gwOffline ?  <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/functions" title={nodeRedOffline ? "Node-RED is shut down": null}>{i18n.__("Functions")} {nodeRedOffline ? <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                                 <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
+                                <a href="https://developers.bigclown.com/basics/bigclown-playground" onClick={openExternal}>{i18n.__("Help")}</a>
                                 {/* <NavLink to="/settings">{i18n.__("settings")}</NavLink> */}
                             </nav>
 
                             <nav className="bottom">
 
                             </nav>
-
-                            <img src={require("../assets/images/logo.png")} className="logo" />
+                            <a href="https://www.bigclown.com/" onClick={openExternal}>
+                                <img src={require("../assets/images/logo.png")} className="logo" />
+                            </a>
                         </aside>
                     </div>
 
                     <main key="main">
-                        <Home path="/" exact/>
+                        {/* <Home path="/" exact/> */}
                         <Route path="/settings" component={Settings}/>
-                        <RouteWithProps path="/devices" component={Devices} model={this.radiomanager} />
+                        <RouteWithProps path="/" exact component={Devices} model={this.radiomanager} />
                         <RouteIframe path="/functions" src="http://127.0.0.1:1880/" id="node-red" />
                         <RouteIframe path="/dashboard" src="http://127.0.0.1:1880/ui" />
                         <RouteWithProps path="/messages" component={MqttLog} model={this.mqttlog}/>

@@ -12,6 +12,43 @@ const flowFile = "flows.json";
 const flowFileStarting = "starting-flows.json";
 let userDir;
 
+function copyFileSync( source, target ) {
+    var targetFile = target;
+
+    if ( fs.existsSync( target ) ) {
+        if ( fs.lstatSync( target ).isDirectory() ) {
+            targetFile = path.join( target, path.basename( source ) );
+        }
+    }
+
+    if (fs.existsSync(targetFile)) {
+        return;
+    }
+
+    fs.writeFileSync(targetFile, fs.readFileSync(source));
+}
+
+function copyFolderRecursiveSync( source, target ) {
+    var files = [];
+
+    var targetFolder = path.join( target, path.basename( source ) );
+    if ( !fs.existsSync( targetFolder ) ) {
+        fs.mkdirSync( targetFolder );
+    }
+
+    if ( fs.lstatSync( source ).isDirectory() ) {
+        files = fs.readdirSync( source );
+        files.forEach( function ( file ) {
+            var curSource = path.join( source, file );
+            if ( fs.lstatSync( curSource ).isDirectory() ) {
+                copyFolderRecursiveSync( curSource, targetFolder );
+            } else {
+                copyFileSync( curSource, targetFolder );
+            }
+        } );
+    }
+}
+
 function setup() {
     let status = "offline";
 
@@ -24,15 +61,10 @@ function setup() {
         const reachable = await isPortReachable(listenPort);
 
         if (!reachable) {
-            userDir =  path.join(app.getPath("userData"), "node-red");
+            const userDir =  path.join(app.getPath("userData"), "node-red");
+            const sourceDir = path.join(__dirname, "..", "assets", "node-red");
 
-            if (!fs.existsSync(userDir)) {
-                fs.mkdirSync(userDir);
-            }
-
-            if (!fs.existsSync(path.join(userDir, flowFile))) {
-                fs.writeFileSync(path.join(userDir, flowFile), fs.readFileSync(path.join(__dirname, "..", "assets", "node-red", flowFileStarting)));
-            }
+            copyFolderRecursiveSync(sourceDir, app.getPath("userData") );
 
             var settings = {
                 uiPort: listenPort,

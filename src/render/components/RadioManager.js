@@ -57,7 +57,10 @@ export default class extends Component {
             return this.setState({nodes});
         }
         for (let i=0, l=nodes.length; i < l; i++) {
-            if ((this.state.nodes[i].id != nodes[i].id) || (this.state.nodes[i].alias != nodes[i].alias)) {
+            if ((this.state.nodes[i].id != nodes[i].id) ||
+                (this.state.nodes[i].alias != nodes[i].alias) ||
+                (this.state.nodes[i].firmware != nodes[i].firmware)||
+                (this.state.nodes[i].version != nodes[i].version)) {
                 return this.setState({nodes});
             }
         }
@@ -95,6 +98,7 @@ export default class extends Component {
                             <tr>
                                 <th>ID</th>
                                 <th>Alias</th>
+                                {/*<th>Firmware</th>*/}
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -109,6 +113,9 @@ export default class extends Component {
                                                 <td>
                                                     <input type="text" autoFocus className="form-control" defaultValue={item.alias} ref={this.textInput} onKeyPress={this.renameInputKeyPress} />
                                                 </td>
+                                                {/*<td>
+                                                    {item.firmware}-{item.version}
+                                                </td> */}
                                                 <td>
                                                     <button onClick={() => self.saveAlias() } className="btn btn-success">Save</button>
                                                     &nbsp;
@@ -124,6 +131,9 @@ export default class extends Component {
                                             <td>
                                                 {item.alias}
                                             </td>
+                                            {/*<td>
+                                                {item.firmware}-{item.version}
+                                            </td>*/}
                                             <td>
                                                 <button onClick={() => self.setState({ editId: item.id }) } className="btn btn-warning">Rename</button>
                                                 &nbsp;

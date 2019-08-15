@@ -2,6 +2,8 @@
 
 const SerialPort = require("serialport");
 var mqtt = require("mqtt");
+const path = require('path');
+const fs = require('fs');
 
 const gateway_topics = [
     "/nodes/get",
@@ -16,19 +18,29 @@ const gateway_topics = [
 ];
 
 class Gateway {
-    constructor(device, mqttUrl, callback, onError) {
+    constructor(device, mqttUrl, callback, onError, cacheDir) {
         this._device = device;
         this._connected = false;
         this._name = null;
         this._alias = null;
         this._nodes = null;
+        this._cache_nodes = {}
         this._subscribes = [];
+        this._cacheDirNodesJson = path.join(cacheDir, 'nodes.json');
+
+        if (!fs.existsSync(cacheDir)) {
+            fs.mkdirSync(cacheDir);
+        }
 
         this._ser = new SerialPort(device, {
             autoOpen: false,
             baudRate: 115200,
             parity: "none",
         });
+
+        try {
+            this._cache_nodes = JSON.parse(fs.readFileSync(this._cacheDirNodesJson), { encoding: "utf8" });
+        } catch(error) {}
 
         this._ser.on("open", function () {
             this._connected = true;
@@ -116,9 +128,25 @@ class Gateway {
         let payload = message.toString();
         console.log("Gateway MQTT message", topic, payload);
 
-        payload = payload.length > 0 ? JSON.parse(message.toString()) : null;
-
         let t = topic.split("/");
+
+        if ((t.length > 3) && (t[t.length - 2] == 'color'))
+        {
+            if (payload.length == 6) {
+                payload = '"#' + payload + '"';
+            }
+            else if ((payload.length == 7) && payload[0] == '#') {
+                payload = '"' + payload + '"';
+            }
+        }
+
+        try {
+            payload = payload.length > 0 ? JSON.parse(payload) : null;
+        } catch (error) {
+            console.error(error.toString());
+            return;
+        }
+
         let typ = t.shift(0);
         if (typ == "gateway") {
             if (topic == "gateway/all/info/get") {
@@ -146,13 +174,12 @@ class Gateway {
             if ((this._alias != null) && (t[0] in this._alias.name)) {
                 t[0] = this._alias.name[t[0]]
             }
-            console.log("test", t, payload);
             this.write(t.join("/"), payload);
         }
     }
 
     _device_readline(line) {
-        console.log("Gateway device readline:", line)
+        console.log("Gateway read:", line)
         let msg;
 
         try {
@@ -202,7 +229,13 @@ class Gateway {
                     }
 
                     this._eeprom_alias_add(id, new_alias);
+
+                    this._subscribe("node/" + new_alias + "/+/+/+/+");
                 }
+
+                this._nodes[id]["info"] = payload;
+
+                this._save_nodes_json();
             }
 
             let alias = id;
@@ -244,14 +277,12 @@ class Gateway {
             }
 
             if (this._nodes == null) {
-                this._nodes = [];
+                this._nodes = {};
 
                 this.write("/nodes/get");
             }
 
         } else if (topic == "/nodes") {
-
-            this._nodes = payload;
 
             if (this._alias == null) {
                 this._alias = {
@@ -263,24 +294,30 @@ class Gateway {
                 return
             }
 
-            let nodes = [];
-
             for (let i in payload) {
-                let id = payload[i];
-                this._subscribe_node(id);
-                nodes.push({ id: id, alias: this._alias.id[id] })
-            }
+                let node = payload[i];
+                if (typeof node === "string") node = {id: node};
 
-            payload = nodes;
+                this._add_node(node.id);
+
+                node["alias"] = this._alias.id[node.id] || null;
+
+                let info = this._nodes[node.id].info;
+                if (info) {
+                    node['firmware'] = info.firmware;
+                    node['version'] = info.version;
+                }
+
+                payload[i] = node;
+            };
 
         } else if (topic == "/detach") {
             this._unsubscribe_node(payload);
-            this._nodes.pop(payload);
+            delete this._nodes[payload];
             this._eeprom_alias_remove(payload);
 
         } else if (topic == "/attach") {
-            this._nodes.push(payload);
-            this._subscribe_node(payload);
+            this._add_node(payload);
         }
 
         if (this._name) {
@@ -328,7 +365,11 @@ class Gateway {
         }
     }
 
-    _subscribe_node(id) {
+    _add_node(id) {
+        if (id in this._nodes) return;
+
+        this._nodes[id] = this._cache_nodes[id] || {};
+
         this._subscribe("node/" + id + "/+/+/+/+");
 
         if (this._alias && (id in this._alias.id)) {
@@ -346,6 +387,7 @@ class Gateway {
 
     _subscribe(topic) {
         if (this._subscribes.indexOf(topic) == -1) {
+            console.log("Gateway MQTT subscribe: ", topic);
             this._subscribes.push(topic);
             this._mqtt.subscribe(topic);
         }
@@ -354,6 +396,7 @@ class Gateway {
     _unsubscribe(topic) {
         let index = this._subscribes.indexOf(topic);
         if (index != -1) {
+            console.log("Gateway MQTT unsubscribe: ", topic);
             this._subscribes.pop(topic);
             this._mqtt.unsubscribe(topic);
         }
@@ -377,12 +420,24 @@ class Gateway {
 
     write(topic, payload = null, callback = null) {
         if (!this._connected) return;
-        this._ser.write(JSON.stringify([topic, payload]) + "\n");
+        const line = JSON.stringify([topic, payload]);
+        console.log("Gateway write:", line);
+        this._ser.write(line + "\n");
         this._ser.drain(callback);
     }
 
     pub(topic, payload) {
         this._mqtt.publish(topic, JSON.stringify(payload));
+    }
+
+    _save_nodes_json() {
+        fs.writeFile(this._cacheDirNodesJson, JSON.stringify(this._nodes), 'utf8', (err) => {
+            if (err) {
+                console.log('Error save file ' + this._cacheDirNodesJson);
+            } else {
+                console.log('The file ' + this._cacheDirNodesJson + ' has been saved!');
+            }
+        });
     }
 }
 

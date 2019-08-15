@@ -15,7 +15,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "install": "electron-rebuild",
+    "postinstall": "electron-builder install-app-deps",
     "dev": "webpack-dev-server --hot --host 0.0.0.0 --config=./webpack.dev.config.js",
     "clean": "rm -rf ./builds ./dist",
     "webpack": "webpack --config webpack.build.config.js",
@@ -67,9 +67,6 @@
       ],
       "category": "Utility"
     },
-    "appImage": {
-      "systemIntegration": "doNotAsk"
-    },
     "nsis": {
       "artifactName": "bigclown-playground-${version}-${os}-setup-${arch}.${ext}"
     },
@@ -113,6 +110,7 @@
     "jquery": "^3.4.1",
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
+    "node-abi": "^2.11.0",
     "node-sass": "^4.12.0",
     "sass-loader": "^7.2.0",
     "shebang-loader": "0.0.1",
