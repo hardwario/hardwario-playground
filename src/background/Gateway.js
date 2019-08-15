@@ -17,7 +17,7 @@ function makeStatus() {
 }
 
 function setup() {
-    const cacheDir = path.join(app.getPath("userData"), "cache");
+    const cacheDir = path.join(app.getPath("userData"), "gateway");
 
     ipcMain.on("gateway/connect", (event, device) => {
         console.log("on gateway:connect", device);

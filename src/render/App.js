@@ -92,7 +92,7 @@ export default class extends Component {
                         <aside className={this.state.visible ? "fade-in" : "fade-out"}>
                             <nav>
                                 {/* <NavLink exact to="/">{i18n.__("home")}</NavLink> */}
-                                <NavLink to="/" title={gwOffline ? "No Radio Dongle connected" : null}>{i18n.__("Devices")} {gwOffline ?  <i className="fa fa-warning"></i> : null}</NavLink>
+                                <NavLink to="/" exact title={gwOffline ? "No Radio Dongle connected" : null}>{i18n.__("Devices")} {gwOffline ?  <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/functions" title={nodeRedOffline ? "Node-RED is shut down": null}>{i18n.__("Functions")} {nodeRedOffline ? <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                                 <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
@@ -113,7 +113,7 @@ export default class extends Component {
                     <main key="main">
                         {/* <Home path="/" exact/> */}
                         <Route path="/settings" component={Settings}/>
-                        <RouteWithProps path="/" component={Devices} model={this.radiomanager} />
+                        <RouteWithProps path="/" exact component={Devices} model={this.radiomanager} />
                         <RouteIframe path="/functions" src="http://127.0.0.1:1880/" id="node-red" />
                         <RouteIframe path="/dashboard" src="http://127.0.0.1:1880/ui" />
                         <RouteWithProps path="/messages" component={MqttLog} model={this.mqttlog}/>
