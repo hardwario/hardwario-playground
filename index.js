@@ -28,14 +28,17 @@ if (process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) |
 
 function createWindow() {
   if (!app.isReady()) return;
-  
+
   let mainWindow;
   mainWindow = new BrowserWindow({
     width: 1000,
     minWidth: 1000,
     minHeight: 480,
-    show: false
+    show: false,
     //,titleBarStyle: 'hidden' future purpose?
+    webPreferences: {
+        nodeIntegration: true
+      }
   });
 
   CustomMenu.setup(!dev);
