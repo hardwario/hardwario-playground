@@ -11,7 +11,7 @@
     "url": "git@github.com:bigclownlabs/bch-playground.git"
   },
   "license": "MIT",
-  "version": "0.11.0",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -44,7 +44,7 @@
       "buildResources": "resources",
       "output": "release"
     },
-    "electronVersion": "4.0.3",
+    "electronVersion": "6.0.2",
     "publish": null,
     "mac": {
       "artifactName": "bigclown-playground-${version}-macos-${arch}.${ext}",
