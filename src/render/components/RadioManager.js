@@ -98,7 +98,7 @@ export default class extends Component {
                             <tr>
                                 <th>ID</th>
                                 <th>Alias</th>
-                                <th>Firmware</th>
+                                {/*<th>Firmware</th>*/}
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -113,9 +113,9 @@ export default class extends Component {
                                                 <td>
                                                     <input type="text" autoFocus className="form-control" defaultValue={item.alias} ref={this.textInput} onKeyPress={this.renameInputKeyPress} />
                                                 </td>
-                                                <td>
+                                                {/*<td>
                                                     {item.firmware}-{item.version}
-                                                </td>
+                                                </td> */}
                                                 <td>
                                                     <button onClick={() => self.saveAlias() } className="btn btn-success">Save</button>
                                                     &nbsp;
@@ -131,9 +131,9 @@ export default class extends Component {
                                             <td>
                                                 {item.alias}
                                             </td>
-                                            <td>
+                                            {/*<td>
                                                 {item.firmware}-{item.version}
-                                            </td>
+                                            </td>*/}
                                             <td>
                                                 <button onClick={() => self.setState({ editId: item.id }) } className="btn btn-warning">Rename</button>
                                                 &nbsp;
