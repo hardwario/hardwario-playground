@@ -47,6 +47,8 @@ export default class extends EventEmitter {
                 this.client.subscribe("gateway/" + this.name + gateway_topics[i]);
             }
 
+            this.client.subscribe("node/+/info");
+
             this.emit('mqttConnect', true);
 
             this.publish("gateway/all/info/get");
