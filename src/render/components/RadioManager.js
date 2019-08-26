@@ -12,6 +12,7 @@ export default class extends Component {
             pairing: props.model.getIsPairingModeStart(),
             editId: null,
             editValue: "",
+            lastAttachNodeId: null
         };
 
         this.textInput = React.createRef();
@@ -26,6 +27,7 @@ export default class extends Component {
         this.setEditId = this.setEditId.bind(this);
         this.saveAlias = this.saveAlias.bind(this);
         this.renameInputKeyPress = this.renameInputKeyPress.bind(this);
+        this.onAttach = this.onAttach.bind(this);
     }
 
     componentDidMount() {
@@ -34,6 +36,7 @@ export default class extends Component {
         this.props.model.on('connect',  this.onConnect);
         this.props.model.on('nodes',  this.onNodes);
         this.props.model.on("pairing-mode", this.onPairingMode);
+        this.props.model.on("attach", this.onAttach);
     }
 
     componentWillUnmount() {
@@ -42,6 +45,7 @@ export default class extends Component {
         this.props.model.removeListener('connect',  this.onConnect);
         this.props.model.removeListener('nodes', this.onNodes);
         this.props.model.removeListener("pairing-mode", this.onPairingMode);
+        this.props.model.removeListener("attach", this.onAttach);
     }
 
     onMqttConnect(connect) {
@@ -72,6 +76,10 @@ export default class extends Component {
         }
     }
 
+    onAttach(nodeId) {
+        this.setState({lastAttachNodeId: nodeId});
+    }
+
     onCLickPairingBtn(e) {
         if (e) e.preventDefault();
 
@@ -90,10 +98,12 @@ export default class extends Component {
                 <div className="col-xs-12">
                     <div className="form-group">
                         <button disabled={!this.state.gatewayStatus} type="button" className={"btn " + (this.state.pairing ? "btn-danger" : "btn-success")} onClick={this.onCLickPairingBtn}>
-                            {this.state.pairing ? "Stop pairing" : "Start pairing"}
+                            {this.state.pairing ? <span>
+                            Stop pairing &nbsp; <span className={' blink_me'}>{'\u25cf'}</span>
+                            </span> : "Start pairing"}
                         </button>
                     </div>
-                    <table className="table table-bordered table-hover">
+                    <table className="table table-bordered table-hover devices">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -108,8 +118,8 @@ export default class extends Component {
                                     if (this.state.editId == item.id)
                                     {
                                         return (
-                                            <tr key={index}>
-                                                <td>{item.id}</td>
+                                            <tr key={index} >
+                                                <td >{item.id}</td>
                                                 <td>
                                                     <input type="text" autoFocus className="form-control" defaultValue={item.alias} ref={this.textInput} onKeyPress={this.renameInputKeyPress} />
                                                 </td>
@@ -126,8 +136,10 @@ export default class extends Component {
                                     }
 
                                     return (
-                                        <tr key={index}>
-                                            <td>{item.id}</td>
+                                        <tr key={index} className={this.state.lastAttachNodeId == item.id ? "lastAttach": ""}>
+                                            <td >
+                                                {item.id}
+                                            </td>
                                             <td>
                                                 {item.alias}
                                             </td>

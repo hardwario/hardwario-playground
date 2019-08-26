@@ -94,13 +94,16 @@ export default class extends EventEmitter {
             }
             else if (topic == "gateway/" + this.name + "/nodes") {
                 this.nodes = payload;
-
                 this.emit("nodes", this.nodes);
             }
             else if (topic == "gateway/" + this.name + "/pairing-mode") {
                 this.pairingMode = payload == "start";
-
                 this.emit("pairing-mode", this.pairingMode);
+            }
+            else if (topic == "gateway/" + this.name + "/attach") {
+                this.pairringStop();
+                this.nodeListUpdate();
+                this.emit("attach", payload);
             }
             else {
                 this.nodeListUpdate();
