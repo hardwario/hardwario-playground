@@ -78,6 +78,7 @@ deploy:
   file:
     - release/*.deb
     - release/*.AppImage
+    - release/*.snap
     - release/*.dmg
     - release/*.tar.gz
   file_glob: true
