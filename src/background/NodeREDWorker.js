@@ -7,11 +7,6 @@ const path = require("path");
 const { app, ipcMain } = require("electron");
 const isPortReachable = require('is-port-reachable');
 
-const listenPort = 1880;
-const flowFile = "flows.json";
-const flowFileStarting = "starting-flows.json";
-let userDir;
-
 function copyFileSync( source, target ) {
     var targetFile = target;
 
@@ -33,7 +28,7 @@ function copyFolderRecursiveSync( source, target ) {
 
     var targetFolder = path.join( target, path.basename( source ) );
     if ( !fs.existsSync( targetFolder ) ) {
-        fs.mkdirSync( targetFolder );
+        fs.mkdirSync( targetFolder, {recursive: true}, err => {} );
     }
 
     if ( fs.lstatSync( source ).isDirectory() ) {
@@ -50,7 +45,9 @@ function copyFolderRecursiveSync( source, target ) {
 }
 
 function setup() {
-    let status = "offline";
+    const listenPort = 1880;
+    const flowFile = "flows.json";
+    let status = "unknown";
 
     ipcMain.on("nodered/status/get", (event, data) => {
         event.sender.send("nodered/status", status);
@@ -60,12 +57,16 @@ function setup() {
 
         const reachable = await isPortReachable(listenPort);
 
+        const isDebug = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) ||
+                        /[\\/]electron[\\/]/.test(process.execPath) ||
+                        process.argv.indexOf("--debug-node-red") != -1;
+
         if (!reachable) {
             const userDir =  path.join(app.getPath("userData"), "node-red");
             const sourceDir = path.join(__dirname, "..", "assets", "node-red");
 
             copyFolderRecursiveSync(sourceDir, app.getPath("userData") );
-
+            //node-red-contrib-bigclown-ga
             var settings = {
                 uiPort: listenPort,
                 verbose: true,
@@ -73,7 +74,35 @@ function setup() {
                 httpNodeRoot: "/",
                 userDir,
                 flowFile,
-                functionGlobalContext: {} // enables global context
+                functionGlobalContext: {}, // enables global context
+                logging: {
+                    // Console logging
+                    console: {
+                        level: isDebug ? "debug" : "info",
+                        metrics: false,
+                        audit: false
+                    },
+                    // Custom logger
+                    myCustomLogger: {
+                        level: 'debug',
+                        metrics: true,
+                        handler: function(settings) {
+                            return function(msg) {
+                                if (msg.level == 50) {
+                                    let m = msg.msg.match(/\[out\] > grpc@.*? install (.+)/);
+                                    if (m) {
+                                        console.log('Fix grpc binary');
+                                        const source = path.join(app.getAppPath(), "node_modules", "grpc", "src", "node", "extension_binary");
+                                        const target = path.join(m[1], 'src', 'node');
+                                        console.log(source)
+                                        console.log(target)
+                                        copyFolderRecursiveSync(source, target);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             };
 
             let http_app = express();
