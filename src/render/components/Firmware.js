@@ -124,7 +124,7 @@ export default class extends Component {
 
         if ((this.state.port === "") && (ports.length > 0)) {
             this.setState({port:ports[0].comName});
-        } 
+        }
 
         this.timer = setTimeout(() => {
             ipcRenderer.send("firmware:get-port-list");
@@ -306,7 +306,7 @@ export default class extends Component {
     {this.state.firmware ?
     <div className="row firmware-detail">
 
-        <div className="form-group col-7">
+        <div className="form-group col-6">
 
             {this.state.firmware.description ? <div>
             <label>Description</label>
@@ -330,19 +330,47 @@ export default class extends Component {
 
         </div>
 
-        <div className="form-group col-5">
+        <div className="form-group col-6">
             {this.state.firmware.images ? <img src={this.state.firmware.images[0].url} alt={this.state.firmware.images[0].title} /> : null}
 
             {this.state.firmware.video ? <div>
-                <br />
                 {isYoutubeUrl(this.state.firmware.video) ?
                 <iframe src={getYoutubeVideoUrl(this.state.firmware.video)} frameBorder="0" allow="encrypted-media" allowFullScreen="1"></iframe>
                 : <a href={this.state.firmware.video} onClick={openExternal}>{this.state.firmware.video}</a>}
             </div> : null}
         </div>
 
-    </div> : null}
+        { (this.state.firmware.articles && this.state.firmware.articles.length > 0) ?
+        <div className="row col-12">
+            <div className="col-12">
+            <label>Articles</label>
+            </div>
+            <ul className="list-unstyled col-12">
+            {
+                this.state.firmware.articles.map((article, index) => {
+                    return (
+                        <li class="media">
+                        { (article.video && article.video.length > 0) ?
+                            isYoutubeUrl(article.video) ?
+                                <iframe class="mr-3" src={getYoutubeVideoUrl(article.video)} frameBorder="0" allow="encrypted-media" allowFullScreen="1"></iframe>
+                                : <video class="mr-3" src={article.video} controls preload="metadata"></video>
 
+                        : (article.images && article.images.length > 0) ?
+                            <img class="mr-3" src={article.images[0].url} alt="{article.images[0].title}"/>
+                            : null
+                        }
+                        <div class="media-body">
+                            <h5 class="mt-0"><a href={article.url} onClick={openExternal}>{article.title}</a></h5>
+                            {article.description}
+                        </div>
+                        </li>
+                    )
+                })
+            }
+            </ul>
+        </div> : null}
+
+    </div> : null}
 
         </div>)
     }

@@ -58,7 +58,11 @@ function loadFirmwareJson(jsonpath) {
 
     let payload = JSON.parse(fs.readFileSync(jsonpath, { encoding: "utf8" })) || [];
 
-    return payload['list'];
+    return payload['list'].map((fw)=>{
+        if (!fw.articles) fw.articles = [];
+
+        return fw;
+    })
 
     // return list.sort((a,b)=>{
     //     let wa = a.name.indexOf("wireless") > -1;
