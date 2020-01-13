@@ -1,6 +1,6 @@
 {
-  "name": "bigclown-playground",
-  "productName": "BigClown Playground",
+  "name": "hardwario-playground",
+  "productName": "Hardwario Playground",
   "author": {
     "name": "HARDWARIO s.r.o.",
     "email": "karel.blavka@hardwario.com",
@@ -28,9 +28,9 @@
     "package-mac": "npm run webpack && electron-builder build --mac"
   },
   "build": {
-    "productName": "BigClown Playground",
-    "appId": "com.electron.bigclown-playground",
-    "artifactName": "bigclown-playground-${version}-${os}-${arch}.${ext}",
+    "productName": "Hardwario Playground",
+    "appId": "com.electron.hio-playground",
+    "artifactName": "hio-playground-${version}-${os}-${arch}.${ext}",
     "files": [
       "dist/",
       "node_modules/",
@@ -47,11 +47,11 @@
     "electronVersion": "6.0.4",
     "publish": null,
     "mac": {
-      "artifactName": "bigclown-playground-${version}-macos-${arch}.${ext}",
+      "artifactName": "hio-playground-${version}-macos-${arch}.${ext}",
       "category": "public.app-category.utilities"
     },
     "win": {
-      "artifactName": "bigclown-playground-${version}-windows-${arch}.${ext}",
+      "artifactName": "hio-playground-${version}-windows-${arch}.${ext}",
       "target": [
         "nsis",
         "portable"
@@ -59,7 +59,7 @@
       "publisherName": "HARDWARIO s.r.o."
     },
     "linux": {
-      "artifactName": "bigclown-playground-${version}-linux-${arch}.${ext}",
+      "artifactName": "hio-playground-${version}-linux-${arch}.${ext}",
       "target": [
         "deb",
         "snap",
@@ -68,7 +68,7 @@
       "category": "Utility"
     },
     "nsis": {
-      "artifactName": "bigclown-playground-${version}-${os}-setup-${arch}.${ext}"
+      "artifactName": "hio-playground-${version}-${os}-setup-${arch}.${ext}"
     },
     "dmg": {
       "contents": [
