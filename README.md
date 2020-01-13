@@ -1,6 +1,6 @@
 <a href="https://www.bigclown.com/"><img src="https://bigclown.sirv.com/logo.png" width="200" alt="BigClown Logo" align="right"></a>
 
-# BigClown Playground app
+# Hardwario Playground app
 
 [![Travis](https://img.shields.io/travis/bigclownlabs/bch-playground/master.svg)](https://travis-ci.org/bigclownlabs/bch-playground)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/j90ijfjm7awnydkp/branch/master?svg=true)](https://ci.appveyor.com/project/Hardwario/bch-playground/branch/master)

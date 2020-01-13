@@ -66,7 +66,6 @@ function setup() {
             const sourceDir = path.join(__dirname, "..", "assets", "node-red");
 
             copyFolderRecursiveSync(sourceDir, app.getPath("userData") );
-            //node-red-contrib-bigclown-ga
             var settings = {
                 uiPort: listenPort,
                 verbose: true,

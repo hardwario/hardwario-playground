@@ -53,7 +53,7 @@ module.exports = {
   target: "electron-renderer",
   plugins: [
     new HtmlWebpackPlugin({
-      title: "BigClown Playground " + process.env.npm_package_version
+      title: "Hardwario Playground " + process.env.npm_package_version
     }),
     new ExtractTextPlugin("bundle.css"),
     new webpack.DefinePlugin({
