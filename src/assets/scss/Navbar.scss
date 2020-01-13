@@ -63,18 +63,18 @@ $navbar-padding-left: 5px;
         flex-direction: column;
         a {
             padding: 5px 10px;
-            color: black;
+            color: white;
         }
         a:hover {
-            background-color: #fdc700;
+            background-color: #4d4d4d;
             text-decoration: none;
         }
         div.item {
             padding: 5px 10px;
-            color: black;
+            color: white;
         }
         a.active {
-            background-color: #0e788a;
+            background-color: #252532;
             color: white;
             .fa-warning {
                 color: #fdc700;
@@ -84,7 +84,7 @@ $navbar-padding-left: 5px;
     aside {
         height: 100%;
         justify-content: space-between;
-        background-color: #ddd;
+        background-color: #6B6A6A;
     }
     #hider {
         background-color: #eee;
