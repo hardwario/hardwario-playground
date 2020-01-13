@@ -104,8 +104,7 @@ export default class extends Component {
                             <nav className="bottom">
 
                             </nav>
-                            <a href="https://www.bigclown.com/" onClick={openExternal}>
-                                <img src={require("../assets/images/logo.png")} className="logo" />
+                                <img src={require("../assets/images/hw-logo-white.svg")} className="logo" />
                             </a>
                         </aside>
                     </div>
