@@ -97,7 +97,7 @@ export default class extends Component {
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                                 <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
-                                <a href="https://developers.hardwario.com/basics/hardwario-playground" onClick={openExternal}>{i18n.__("Help")}</a>
+                                <a href="https://developers.bigclown.com/basics/bigclown-playground" onClick={openExternal}>{i18n.__("Help")}</a>
                                 {/* <NavLink to="/settings">{i18n.__("settings")}</NavLink> */}
                             </nav>
 
