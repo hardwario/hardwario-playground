@@ -18,7 +18,7 @@ before_install:
   - node -p 'process.platform + "@" + process.arch'
   - npm --version
   - npm install node-pre-gyp -g
-  - npm install node-abi@2.11.0 -g
+  - npm install node-abi@2.13.0 -g
   - npm install electron-builder -g
 
 install:
