@@ -146,6 +146,6 @@
     "request-progress": "^3.0.0",
     "serialport": "^8.0.6",
     "sleep": "^6.1.0",
-    "ubidots-nodered": "^1.1.1"
+    "ubidots-nodered": "^1.2.0"
   }
 }
