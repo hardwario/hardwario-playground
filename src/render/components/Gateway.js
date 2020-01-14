@@ -55,7 +55,7 @@ export default class extends Component {
 
         if (this.state.ports.length == ports.length){
             for (let i=0, l=ports.length; i < l; i++) {
-                if (this.state.ports[i].comName != ports[i].comName) {
+                if (this.state.ports[i].path != ports[i].path) {
                     change = true;
                     break;
                 }
@@ -67,7 +67,8 @@ export default class extends Component {
         if (change)
         {
             if ((this.state.selectedPort == "") && (ports.length > 0)) {
-                this.setState({ selectedPort: ports[0].comName });
+                this.setState({ selectedPort: ports[0].path });
+                console.log(this.state.selectedPort);
             }
             else if (ports.length == 0)
             {
@@ -103,6 +104,8 @@ export default class extends Component {
 
         if (this.state.selectedPort == "") return;
 
+        console.log(this.state.selectedPort);
+
         ipcRenderer.send("gateway/connect", this.state.selectedPort)
     }
 
@@ -116,7 +119,7 @@ export default class extends Component {
                         <select className="form-control" value={this.state.selectedPort} onChange={(e) => this.setState({ selectedPort: e.target.value })}>
                             {this.state.ports.length == 0 ? <option>(no device available)</option> : null }
                             {
-                                this.state.ports.map((port, index) => <option value={port.comName} key={index}>{port.comName}{port.serialNumber ? " " + port.serialNumber : null}</option>)
+                                this.state.ports.map((port, index) => <option value={port.path} key={index}>{port.path}{port.serialNumber ? " " + port.serialNumber : null}</option>)
                             }
                         </select>
                     </FormGroup>

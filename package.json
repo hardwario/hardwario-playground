@@ -1,6 +1,6 @@
 {
   "name": "hardwario-playground",
-  "productName": "Hardwario Playground",
+  "productName": "HARDWARIO Playground",
   "author": {
     "name": "HARDWARIO s.r.o.",
     "email": "karel.blavka@hardwario.com",
@@ -28,9 +28,9 @@
     "package-mac": "npm run webpack && electron-builder build --mac"
   },
   "build": {
-    "productName": "Hardwario Playground",
+    "productName": "HARDWARIO Playground",
     "appId": "com.electron.hio-playground",
-    "artifactName": "hio-playground-${version}-${os}-${arch}.${ext}",
+    "artifactName": "hio-playground-v${version}-${os}-${arch}.${ext}",
     "files": [
       "dist/",
       "node_modules/",
@@ -48,11 +48,11 @@
     "electronVersion": "7.1.9",
     "publish": null,
     "mac": {
-      "artifactName": "hio-playground-${version}-macos-${arch}.${ext}",
+      "artifactName": "hio-playground-v${version}-macos-${arch}.${ext}",
       "category": "public.app-category.utilities"
     },
     "win": {
-      "artifactName": "hio-playground-${version}-windows-${arch}.${ext}",
+      "artifactName": "hio-playground-v${version}-windows-${arch}.${ext}",
       "target": [
         "nsis",
         "portable"
@@ -60,7 +60,7 @@
       "publisherName": "HARDWARIO s.r.o."
     },
     "linux": {
-      "artifactName": "hio-playground-${version}-linux-${arch}.${ext}",
+      "artifactName": "hio-playground-v${version}-linux-${arch}.${ext}",
       "target": [
         "deb",
         "snap",
@@ -69,7 +69,7 @@
       "category": "Utility"
     },
     "nsis": {
-      "artifactName": "hio-playground-${version}-${os}-setup-${arch}.${ext}"
+      "artifactName": "hio-playground-v${version}-${os}-setup-${arch}.${ext}"
     },
     "dmg": {
       "contents": [

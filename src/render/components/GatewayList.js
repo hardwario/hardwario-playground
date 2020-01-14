@@ -31,9 +31,9 @@ export default class extends Component {
             <div id="gatewayList">
                 {
                     this.state.ports.map((port, index) => {
-                        return <div className="port" key={port.comName} onClick={() => {
-                            ipcRenderer.send("gateway/connect", port.comName)
-                        }} >{port.comName}</div>
+                        return <div className="port" key={port.path} onClick={() => {
+                            ipcRenderer.send("gateway/connect", port.path)
+                        }} >{port.path}</div>
                     })
                 }
                 <div className="port" onClick={() => {

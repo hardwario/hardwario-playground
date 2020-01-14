@@ -112,6 +112,7 @@ class Flash_Serial {
           return this._read(buffer, 1);
         })
         .then((length) => {
+            console.log(length, buffer, buffer.readUInt8());
           if ((length == 1) && (buffer.readUInt8() == ACK)) {
             resolve();
           } else {
@@ -189,11 +190,11 @@ class Flash_Serial {
 
     return new Promise((resolve, reject) => {
       this._ser.read(readBuffer, 0, 1)
-        .then((length) => {
+        .then((ret) => {
           if (readBuffer[0] == ACK) {
             resolve();
           } else {
-            console.log(length, readBuffer);
+            console.log(ret.bytesRead, readBuffer);
             reject('Expect ACK');
           }
         })
@@ -213,11 +214,14 @@ class Flash_Serial {
             this._ser.close();
         }, timeout);
 
+        var ret;
+
         while (read_length < length) {
-          read_length += await this._ser.read(readBuffer, read_length, length - read_length).catch((e)=>{
+            ret = await this._ser.read(readBuffer, read_length, length - read_length).catch((e)=>{
             clearTimeout(timer);
             reject(e);
           });
+          read_length += ret.bytesRead;
         }
 
         clearTimeout(timer);
@@ -301,9 +305,9 @@ class Flash_Serial {
         .then(() => {
           return this._ser.read(readBuffer, 0, 2);
         })
-        .then((l) => {
+        .then((ret) => {
           if ((readBuffer[0] & readBuffer[1]) != ACK) {
-            if ((l == 1) && (readBuffer[0] == ACK)) {
+            if ((ret.bytesRead == 1) && (readBuffer[0] == ACK)) {
               return this._wait_for_ack();
             }
 
