@@ -38,7 +38,8 @@
       "index.js",
       "menu.js",
       "package.json",
-      "resources/icon.*"
+      "resources/icon.*",
+      "resources/icons"
     ],
     "directories": {
       "buildResources": "resources",

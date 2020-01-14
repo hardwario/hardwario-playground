@@ -35,10 +35,11 @@ function createWindow() {
     minWidth: 1000,
     minHeight: 480,
     show: false,
+    icon: path.join(__dirname, 'src', 'assets', 'icons', 'icon.png'),
     //,titleBarStyle: 'hidden' future purpose?
     webPreferences: {
-        nodeIntegration: true
-      }
+    nodeIntegration: true
+    },
   });
 
   CustomMenu.setup(!dev);

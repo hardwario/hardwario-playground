@@ -73,11 +73,14 @@ $navbar-padding-left: 5px;
             padding: 5px 10px;
             color: white;
         }
+        .fa-warning {
+            color:#ffe100;
+        }
         a.active {
             background-color: #252532;
             color: white;
             .fa-warning {
-                color: #fdc700;
+                color: #ffe100;
             }
         }
     }
