@@ -83,12 +83,15 @@ function createWindow() {
             buttons: ["Cancel", "Close without Saving"],
             title: "Warning",
             message: "Node-RED contains unsaved changes"
-        }, (response)=>{
-            if (response == 1) {
+        }).then((result)=>{
+            console.log('showMessageBox', 'response', result);
+            if (result.response == 1) {
                 mainWindow.send("iframe:node-red:visible", false);
                 timer = setTimeout(()=>{mainWindow.close()}, 100);
             }
-        });
+        }).catch(err => {
+          console.error('showMessageBox', err);
+        })
 
     }, 1000);
   })
