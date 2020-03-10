@@ -1,4 +1,4 @@
-<a href="https://www.bigclown.com/"><img src="https://bigclown.sirv.com/logo.png" width="200" alt="BigClown Logo" align="right"></a>
+<a href="https://www.hardwario.com/"><img src="https://www.hardwario.com/ci/assets/hw-logo.svg" width="200" alt="HARDWARIO Logo" align="right"></a>
 
 # Hardwario Playground app
 
@@ -6,7 +6,7 @@
 [![Appveyor](https://ci.appveyor.com/api/projects/status/j90ijfjm7awnydkp/branch/master?svg=true)](https://ci.appveyor.com/project/Hardwario/bch-playground/branch/master)
 [![Release](https://img.shields.io/github/release/bigclownlabs/bch-playground.svg)](https://github.com/bigclownlabs/bch-playground/releases)
 [![License](https://img.shields.io/github/license/bigclownlabs/bch-playground.svg)](https://github.com/bigclownlabs/bch-playground/blob/master/LICENSE)
-[![Twitter](https://img.shields.io/twitter/follow/BigClownLabs.svg?style=social&label=Follow)](https://twitter.com/BigClownLabs)
+[![Twitter](https://img.shields.io/twitter/follow/hardwario_en.svg?style=social&label=Follow)](https://twitter.com/hardwario_en)
 
 
 This repository contains Playground application.
