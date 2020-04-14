@@ -116,7 +116,9 @@ class Gateway {
         console.log("Gateway MQTT connect");
         this._mqtt.subscribe("gateway/all/info/get");
         for (let i in this._subscribes) {
-            this._mqtt.subscribe(this._subscribes[i]);
+            const topic = this._subscribes[i];
+            console.log("Gateway MQTT subscribe: ", topic);
+            this._mqtt.subscribe(topic);
         }
     }
 
@@ -366,11 +368,10 @@ class Gateway {
     }
 
     _add_node(id) {
-        if (id in this._nodes) return;
-
-        this._nodes[id] = this._cache_nodes[id] || {};
-
-        this._subscribe("node/" + id + "/+/+/+/+");
+        if (!(id in this._nodes)) {
+            this._nodes[id] = this._cache_nodes[id] || {};
+            this._subscribe("node/" + id + "/+/+/+/+");
+        }
 
         if (this._alias && (id in this._alias.id)) {
             this._subscribe("node/" + this._alias.id[id] + "/+/+/+/+");
