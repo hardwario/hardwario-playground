@@ -116,7 +116,15 @@ function setup() {
 
                     resolve();
                 });
+            }).otherwise(function(err) {
+                RED.log.error(RED.log._("server.failed-to-start"));
+                if (err.stack) {
+                    RED.log.error(err.stack);
+                } else {
+                    RED.log.error(err);
+                }
             });
+
         } else {
             status = "external";
 
