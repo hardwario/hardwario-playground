@@ -23,5 +23,6 @@ function setup() {
 }
 
 module.exports = {
-    setup
+    setup,
+    settings,
 }
