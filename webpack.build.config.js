@@ -23,11 +23,8 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: "css-loader"
-                }),
-                include: [/node_modules/, defaultInclude]
+                use: ["style-loader", "css-loader"],
+                include: [defaultInclude, /node_modules/]
             },
             {
                 test: /\.scss$/,
