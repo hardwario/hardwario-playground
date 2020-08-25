@@ -28,7 +28,7 @@ class Enmon extends EventEmitter {
 
         this._isConnected = false;
 
-        const programPath = path.join(__dirname, "..", "assets", "enmon");
+        const programPath = path.join(__dirname, "..", "assets", "bin", "enmon");
 
         this._process = spawn(programPath, ['--loop', '--delay', this._delay.toString()]);
 

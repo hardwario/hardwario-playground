@@ -26,7 +26,9 @@ build_script:
 
       echo "downloadUri : $downloadUri"
 
-      Invoke-WebRequest -Uri "$downloadUri" -Out src\assets\enmon.exe
+      Invoke-WebRequest -Uri "$downloadUri" -Out src\assets\bin\enmon.exe
+
+      dir src\assets\bin
 
   - if "%platform%" == "x86" npm run package-win32
   - if "%platform%" == "x64" npm run package-win64

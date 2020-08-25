@@ -45,6 +45,18 @@
       "buildResources": "resources",
       "output": "release"
     },
+    "extraFiles": [
+        {
+            "from": "src/assets/node-red",
+            "to": "src/assets/node-red",
+            "filter": ["**/*"]
+        },
+        {
+            "from": "src/assets/bin",
+            "to": "src/assets/bin",
+            "filter": ["**/*"]
+        }
+      ],
     "electronVersion": "8.5.0",
     "publish": null,
     "mac": {
