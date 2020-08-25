@@ -9,6 +9,7 @@ export default class extends Component {
         this.state = {
             isConnected: props.model.isConnect(),
             bridgeStatus: "disabled",
+            values: props.model.getValues(),
         };
 
         this.ipcBridgeStatus = this.ipcBridgeStatus.bind(this);
@@ -44,6 +45,8 @@ export default class extends Component {
 
     onMessage(message) {
         console.log("Render on message", message);
+        this.setState( { values: this.props.model.getValues() });
+        console.log(this.state.values);
     }
 
     buttonOnClick() {
@@ -65,6 +68,31 @@ export default class extends Component {
                         <Label className="mr-sm-2"></Label>
                         <Button disabled={false} color={this.state.bridgeStatus != 'disabled' ? "danger": "success"} onClick={this.buttonOnClick}>{this.state.bridgeStatus != 'disabled' ? "Disable Bridge" : "Enable Bridge"}</Button>
                     </FormGroup>
+
+                    <table className="table table-bordered table-hover values">
+                        <thead>
+                            <tr>
+                                <th>Label</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                this.state.values.map((item, index) => {
+                                    return (
+                                        <tr key={index}>
+                                            <td >
+                                                {item.label}
+                                            </td>
+                                            <td>
+                                                {item.value}
+                                            </td>
+                                        </tr>
+                                    )
+                                })
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         )

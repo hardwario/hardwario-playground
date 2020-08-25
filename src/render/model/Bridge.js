@@ -7,7 +7,8 @@ export default class extends EventEmitter {
         super();
         this._url = null;
         this._connect = false;
-        this._cnt = 0;
+        this._values_map = {};
+        this._values_list = [];
     }
 
     connect(url) {
@@ -34,12 +35,30 @@ export default class extends EventEmitter {
         });
 
         this.client.on("message", (topic, data) => {
-            let message = { topic: topic.substring(7),  payload: data.toString() };
+            let message = { topic: topic.substring(7), payload: data.toString() };
+
+            const tmp = this._values_map[message.topic];
+            if (tmp) {
+                tmp.value = message.payload;
+                tmp.time = new Date();
+            } else {
+                this._values_map[message.topic] = {
+                    label: message.topic[0].toUpperCase() + message.topic.substring(1),
+                    value: message.payload,
+                    time: new Date()
+                };
+                this._values_list = Object.values(this._values_map).sort((a,b)=>{return a.label < b.label ? -1 : 1});
+            }
+
             this.emit("message", message);
         });
     }
 
     isConnect() {
         return this._connect;
+    }
+
+    getValues() {
+        return this._values_list;
     }
 }
