@@ -21,11 +21,19 @@ install:
   - npm rebuild node-sass
 
 build_script:
+  - ps: >-
+      $downloadUri = ((Invoke-RestMethod -Method GET -Uri https://api.github.com/repos/hardwario/enmon/releases/latest).assets | Where-Object name -like "*win32.exe" ).browser_download_url
+
+      echo "downloadUri : $downloadUri"
+
+      Invoke-WebRequest -Uri "$downloadUri" -Out src\assets\enmon.exe
+
   - if "%platform%" == "x86" npm run package-win32
   - if "%platform%" == "x64" npm run package-win64
   - cd release
   - dir
   - ps: >-
+
       $platform = Get-ChildItem Env:PLATFORM
 
       $platform = $platform.value
