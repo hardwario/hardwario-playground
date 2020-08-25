@@ -33,5 +33,6 @@
   "connect": "Connect",
   "remove": "Remove",
   "rename": "Rename",
-  "remoteIp": "Remote IP"
+  "remoteIp": "Remote IP",
+  "bridge": "Bridge"
 }

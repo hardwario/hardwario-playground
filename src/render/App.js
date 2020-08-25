@@ -6,6 +6,8 @@ import { RouteIframe, RouteWithProps } from "./components/Route";
 
 import RadioManagerModel from "./model/RadioManager";
 import MqttLogModel from "./model/MqttLog";
+import BridgeModel from "./model/Bridge";
+
 
 import MqttLog from "./components/MqttLog";
 import Settings from "./components/Settings";
@@ -14,7 +16,7 @@ import Firmware from "./components/Firmware";
 import Gateway from "./components/Gateway";
 import Devices from "./components/Devices";
 import Home from "./components/Home";
-
+import Bridge from "./components/Bridge";
 
 // Import SCSS
 import "../assets/scss/index.scss";
@@ -39,6 +41,7 @@ export default class extends Component {
 
         this.radiomanager = new RadioManagerModel();
         this.mqttlog = new MqttLogModel();
+        this.bridge = new BridgeModel();
     }
 
     componentDidMount() {
@@ -63,6 +66,7 @@ export default class extends Component {
         ipcRenderer.on("settings/value/mqtt.ip", (sender, mqttIp) => {
             this.radiomanager.connect("mqtt://" + mqttIp);
             this.mqttlog.connect("mqtt://" + mqttIp);
+            this.bridge.connect("mqtt://" + mqttIp);
         });
 
         ipcRenderer.send("gateway/status/get");
@@ -97,6 +101,7 @@ export default class extends Component {
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                                 <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
+                                <NavLink to="/bridge">{i18n.__("bridge")}</NavLink>
                                 <a href="https://developers.bigclown.com/basics/bigclown-playground" onClick={openExternal}>{i18n.__("Help")}</a>
                                 {/* <NavLink to="/settings">{i18n.__("settings")}</NavLink> */}
                             </nav>
@@ -117,6 +122,7 @@ export default class extends Component {
                         <RouteIframe path="/functions" src="http://127.0.0.1:1880/" id="node-red" />
                         <RouteIframe path="/dashboard" src="http://127.0.0.1:1880/ui" />
                         <RouteWithProps path="/messages" component={MqttLog} model={this.mqttlog}/>
+                        <RouteWithProps path="/bridge" component={Bridge} model={this.bridge}/>
                         <Route path="/firmware" component={Firmware} />
                     </main>
                 </div>
