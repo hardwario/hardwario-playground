@@ -32,8 +32,6 @@ class Enmon extends EventEmitter {
 
         this._process = spawn(programPath, ['--loop', '--delay', this._delay.toString()]);
 
-        this.emit('state', 'start');
-
         const self = this;
 
         this._process.on('close', (code) => {
@@ -99,6 +97,7 @@ class Enmon extends EventEmitter {
         if (this._timeout) {
             clearTimeout(this._timeout);
         }
+        this.emit('state', this.getState());
     }
 
     getState() {

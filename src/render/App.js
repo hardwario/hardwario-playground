@@ -36,7 +36,8 @@ export default class extends Component {
             visible: true,
             gatewayStatus: "unknown",
             noderedStatus: "unknown",
-            brokerStatus: "unknown"
+            brokerStatus: "unknown",
+            bridgeStatus: "disabled",
         };
 
         this.radiomanager = new RadioManagerModel();
@@ -62,6 +63,11 @@ export default class extends Component {
                 this.setState({ brokerStatus });
             }
         });
+        ipcRenderer.on("bridge/status", (sender, payload) => {
+            if (this.state.bridgeStatus != payload.status) {
+                this.setState({ bridgeStatus: payload.status });
+            }
+        });
 
         ipcRenderer.on("settings/value/mqtt.ip", (sender, mqttIp) => {
             this.radiomanager.connect("mqtt://" + mqttIp);
@@ -72,6 +78,7 @@ export default class extends Component {
         ipcRenderer.send("gateway/status/get");
         ipcRenderer.send("nodered/status/get");
         ipcRenderer.send("broker/status/get");
+        ipcRenderer.send("bridge/status/get");
         ipcRenderer.send("settings/get", "mqtt.ip");
     }
 
@@ -88,6 +95,7 @@ export default class extends Component {
         let gwOffline = this.state.gatewayStatus == "offline";
         let nodeRedOffline = this.state.noderedStatus == "offline";
         let mqttOffline = this.state.brokerStatus == "offline";
+        let bridgeOffline = this.state.bridgeStatus == "offline";
         return (
             <HashRouter>
                 <div id="app" >
@@ -101,7 +109,7 @@ export default class extends Component {
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                                 <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
-                                <NavLink to="/bridge">{i18n.__("bridge")}</NavLink>
+                                <NavLink to="/bridge" title={bridgeOffline ? "Bridge is not connected" : null}>{i18n.__("bridge")} {bridgeOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <a href="https://developers.bigclown.com/basics/bigclown-playground" onClick={openExternal}>{i18n.__("Help")}</a>
                                 {/* <NavLink to="/settings">{i18n.__("settings")}</NavLink> */}
                             </nav>
