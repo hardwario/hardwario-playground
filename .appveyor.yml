@@ -22,13 +22,15 @@ install:
 
 build_script:
   - ps: >-
+      mkdir bin
+
       $downloadUri = ((Invoke-RestMethod -Method GET -Uri https://api.github.com/repos/hardwario/enmon/releases/latest).assets | Where-Object name -like "*win32.exe" ).browser_download_url
 
       echo "downloadUri : $downloadUri"
 
-      Invoke-WebRequest -Uri "$downloadUri" -Out src\assets\bin\enmon.exe
+      Invoke-WebRequest -Uri "$downloadUri" -Out bin\enmon.exe
 
-      dir src\assets\bin
+      dir bin
 
   - if "%platform%" == "x86" npm run package-win32
   - if "%platform%" == "x64" npm run package-win64

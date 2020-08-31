@@ -34,7 +34,7 @@
     "files": [
       "dist/",
       "node_modules/",
-      "src/",
+      "src",
       "index.js",
       "menu.js",
       "package.json",
@@ -47,21 +47,21 @@
     },
     "extraFiles": [
         {
-            "from": "src/assets/node-red",
-            "to": "src/assets/node-red",
-            "filter": ["**/*"]
-        },
-        {
-            "from": "src/assets/bin",
-            "to": "src/assets/bin",
-            "filter": ["**/*"]
+          "from": "bin",
+          "to": "Resources/bin",
+          "filter": [
+            "**/*"
+          ]
         }
       ],
     "electronVersion": "8.5.0",
     "publish": null,
     "mac": {
       "artifactName": "hio-playground-v${version}-macos-${arch}.${ext}",
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "binaries": [
+        "dist/mas/HARDWARIO Playground.app/Contents/Resources/bin/enmon"
+      ]
     },
     "win": {
       "artifactName": "hio-playground-v${version}-windows-${arch}.${ext}",

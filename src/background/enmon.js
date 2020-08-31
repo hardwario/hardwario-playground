@@ -1,11 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-const { ipcMain } = require("electron");
+const { ipcMain, app } = require("electron");
 const notifyAll = require("../utils/notifyAll");
 const EventEmitter = require('events');
 const { spawn } = require('child_process');
 const mqtt = require("mqtt");
 const { settings } = require('./Settings')
+const isPackaged = process.mainModule.filename.indexOf('app.asar') !== -1;
 
 class Enmon extends EventEmitter {
 
@@ -28,9 +29,19 @@ class Enmon extends EventEmitter {
 
         this._isConnected = false;
 
-        const programPath = path.join(__dirname, "..", "assets", "bin", "enmon");
+        console.log('Enmon dirname', __dirname);
 
-        this._process = spawn(programPath, ['--loop', '--delay', this._delay.toString()]);
+        const programPath = isPackaged ?
+            path.join(path.dirname(app.getAppPath()), '..', './Resources', './bin') :
+            path.join(__dirname, "..", "..", 'bin');
+
+        console.log("Enmon path", programPath);
+
+        const execPath = path.resolve(programPath, 'enmon');
+
+        console.log("Enmon exec", execPath);
+
+        this._process = spawn(execPath, ['--loop', '--delay', this._delay.toString()]);
 
         const self = this;
 
