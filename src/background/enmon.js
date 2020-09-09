@@ -18,32 +18,35 @@ class Enmon extends EventEmitter {
         this._enable = false;
         this._timeout = false;
         this._isConnected = false;
-        this._delay = 5;
     }
 
     _start() {
-        console.log("Enmon:start", this._enable, this._process === null);
+        // console.log("Enmon:start", this._enable, this._process === null);
         if (!this._enable) return;
         if (this._process) return;
         if (this._timeout) {
             clearTimeout(this._timeout);
         }
+        this._restart = false;
+
+        const delay = settings.get('enmon-delay');
 
         this._isConnected = false;
 
-        console.log('Enmon dirname', __dirname);
+        // console.log('Enmon dirname', __dirname);
 
         const programPath = isPackaged ?
             path.join(path.dirname(app.getAppPath()), '..', './Resources', './bin') :
             path.join(__dirname, "..", "..", 'bin');
 
-        console.log("Enmon path", programPath);
+        // console.log("Enmon path", programPath);
 
         const execPath = path.resolve(programPath, 'enmon');
+        const params = ['--loop', '--delay', delay.toString()];
 
-        console.log("Enmon exec", execPath);
+        console.log("Enmon: ", execPath, params);
 
-        this._process = spawn(execPath, ['--loop', '--delay', this._delay.toString()]);
+        this._process = spawn(execPath, params);
 
         const self = this;
 
@@ -57,7 +60,7 @@ class Enmon extends EventEmitter {
             }
 
             if (self._enable) {
-                self._timeout = setTimeout(() => { self._start(); }, self._delay * 1000);
+                self._timeout = setTimeout(() => { self._start(); }, this._restart ? 1 : parseInt(delay) * 1000);
             }
         });
 
@@ -111,6 +114,14 @@ class Enmon extends EventEmitter {
             clearTimeout(this._timeout);
         }
         this.emit('state', this.getState());
+    }
+
+    restart() {
+        if (!this._enable) return;
+        this._restart = true;
+        if (this._process) {
+            this._process.kill();
+        }
     }
 
     getState() {
@@ -171,6 +182,7 @@ module.exports.setup = () => {
 
     settings.on('enmon-delay', (value) => {
         console.log('enmon-delay', value);
+        if (enmon) enmon.restart();
     });
 
     enable(settings.get('enmon-enable'));
