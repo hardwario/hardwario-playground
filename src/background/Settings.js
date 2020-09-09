@@ -4,6 +4,8 @@ const ConfigStore = require("../utils/ConfigStore");
 var settings = new ConfigStore("settings.json", {
     "language": "en",
     "mqtt.ip": "127.0.0.1",
+    "mqtt-broker-bind": "127.0.0.1",
+    "node-red-bind": "127.0.0.1",
     "enmon-enable": false,
     "enmon-delay": 5,
 });

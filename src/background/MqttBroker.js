@@ -2,22 +2,22 @@
 var aedes = require('aedes')()
 
 const isPortReachable = require("is-port-reachable");
+const { settings } = require('./Settings');
 const { ipcMain } = require("electron");
-
-
-const DefaultMqttPort = 1883;
 
 let server;
 let status = "offline";
 
-async function setup(port) {
-    const reachable = await isPortReachable(port || DefaultMqttPort);
+async function setup() {
+    const reachable = await isPortReachable(1883);
 
     if (!reachable) {
         var server = require('net').createServer(aedes.handle)
-        var port = 1883
 
-        server.listen(port, function () {
+        server.listen({
+            port: 1883,
+            host: settings.get("mqtt-broker-bind"),
+        }, function () {
             console.log("MQTT aedes server is up and running");
             status = "online";
         })
