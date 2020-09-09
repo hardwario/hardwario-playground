@@ -61,4 +61,9 @@ export default class extends EventEmitter {
     getValues() {
         return this._values_list;
     }
+
+    resetValuesList() {
+        this._values_map = {};
+        this._values_list = [];
+    }
 }

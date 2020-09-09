@@ -10,13 +10,15 @@ export default class extends Component {
             isConnected: props.model.isConnect(),
             status: "disabled",
             values: props.model.getValues(),
-            showUdevHint: false
+            showUdevHint: false,
+            delay: ipcRenderer.sendSync('settings/get-sync', 'enmon-delay'),
         };
 
         this.ipcBridgeStatus = this.ipcBridgeStatus.bind(this);
         this.onConnect = this.onConnect.bind(this);
         this.onMessage = this.onMessage.bind(this);
         this.buttonOnClick = this.buttonOnClick.bind(this);
+        this.handleChangeDelay = this.handleChangeDelay.bind(this);
     }
 
     componentDidMount() {
@@ -36,8 +38,13 @@ export default class extends Component {
 
     ipcBridgeStatus(sender, payload) {
         console.log(payload);
-        if (this.state.status != payload.status || this.state.showUdevHint != payload.showUdevHint) {
+        if (this.state.status !== payload.status || this.state.showUdevHint !== payload.showUdevHint) {
             this.setState({ status: payload.status, showUdevHint: payload.showUdevHint });
+
+            if (payload.status !== 'online') {
+                this.props.model.resetValuesList();
+                this.setState( { values: [] });
+            }
         }
     }
 
@@ -48,11 +55,9 @@ export default class extends Component {
     onMessage(message) {
         console.log("Render on message", message);
         this.setState( { values: this.props.model.getValues() });
-        console.log(this.state.values);
     }
 
     buttonOnClick() {
-
         if (this.state.status !== "disabled") {
             this.setState({ enable: false });
             ipcRenderer.send("settings/set", { key: 'enmon-enable', value: false });
@@ -60,6 +65,11 @@ export default class extends Component {
             this.setState({ enable: true });
             ipcRenderer.send("settings/set", { key: 'enmon-enable', value: true });
         }
+    }
+
+    handleChangeDelay(event) {
+        this.setState({delay: event.target.value});
+        ipcRenderer.send("settings/set", { key: 'enmon-delay', value: event.target.value });
     }
 
     render() {
@@ -70,6 +80,11 @@ export default class extends Component {
                         <Label className="mr-sm-2"></Label>
                         <Button disabled={false} color={this.state.status != 'disabled' ? "danger": "success"} onClick={this.buttonOnClick}>{this.state.status != 'disabled' ? "Disable Bridge" : "Enable Bridge"}</Button>
                     </FormGroup>
+                    <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+                        <Label className="mr-sm-2">Update interval</Label>
+                        <Input value={this.state.delay} onChange={this.handleChangeDelay} type="number" min="1" max="3600" step="1"></Input>
+                    </FormGroup>
+
                 </div>
                     {this.state.showUdevHint ? <div><br/><Alert color="warning">
                     For work on linux without sudo you must create udev rule<br/>
