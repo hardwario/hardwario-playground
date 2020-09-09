@@ -22,6 +22,11 @@ function setup() {
         console.log("settings/set", data);
         settings.set(data.key, data.value);
     });
+
+    ipcMain.on('settings/get-sync', (event, key) => {
+        console.log("settings/get-sync", key, settings.get(key));
+        event.returnValue = settings.get(key)
+    });
 }
 
 module.exports = {
