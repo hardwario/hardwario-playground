@@ -5,8 +5,10 @@ const notifyAll = require("../utils/notifyAll");
 const EventEmitter = require('events');
 const { spawn } = require('child_process');
 const mqtt = require("mqtt");
+const os = require('os');
 const { settings } = require('./Settings')
 const isPackaged = process.mainModule.filename.indexOf('app.asar') !== -1;
+const isLinux = os.platform() == 'linux';
 
 class Enmon extends EventEmitter {
 
@@ -144,7 +146,11 @@ function enable(value) {
 
             enmon.on('state', (state) => {
                 console.log('Enmon state', state);
-                notifyAll('bridge/status', { status: state });
+                const payload = { status: state };
+                if (isLinux && (state === 'offline')) {
+                    payload.showUdevHint = !fs.existsSync('/etc/udev/rules.d/99-enmon.rules');
+                }
+                notifyAll('bridge/status', payload);
             });
 
             enmon.enable();
@@ -170,6 +176,12 @@ module.exports.setup = () => {
     enable(settings.get('enmon-enable'));
 
     ipcMain.on("bridge/status/get", (event, data) => {
-        event.sender.send("bridge/status", { status: !enmon ? 'disabled' : enmon.getState() } );
+        const payload = { status: !enmon ? 'disabled' : enmon.getState() };
+        if (isLinux && (payload.status === 'offline')) {
+            payload.showUdevHint = !fs.existsSync('/etc/udev/rules.d/99-enmon.rules');
+        }
+        event.sender.send("bridge/status", payload);
     });
+
+    // pkexec'
 };

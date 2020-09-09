@@ -8,8 +8,9 @@ export default class extends Component {
         super(props);
         this.state = {
             isConnected: props.model.isConnect(),
-            bridgeStatus: "disabled",
+            status: "disabled",
             values: props.model.getValues(),
+            showUdevHint: false
         };
 
         this.ipcBridgeStatus = this.ipcBridgeStatus.bind(this);
@@ -34,8 +35,9 @@ export default class extends Component {
     }
 
     ipcBridgeStatus(sender, payload) {
-        if (this.state.bridgeStatus != payload.status) {
-            this.setState({ bridgeStatus: payload.status });
+        console.log(payload);
+        if (this.state.status != payload.status || this.state.showUdevHint != payload.showUdevHint) {
+            this.setState({ status: payload.status, showUdevHint: payload.showUdevHint });
         }
     }
 
@@ -51,7 +53,7 @@ export default class extends Component {
 
     buttonOnClick() {
 
-        if (this.state.bridgeStatus !== "disabled") {
+        if (this.state.status !== "disabled") {
             this.setState({ enable: false });
             ipcRenderer.send("settings/set", { key: 'enmon-enable', value: false });
         } else {
@@ -66,8 +68,14 @@ export default class extends Component {
                 <div className="form-inline">
                     <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
                         <Label className="mr-sm-2"></Label>
-                        <Button disabled={false} color={this.state.bridgeStatus != 'disabled' ? "danger": "success"} onClick={this.buttonOnClick}>{this.state.bridgeStatus != 'disabled' ? "Disable Bridge" : "Enable Bridge"}</Button>
+                        <Button disabled={false} color={this.state.status != 'disabled' ? "danger": "success"} onClick={this.buttonOnClick}>{this.state.status != 'disabled' ? "Disable Bridge" : "Enable Bridge"}</Button>
                     </FormGroup>
+                </div>
+                    {this.state.showUdevHint ? <div><br/><Alert color="warning">
+                    For work on linux without sudo you must create udev rule<br/>
+                    You can use this command:<br/>
+                    echo 'SUBSYSTEMS=="usb", ACTION=="add", ATTRS{'{idVendor}'}=="0403", ATTRS{'{idProduct}'}=="6030", MODE="0666"' | sudo tee /etc/udev/rules.d/99-enmon.rules
+                    </Alert></div> : null}
 
                     <table className="table table-bordered table-hover values">
                         <thead>
@@ -93,7 +101,7 @@ export default class extends Component {
                             }
                         </tbody>
                     </table>
-                </div>
+
             </div>
         )
     }
