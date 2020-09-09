@@ -25,14 +25,15 @@ install:
   - npm install
 
 script:
+  - mkdir bin
   - >
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      if [[ "$ARCH" == "x86" ]]; then
-        npm run package-linux32;
-      else
-        npm run package-linux64;
-        npm run package-linux-appimage;
-      fi
+      ENMON_URL=$(curl -s https://api.github.com/repos/hardwario/enmon/releases/latest | grep browser_download_url | grep linux | head -n 1 | cut -d '"' -f 4)
+      curl -o bin/enmon "$ENMON_URL"
+      chmod +x bin/enmon
+
+      npm run package-linux64;
+      npm run package-linux-appimage;
 
       cp release/*.deb .
       rename -v "s/linux/ubuntu/" *.deb
@@ -51,6 +52,10 @@ script:
 
   - >
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      ENMON_URL=$(curl -s https://api.github.com/repos/hardwario/enmon/releases/latest | grep browser_download_url | grep darwin | head -n 1 | cut -d '"' -f 4)
+      curl -o bin/enmon "$ENMON_URL"
+      chmod +x bin/enmon
+
       npm run package-mac;
     fi
 
@@ -66,6 +71,7 @@ addons:
       - libkrb5-dev
       - bc
       - bsdtar
+      - curl
 
 cache:
   directories:

@@ -5,6 +5,7 @@ const RED = require("node-red");
 const fs = require("fs");
 const path = require("path");
 const { app, ipcMain } = require("electron");
+const { settings } = require('./Settings');
 const isPortReachable = require('is-port-reachable');
 
 function copyFileSync( source, target ) {
@@ -111,7 +112,7 @@ function setup() {
             http_app.use(settings.httpNodeRoot, RED.httpNode);
 
             RED.start().then(function () {
-                server.listen(listenPort, "127.0.0.1", ()=>{
+                server.listen(listenPort, settings.get("node-red-bind"), ()=>{
                     status = "online";
 
                     resolve();

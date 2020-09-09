@@ -34,22 +34,50 @@
     "files": [
       "dist/",
       "node_modules/",
-      "src/",
+      "src",
       "index.js",
       "menu.js",
       "package.json",
       "resources/icon.*",
-      "resources/icons"
+      "resources/icons",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "extraResources": [
+      "node_modules/\\@node-red/**/examples/**/*",
+      "node_modules/\\@hardwario/**/examples/**/*",
+      "node_modules/node-red*/**/examples/**/*"
     ],
     "directories": {
       "buildResources": "resources",
       "output": "release"
     },
+    "extraFiles": [
+      {
+        "from": "bin",
+        "to": "Resources/bin",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "electronVersion": "8.5.0",
     "publish": null,
     "mac": {
       "artifactName": "hio-playground-v${version}-macos-${arch}.${ext}",
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "binaries": [
+        "dist/mas/HARDWARIO Playground.app/Contents/Resources/bin/enmon"
+      ]
     },
     "win": {
       "artifactName": "hio-playground-v${version}-windows-${arch}.${ext}",
@@ -103,15 +131,15 @@
     "electron": "8.5.0",
     "electron-builder": "^22.8.0",
     "electron-json-config": "^1.5.3",
-    "electron-packager": "^15.0.0",
-    "electron-rebuild": "^1.11.0",
+    "electron-packager": "^15.1.0",
+    "electron-rebuild": "^2.0.2",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
     "jquery": "^3.5.1",
     "less": "^3.12.2",
     "less-loader": "^6.2.0",
-    "node-abi": "^2.18.0",
+    "node-abi": "^2.19.1",
     "node-sass": "^4.14.1",
     "sass-loader": "^9.0.3",
     "shebang-loader": "0.0.1",
@@ -124,6 +152,7 @@
     "@hardwario/node-red-contrib-hardwario": "^1.0.1",
     "@hardwario/node-red-contrib-hardwario-voice": "^1.1.4",
     "aedes": "^0.42.5",
+    "asar": "^3.0.3",
     "copy-to-clipboard": "^3.3.1",
     "electron-context-menu": "^2.3.0",
     "electron-prompt": "^1.6.0",
@@ -147,7 +176,7 @@
     "reactstrap": "^8.5.1",
     "request": "^2.88.2",
     "request-progress": "^3.0.0",
-    "serialport": "8.0.8",
+    "serialport": "9.0.1",
     "sleep": "^6.3.0",
     "ubidots-nodered": "^2.0.1"
   }

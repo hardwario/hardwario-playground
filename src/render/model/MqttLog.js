@@ -7,7 +7,7 @@ export default class extends EventEmitter {
         super();
         this._url = null;
         this._connect = false;
-        this._subscribed = ["node/#"];
+        this._subscribed = ["node/#", 'bridge/#'];
         this._cnt = 0;
         this._messages = [];
         this._messagesMaxLength = 50;

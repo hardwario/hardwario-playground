@@ -1,9 +1,12 @@
 const electron = require('electron');
 const path = require('path');
 const fs = require('fs');
+const EventEmitter = require('events');
 
-class ConfigStore {
+class ConfigStore extends EventEmitter {
     constructor(filename, defaults={}) {
+        super();
+
         const userDataPath = (electron.app || electron.remote.app).getPath('userData');
 
         this.path = path.join(userDataPath, filename);
@@ -25,6 +28,8 @@ class ConfigStore {
         this.data[key] = val;
 
         fs.writeFileSync(this.path, JSON.stringify(this.data), { encoding: "utf8" });
+
+        this.emit(key, val);
     }
 }
 
