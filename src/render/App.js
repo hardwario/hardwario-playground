@@ -105,11 +105,11 @@ export default class extends Component {
                             <nav>
                                 {/* <NavLink exact to="/">{i18n.__("home")}</NavLink> */}
                                 <NavLink to="/" exact title={gwOffline ? "No Radio Dongle connected" : null}>{i18n.__("Devices")} {gwOffline ?  <i className="fa fa-warning"></i> : null}</NavLink>
+                                <NavLink to="/bridge" title={bridgeOffline ? "Bridge is not connected" : null}>{i18n.__("bridge")} {bridgeOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
+                                <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
+                                <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/functions" title={nodeRedOffline ? "Node-RED is shut down": null}>{i18n.__("Functions")} {nodeRedOffline ? <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
-                                <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
-                                <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
-                                <NavLink to="/bridge" title={bridgeOffline ? "Bridge is not connected" : null}>{i18n.__("bridge")} {bridgeOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <a href="https://developers.bigclown.com/basics/bigclown-playground" onClick={openExternal}>{i18n.__("Help")}</a>
                                 {/* <NavLink to="/settings">{i18n.__("settings")}</NavLink> */}
                             </nav>
