@@ -31,6 +31,8 @@ export default class extends Component {
         this.onMessage = this.onMessage.bind(this);
         this.onSubscribeChange = this.onSubscribeChange.bind(this);
         this.onClickClear = this.onClickClear.bind(this);
+        this._handleKeyDownPub = this._handleKeyDownPub.bind(this);
+        this._handleKeyDownSub = this._handleKeyDownSub.bind(this);
     }
 
     componentDidMount() {
@@ -113,6 +115,18 @@ export default class extends Component {
           });
     }
 
+    _handleKeyDownPub(event) {
+        if (event.key === 'Enter') {
+            this.onClickPublish(event);
+        }
+    }
+
+    _handleKeyDownSub() {
+        if (event.key === 'Enter') {
+            this.onClickSubscribe(event);
+        }
+    }
+
     componentDidUpdate() {
         let el = ReactDOM.findDOMNode(this._ref_messages.current);
         el.scrollTop = el.scrollHeight;
@@ -122,23 +136,8 @@ export default class extends Component {
         let  isHighlightedMessages = this.props.model.isHighlightedMessages;
         return (
             <div id="mqttlog">
-                {this.state.highlighted_messages.length > 0 ? <div className="Console">
-                    <ul>
-                        {
-                            this.state.highlighted_messages.map((item, index) => {
-                                return (
-                                    <li key={item.key}>
-                                        <div>{formatTime(item.time)}&nbsp;<i title="Copy topic to Clipboard" onClick={() => this.onClickCopyTopic(item)} className="fa fa-clipboard" aria-hidden="true"></i>&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
-                                        <div>{item.payload}</div>
-                                        <div className="ConsoleButton"><i  title="remove" onClick={() => this.onClickRemove(item)} className="fa fa-remove" aria-hidden="true"></i></div>
-                                    </li>
-                                )
-                            })
-                        }
-                    </ul>
-                </div> : null}
 
-                <div className="Console" ref={this._ref_messages} style={{height: "300px"}}>
+                <div className="messagesLog" ref={this._ref_messages}>
                     <ul >
                         {
                             this.state.messages.map((item, index) => {
@@ -155,59 +154,55 @@ export default class extends Component {
                     </ul>
                 </div>
 
-                <button onClick={this.onClickClear} className="btn btn-secondary btn-sm float-right" >Clear</button>
+                {this.state.highlighted_messages.length > 0 ? <div className="highlightedMessages">
+                    <ul>
+                        {
+                            this.state.highlighted_messages.map((item, index) => {
+                                return (
+                                    <li key={item.key}>
+                                        <div>{formatTime(item.time)}&nbsp;<i title="Copy topic to Clipboard" onClick={() => this.onClickCopyTopic(item)} className="fa fa-clipboard" aria-hidden="true"></i>&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
+                                        <div>{item.payload}</div>
+                                        <div className="ConsoleButton"><i  title="remove" onClick={() => this.onClickRemove(item)} className="fa fa-remove" aria-hidden="true"></i></div>
+                                    </li>
+                                )
+                            })
+                        }
+                    </ul>
+                </div> : null}
 
-                <form>
-                    <div className="form-group">
-                        <label className="control-label col-xs-1">
-                            {this.state.checkbox ? "Publish mode" : "Subscribe mode"}
-                        </label>
-                        <div className="col-xs-2">
-                            <label className="switch">
-                                <input type="checkbox" onChange={(event) => this.setState({ checkbox: event.target.checked })} />
-                                <span className="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-                    {this.state.checkbox ?
-                        <div className="form-group">
-                            <label className="control-label col-xs-1">Payload</label>
-                            <div className="col-xs-8">
-                                <input className="form-control" value={this.state.pub_topic} onChange={(e) => this.setState({ pub_topic: e.target.value })} type="text" placeholder="Enter topic to publish" />
-                                <input className="form-control" value={this.state.pub_payload} onChange={(e) => this.setState({ pub_payload: e.target.value })} type="text" placeholder="Enter message to publish" />
-                            </div>
-                            <div className="col-xs-2">
-                                <button disabled={!this.state.isConnected} onClick={this.onClickPublish} className="btn btn-primary btn-sm">Publish</button>
-                            </div>
-                        </div>
-                        :
-                        <div className="form-group">
-                            <label className="control-label col-xs-1">Topic</label>
-                            <div className="col-xs-8">
-                                <input className="form-control" placeholder="Enter topic to subscribe" value={this.state.sub_topic} onChange={(e) => this.setState({ sub_topic: e.target.value })} type="text" />
-                            </div>
-                            <div className="col-xs-2">
-                                <button disabled={!this.state.isConnected} onClick={this.onClickSubscribe} className="btn btn-primary btn-sm">Subscribe</button>
-                            </div>
-                        </div>
-                    }
-                </form>
+                <button onClick={this.onClickClear} className="btn btn-secondary btn-sm float-right btnClear" >Clear all messages</button>
+
+                <div className="bottomLog">
+
+                <header className="h4">Publish message</header>
+                <div className="input-group mb-3 input-group-sm">
+                    <input className="form-control" value={this.state.pub_topic} onChange={(e) => this.setState({ pub_topic: e.target.value })} onKeyDown={this._handleKeyDownPub} type="text" placeholder="Enter topic to publish" />
+                    <input className="form-control" value={this.state.pub_payload} onChange={(e) => this.setState({ pub_payload: e.target.value })} onKeyDown={this._handleKeyDownPub} type="text" placeholder="Enter payload to publish" />
+                    <button disabled={!this.state.isConnected} onClick={this.onClickPublish} className="btn btn-primary btn-sm">Publish</button>
+                </div>
+
                 <header className="h4">Subscribed topics</header>
-                <div className="Console">
+                <div className="input-group input-group-sm">
+                    <input type="text" className="form-control" placeholder="Enter topic to subscribe" value={this.state.sub_topic} onChange={(e) => this.setState({ sub_topic: e.target.value })} onKeyDown={this._handleKeyDownSub} type="text" />
+                    <div className="input-group-append">
+                        <button type="submit" className="btn btn-primary mb-2" disabled={!this.state.isConnected} onClick={this.onClickSubscribe} >Subscribe</button>
+                    </div>
+                </div>
+                <div className="subTable">
                     <ul>
                         {
                             this.state.subscribed_topics.map((topic, index) => {
                                 return (
                                     <li key={index}>
                                         <div>{topic}</div>
-                                        <div className="ConsoleButton"><button onClick={() => this.onClickUnsubscribe(topic)}>-</button></div>
+                                        <div className="ConsoleButton"><i  title="remove" onClick={() => this.onClickUnsubscribe(topic)} className="fa fa-remove" aria-hidden="true"></i></div>
                                     </li>
                                 )
                             })
                         }
                     </ul>
                 </div>
-                <button disabled={!this.state.isConnected} onClick={this.onClickUnsubscribeAll} className="btn btn-danger btn-sm">Unsubscribe all</button>
+                </div>
             </div>
 
         )

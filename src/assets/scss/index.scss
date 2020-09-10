@@ -1,8 +1,5 @@
-// GLOBAL APP STYLES
-@import "./Routes";
 $fa-font-path: "~font-awesome/fonts";
 @import '~font-awesome/scss/font-awesome.scss';
-// COMPONENTS AND CONTAINERS STYLES
 @import "./Home";
 @import "./Navbar";
 @import "./MqttLog";
@@ -13,6 +10,20 @@ $fa-font-path: "~font-awesome/fonts";
 @import "./Bridge";
 body {
     overflow: hidden;
+}
+
+#app {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    >main {
+        width: 100%;
+        background-color: rgb(255, 255, 255);
+        position: relative;
+        overflow: auto;
+    }
+    >footer {}
 }
 
 iframe.route {

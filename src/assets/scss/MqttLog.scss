@@ -1,17 +1,25 @@
+$bottomLog: 260px;
+
 #mqttlog {
     padding: 10px;
-    .Console {
-        border: 2px solid gray;
-        border-radius: 0px;
-        overflow-y: auto;
+    width: 100%;
+    .highlightedMessages {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        ul {
+            padding: 5px;
+            margin: 0px;
+        }
         &>ul {
-            margin: 1px;
+            margin: 0px;
             padding-left: 5px;
             padding-right: 5px;
             justify-content: space-between;
         }
         & li {
-            min-height: 35px;
+            margin: 2px 0 0 0;
             display: flex;
             align-items: center;
             .ConsoleButton {
@@ -21,6 +29,77 @@
         .fa {
             cursor: pointer;
         }
+        border: 2px solid gray;
+        background-color: white;
+    }
+    .messagesLog {
+        border-radius: 0px;
+        overflow-y: auto;
+        position: absolute;
+        top: 10px;
+        bottom: $bottomLog;
+        right: 10px;
+        left: 10px;
+        border: 2px solid gray;
+        min-height: 100px;
+        ul {
+            padding: 5px;
+            margin: 0px;
+        }
+        &>ul {
+            margin: 0px;
+            padding-left: 5px;
+            padding-right: 5px;
+            justify-content: space-between;
+        }
+        & li {
+            margin: 2px 0 0 0;
+            display: flex;
+            align-items: center;
+            .ConsoleButton {
+                margin-left: auto;
+            }
+        }
+        .fa {
+            cursor: pointer;
+        }
+    }
+
+    .btnClear {
+        position: absolute;
+        bottom: $bottomLog - 30px;
+        right: 10px;
+    }
+
+    .subTable {
+        border: 2px solid gray;
+        border-radius: 0px;
+        overflow-y: auto;
+        height: 60px;
+        &>ul {
+            margin: 1px;
+            padding-left: 5px;
+            padding-right: 5px;
+            justify-content: space-between;
+        }
+        & li {
+            margin: 2px 0 0 0;
+            display: flex;
+            align-items: center;
+            .ConsoleButton {
+                margin-left: auto;
+            }
+        }
+        .fa {
+            cursor: pointer;
+        }
+    }
+    .bottomLog {
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+        padding: 10px;
+        margin: 0 -10px 0 -10px;
     }
     hr {
         margin: 0px;
@@ -78,5 +157,9 @@
     }
     .slider.round:before {
         border-radius: 50%;
+    }
+
+    .btn {
+        min-width: 140px;
     }
 }
