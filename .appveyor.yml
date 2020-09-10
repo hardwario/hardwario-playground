@@ -32,6 +32,8 @@ build_script:
 
       dir bin
 
+  - ps: Copy-Item -Path "patch\*" -Destination . -Recurse -Force
+
   - if "%platform%" == "x86" npm run package-win32
   - if "%platform%" == "x64" npm run package-win64
   - cd release
