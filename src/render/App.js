@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { HashRouter, Route, Switch, NavLink } from "react-router-dom";
 import { ipcRenderer, shell } from "electron";
-
+import { ToastContainer, toast } from 'react-toastify';
 import { RouteIframe, RouteWithProps } from "./components/Route";
 
 import RadioManagerModel from "./model/RadioManager";
@@ -20,6 +20,7 @@ import Bridge from "./components/Bridge";
 
 // Import SCSS
 import "../assets/scss/index.scss";
+import 'react-toastify/dist/ReactToastify.css';
 
 // Import language files
 const i18n = require("../utils/i18n");
@@ -133,6 +134,8 @@ export default class extends Component {
                         <RouteWithProps path="/bridge" component={Bridge} model={this.bridge}/>
                         <Route path="/firmware" component={Firmware} />
                     </main>
+
+                    <ToastContainer position="top-right" autoClose={2000} closeOnClick/>
                 </div>
             </HashRouter>
         )

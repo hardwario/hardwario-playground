@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import copy from 'copy-to-clipboard';
+import { ToastContainer, toast } from 'react-toastify';
 
 function formatTime(time) {
     return  time.toTimeString().split(' ')[0];
@@ -112,6 +113,7 @@ export default class extends Component {
         copy(message.topic, {
             debug: true,
             message: 'Press #{key} to copy',
+            onCopy: () => { toast.success("Copied to clipboard: " + message.topic) }
           });
     }
 
@@ -143,7 +145,11 @@ export default class extends Component {
                             this.state.messages.map((item, index) => {
                                 return (
                                     <li key={item.key}>
-                                        <div>{formatTime(item.time)}&nbsp;<i title="Copy topic to Clipboard" onClick={() => this.onClickCopyTopic(item)} className="fa fa-clipboard" aria-hidden="true"></i>&nbsp;<span style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span></div>
+                                        <div>
+                                            {formatTime(item.time)}&nbsp;
+                                            <i title="Copy topic to Clipboard" onClick={() => this.onClickCopyTopic(item)} className="fa fa-clipboard" aria-hidden="true"></i>&nbsp;
+                                            <span onClick={() => this.onClickCopyTopic(item)} style={{ fontWeight: "bold" }}>{item.topic}&nbsp;</span>
+                                        </div>
                                         <div>{item.payload}</div>
                                         <div className="ConsoleButton">
                                             {isHighlightedMessages(item.topic) ? null :<i title="pinned topic" onClick={() => this.onClickAdd(item)} className="fa fa-thumb-tack" aria-hidden="true"></i>}

@@ -173,6 +173,7 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-select": "1.2.1",
+    "react-toastify": "^6.0.8",
     "reactstrap": "^8.5.1",
     "request": "^2.88.2",
     "request-progress": "^3.0.0",

@@ -67,7 +67,7 @@ function setup() {
             const sourceDir = path.join(__dirname, "..", "assets", "node-red");
 
             copyFolderRecursiveSync(sourceDir, app.getPath("userData") );
-            var settings = {
+            var config = {
                 uiPort: listenPort,
                 verbose: true,
                 httpAdminRoot: "/",
@@ -107,9 +107,9 @@ function setup() {
 
             let http_app = express();
             let server = http.createServer(http_app);
-            RED.init(server, settings);
-            http_app.use(settings.httpAdminRoot, RED.httpAdmin);
-            http_app.use(settings.httpNodeRoot, RED.httpNode);
+            RED.init(server, config);
+            http_app.use(config.httpAdminRoot, RED.httpAdmin);
+            http_app.use(config.httpNodeRoot, RED.httpNode);
 
             RED.start().then(function () {
                 server.listen(listenPort, settings.get("node-red-bind"), ()=>{
