@@ -90,6 +90,8 @@ export default class extends Component {
                     For work on linux without sudo you must create udev rule<br/>
                     You can use this command:<br/>
                     echo 'SUBSYSTEMS=="usb", ACTION=="add", ATTRS{'{idVendor}'}=="0403", ATTRS{'{idProduct}'}=="6030", MODE="0666"' | sudo tee /etc/udev/rules.d/99-enmon.rules
+                    <br/><br/>
+                    Please disconnect and connect Bridge Module again after you type command above
                     </Alert></div> : null}
 
                     <table className="table table-bordered table-hover values">
