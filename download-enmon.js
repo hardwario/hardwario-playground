@@ -2,8 +2,22 @@ const https = require('https');
 const os = require('os');
 const fs = require('fs');
 
-https.get('https://api.github.com/repos/hardwario/enmon/releases/latest' ,{ headers: { 'User-Agent': 'Mozilla/5.0' } },
+const headers = {
+    'User-Agent': 'Mozilla/5.0',
+};
+
+if (process.env.GITHUB_KEY) {
+    console.log('Add Authorization');
+    headers['Authorization'] = `token ${process.env.GITHUB_KEY}`;
+}
+
+https.get('https://api.github.com/repos/hardwario/enmon/releases/latest' ,{ headers: headers },
     (res) => {
+
+        if (res.statusCode !== 200) {
+            throw new Error(`StatusCode: ${res.statusCode}`);
+        }
+
         let body = "";
 
         res.on("data", (chunk) => {
@@ -21,11 +35,11 @@ https.get('https://api.github.com/repos/hardwario/enmon/releases/latest' ,{ head
                 if (asset) {
                     console.log(asset[0].browser_download_url);
 
-                    https.get(asset[0].browser_download_url, (response) => {
+                    https.get(asset[0].browser_download_url, { headers: headers }, (response) => {
                         console.log(response.headers.location)
 
                         const file = fs.createWriteStream("bin/enmon");
-                        https.get(response.headers.location, (response) => {
+                        https.get(response.headers.location, { headers: headers }, (response) => {
                             response.pipe(file);
                         });
                     });
