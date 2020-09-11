@@ -24,6 +24,7 @@ before_install:
 
 install:
   - npm install
+  - npm audit fix
 
 script:
   - cp -rfv patch/* ./

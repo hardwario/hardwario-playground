@@ -15,10 +15,8 @@ install:
   - ps: Install-Product node $env:nodejs_version
   # install modules
   - npm install node-pre-gyp -g
-  - npm install node-abi@2.13.0 -g
-  - npm install electron-builder -g
   - npm install
-  - npm rebuild node-sass
+  - npm audit fix
 
 build_script:
   - ps: >-
