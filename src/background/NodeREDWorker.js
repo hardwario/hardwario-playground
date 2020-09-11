@@ -67,6 +67,15 @@ function setup() {
             const sourceDir = path.join(__dirname, "..", "assets", "node-red");
 
             copyFolderRecursiveSync(sourceDir, app.getPath("userData") );
+
+            // Delete old flow
+            ['climate-monitor.json', 'motion-detector.json', 'power-controller.json', 'co2-monitor.json'].forEach((filename) => {
+                const filepath = path.join(userDir, "lib", "flows", filename);
+                if (fs.existsSync(filepath)) {
+                    fs.unlinkSync(filepath);
+                }
+            });
+
             var config = {
                 uiPort: listenPort,
                 verbose: true,

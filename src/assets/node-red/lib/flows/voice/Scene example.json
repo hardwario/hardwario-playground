@@ -1,0 +1,59 @@
+[
+  {
+    "id": "4a25fa9c.592764",
+    "type": "hardwario-scene",
+    "z": "ed0e7560.19c198",
+    "name": "",
+    "scene": "867758d1.0467e8",
+    "x": 200.5,
+    "y": 257,
+    "wires": [["df844f0c.5fd2b"]]
+  },
+  {
+    "id": "df844f0c.5fd2b",
+    "type": "mqtt out",
+    "z": "ed0e7560.19c198",
+    "name": "",
+    "topic": "",
+    "qos": "",
+    "retain": "",
+    "broker": "684987f5.b70a38",
+    "x": 360.5,
+    "y": 257,
+    "wires": []
+  },
+  {
+    "id": "867758d1.0467e8",
+    "type": "hardwario-scene-config",
+    "z": "",
+    "name": "Favourite scene",
+    "nicknames": "fav scene, favourite",
+    "reversible": true,
+    "reverseCommands": "[{\"payload\": '\"#ffffff\"', \"topic\": \"node/power-controller:0/led-strip/-/color/set\"}]",
+    "commandsType": "json",
+    "reverseCommandsType": "json",
+    "commands": "[{\"payload\": '\"#000000\"',\"topic\": \"node/power-controller:0/led-strip/-/color/set\"}]"
+  },
+  {
+    "id": "684987f5.b70a38",
+    "type": "mqtt-broker",
+    "z": "",
+    "name": "",
+    "broker": "localhost",
+    "port": "1883",
+    "clientid": "",
+    "usetls": false,
+    "compatmode": true,
+    "keepalive": "60",
+    "cleansession": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": ""
+  }
+]
