@@ -39,7 +39,7 @@ https.get('https://api.github.com/repos/hardwario/enmon/releases/latest' ,{ head
                         console.log(response.headers.location)
 
                         const file = fs.createWriteStream("bin/enmon");
-                        https.get(response.headers.location, { headers: headers }, (response) => {
+                        https.get(response.headers.location, (response) => {
                             response.pipe(file);
                         });
                     });
