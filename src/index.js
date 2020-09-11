@@ -13,15 +13,6 @@ const i18n = require("./utils/i18n");
 let root = document.createElement("div");
 root.id = "root";
 document.body.appendChild(root);
-
-ipcRenderer.on("settings/value/language", (sender, language) => {
-    i18n.setup(language);
-
-    ipcRenderer.removeAllListeners("settings/value/language");
-
-    render(<App />, document.getElementById("root"));
-});
-
-ipcRenderer.send("settings/get", "language");
-
-render(<div>Loading...</div>, document.getElementById("root"));
+var language = ipcRenderer.sendSync('settings/get-sync', 'language');
+i18n.setup(language);
+render(<App />, document.getElementById("root"));
