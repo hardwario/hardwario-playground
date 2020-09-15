@@ -73,7 +73,6 @@ export default class extends Component {
         ipcRenderer.on("settings/value/mqtt.ip", (sender, mqttIp) => {
             this.radiomanager.connect("mqtt://" + mqttIp);
             this.mqttlog.connect("mqtt://" + mqttIp);
-            this.bridge.connect("mqtt://" + mqttIp);
         });
 
         ipcRenderer.send("gateway/status/get");
