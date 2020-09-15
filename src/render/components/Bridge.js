@@ -1,22 +1,21 @@
 import React, { Component } from "react";
 import { Input, FormGroup, Label, Alert, Button } from 'reactstrap';
 const { ipcRenderer } = require("electron");
-
+import Moment from 'moment';
 export default class extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             isConnected: props.model.isConnect(),
-            status: "disabled",
+            status: props.model.getStatus(),
             values: props.model.getValues(),
-            showUdevHint: false,
+            showUdevHint: props.model.getShowUdevHint(),
             delay: ipcRenderer.sendSync('settings/get-sync', 'enmon-delay'),
         };
-
-        this.ipcBridgeStatus = this.ipcBridgeStatus.bind(this);
         this.onConnect = this.onConnect.bind(this);
         this.onMessage = this.onMessage.bind(this);
+        this.onStatus = this.onStatus.bind(this);
         this.buttonOnClick = this.buttonOnClick.bind(this);
         this.handleChangeDelay = this.handleChangeDelay.bind(this);
     }
@@ -25,7 +24,7 @@ export default class extends Component {
         console.log("Bridge:componentDidMount");
         this.props.model.on('connect', this.onConnect);
         this.props.model.on('message', this.onMessage);
-        ipcRenderer.on("bridge/status", this.ipcBridgeStatus);
+        this.props.model.on('status', this.onStatus);
 
         ipcRenderer.send("bridge/status/get");
     }
@@ -33,23 +32,18 @@ export default class extends Component {
         console.log("Bridge:componentWillUnmount");
         this.props.model.removeListener('connect', this.onConnect);
         this.props.model.removeListener('message', this.onMessage);
-        ipcRenderer.removeListener("bridge/status", this.ipcBridgeStatus);
-    }
-
-    ipcBridgeStatus(sender, payload) {
-        console.log(payload);
-        if (this.state.status !== payload.status || this.state.showUdevHint !== payload.showUdevHint) {
-            this.setState({ status: payload.status, showUdevHint: payload.showUdevHint });
-
-            if (payload.status !== 'online') {
-                this.props.model.resetValuesList();
-                this.setState( { values: [] });
-            }
-        }
+        this.props.model.removeListener('status', this.onStatus);
     }
 
     onConnect(connect) {
         this.setState({ isConnected: connect });
+    }
+
+    onStatus(payload) {
+        if (this.state.status !== payload.status || this.state.showUdevHint !== payload.showUdevHint) {
+            this.setState({ status: payload.status, showUdevHint: payload.showUdevHint });
+            this.setState( { values: this.props.model.getValues() });
+        }
     }
 
     onMessage(message) {
@@ -99,6 +93,7 @@ export default class extends Component {
                             <tr>
                                 <th>Label</th>
                                 <th>Value</th>
+                                <th>Time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -111,6 +106,9 @@ export default class extends Component {
                                             </td>
                                             <td>
                                                 {item.value}
+                                            </td>
+                                            <td>
+                                                {Moment(item.time).format('HH:mm:ss')}
                                             </td>
                                         </tr>
                                     )
