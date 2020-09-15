@@ -149,9 +149,19 @@ function enable(value) {
                 if (line.startsWith('@SENSOR: "')) {
                     line = line.substring(10);
                     const i = line.indexOf('",');
-                    const name = line.substring(0, i).toLowerCase();
-                    const value = line.substring(i + 2);
-                    client.publish(`bridge/${name}`, value);
+                    const label = line.substring(0, i);
+                    let value = line.substring(i + 2);
+                    if (value === 'NULL') value = 'null';
+
+                    notifyAll('bridge/msg', {
+                        label,
+                        value,
+                        time: new Date(),
+                    });
+
+                    if (value !== 'null') {
+                        client.publish(`bridge/${label.toLowerCase()}`, value);
+                    }
                 }
             });
 
