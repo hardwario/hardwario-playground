@@ -113,8 +113,8 @@ export default class extends Component {
         copy(message.topic, {
             debug: true,
             message: 'Press #{key} to copy',
-            onCopy: () => { toast.success("Copied to clipboard: " + message.topic) }
           });
+        toast.success("Copied to clipboard: " + message.topic);
     }
 
     _handleKeyDownPub(event) {
