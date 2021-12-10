@@ -135,7 +135,7 @@ function setup() {
             notifyAll("firmware:list", firmware_list);
         })
         .catch((err)=>{
-            console.error(err);
+            console.error('updateFirmwareJson', err);
             firmware_list = loadFirmwareJson(getFirmwareJsonPath()) || [];
         });
 

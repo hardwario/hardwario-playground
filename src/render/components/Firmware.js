@@ -1,7 +1,8 @@
 import React, { Component, RaisedButton } from "react";
 import { Button, Alert, Progress } from 'reactstrap';
 const { ipcRenderer, shell } = require("electron");
-const { dialog } = require('electron').remote;
+// const { dialog } = require('@electron/remote');
+
 import Select from 'react-select';
 
 const youtubeUrlRegex = /^(?:(?:https?:)?\/\/)?(?:www\.)?(?:m\.)?(?:youtu(?:be)?\.com\/(?:v\/|embed\/|watch(?:\/|\?v=))|youtu\.be\/)((?:\w|-){11})(?:\S+)?$/;
@@ -147,17 +148,17 @@ export default class extends Component {
         e.preventDefault();
         e.stopPropagation();
 
-        dialog.showOpenDialog({properties: ['openFile'], filters: [{name: '.bin', extensions: ['bin']}]})
-        .then((result) => {
-            console.log('result.canceled', result.canceled);
-            if (result.canceled) return;
-            console.log('result.filePaths', result.filePaths);
-            if (result.filePaths !== undefined && result.filePaths.length === 1) {
-                // this.setState({ file: file[0] });
-                this.setState({ custom: {name: result.filePaths[0] } });
-                this.setState({ firmware: this.state.custom });
-            }
-        });
+        // dialog.showOpenDialog({properties: ['openFile'], filters: [{name: '.bin', extensions: ['bin']}]})
+        // .then((result) => {
+        //     console.log('result.canceled', result.canceled);
+        //     if (result.canceled) return;
+        //     console.log('result.filePaths', result.filePaths);
+        //     if (result.filePaths !== undefined && result.filePaths.length === 1) {
+        //         // this.setState({ file: file[0] });
+        //         this.setState({ custom: {name: result.filePaths[0] } });
+        //         this.setState({ firmware: this.state.custom });
+        //     }
+        // });
     }
 
     flash() {
