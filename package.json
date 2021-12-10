@@ -70,7 +70,7 @@
         ]
       }
     ],
-    "electronVersion": "14.2.1",
+    "electronVersion": "16.0.4",
     "publish": null,
     "mac": {
       "artifactName": "hio-playground-v${version}-macos-${arch}.${ext}",
@@ -128,7 +128,7 @@
     "bootstrap": "^4.5.2",
     "css-loader": "^4.2.1",
     "deep-equal": "^2.0.5",
-    "electron": "14.2.1",
+    "electron": "16.0.4",
     "electron-builder": "^22.14.5",
     "electron-json-config": "^1.5.3",
     "electron-packager": "^15.4.0",
