@@ -25,7 +25,9 @@
     "package-linux-appimage": "npm run webpack && electron-builder build --linux AppImage",
     "package-win32": "npm run webpack && electron-builder build --win --ia32",
     "package-win64": "npm run webpack && electron-builder build --win --x64",
-    "package-mac": "npm run webpack && electron-builder build --mac"
+    "package-mac": "npm run webpack && electron-builder build --mac",
+    "patch": "cp -rfv patch/* ./ && sed -r -i'' \"s/function copy \\(/function \\(/g\" ./node_modules/mqtt/node_modules/bl/BufferList.js",
+    "download-enmon": "node download-enmon.js"
   },
   "build": {
     "productName": "HARDWARIO Playground",
