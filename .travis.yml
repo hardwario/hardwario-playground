@@ -9,7 +9,7 @@ os:
 
 env:
   matrix:
-  - BINARY_BUILDER="true" TRAVIS_NODE_VERSION="12"
+  - BINARY_BUILDER="true" TRAVIS_NODE_VERSION="16"
 
 before_install:
   - nvm install $TRAVIS_NODE_VERSION
