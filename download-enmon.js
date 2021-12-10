@@ -11,6 +11,11 @@ if (process.env.GITHUB_KEY) {
     headers['Authorization'] = `token ${process.env.GITHUB_KEY}`;
 }
 
+if (!fs.existsSync('bin')) {
+    console.log('Create folder bin');
+    fs.mkdirSync('bin');
+}
+
 https.get('https://api.github.com/repos/hardwario/enmon/releases/latest' ,{ headers: headers },
     (res) => {
 
