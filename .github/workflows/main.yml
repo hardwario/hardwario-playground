@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 16.x
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16.x
+        cache: 'npm'
+
+    - name: patch node gyp on windows to support Visual Studio 2019
+      if: matrix.os == 'windows-latest'
+      shell: powershell
+      run: |
+        npm install --global node-gyp@latest
+        npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+
+    - name: Install
+      run: npm install
+
+    - name: Build
+      shell: bash
+      run: |
+           if [ "$RUNNER_OS" == "Linux" ]; then
+                npm run package-linux64
+                npm run package-linux-appimage
+           elif [ "$RUNNER_OS" == "Windows" ]; then
+                npm run package-win64
+           elif [ "$RUNNER_OS" == "macOS" ];
+                 npm run package-mac
+           else
+                echo "$RUNNER_OS not supported"
+                exit 1
+           fi
+
+    - name: Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: release
+        path: release/*
