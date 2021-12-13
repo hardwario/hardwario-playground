@@ -1,7 +1,6 @@
 import React, { Component, RaisedButton } from "react";
 import { Button, Alert, Progress } from 'reactstrap';
 const { ipcRenderer, shell } = require("electron");
-// const { dialog } = require('@electron/remote');
 
 import Select from 'react-select';
 
@@ -61,6 +60,7 @@ export default class extends Component {
         this.formFirmwareSelectOnChange = this.formFirmwareSelectOnChange.bind(this);
         this.formVersionSelectOnChange = this.formVersionSelectOnChange.bind(this);
         this.formFirmwareSelectonInputChange = this.formFirmwareSelectonInputChange.bind(this);
+        this.ipcFileDialogResult = this.ipcFileDialogResult.bind(this);
     }
 
     componentDidMount() {
@@ -78,6 +78,8 @@ export default class extends Component {
 
         ipcRenderer.addListener("firmware:download", this.ipcDownload);
 
+        ipcRenderer.addListener("firmware:file-dialog-result", this.ipcFileDialogResult);
+
         ipcRenderer.send("firmware:get-port-list");
 
         ipcRenderer.send("firmware:get-list");
@@ -85,6 +87,8 @@ export default class extends Component {
 
     componentWillUnmount() {
         console.log('firmware:componentWillUnmount');
+
+        ipcRenderer.removeListener("firmware:file-dialog-result", this.ipcFileDialogResult)
 
         ipcRenderer.removeListener("firmware:progress", this.ipcProgressUpdate);
 
@@ -144,21 +148,15 @@ export default class extends Component {
         ipcRenderer.send("firmware:get-port-list");
     }
 
+    ipcFileDialogResult(sender, payload) {
+        this.setState({ custom: { name: payload.filePath } });
+        this.setState({ firmware: this.state.custom });
+    }
+
     openDialogBin(e) {
         e.preventDefault();
         e.stopPropagation();
-
-        // dialog.showOpenDialog({properties: ['openFile'], filters: [{name: '.bin', extensions: ['bin']}]})
-        // .then((result) => {
-        //     console.log('result.canceled', result.canceled);
-        //     if (result.canceled) return;
-        //     console.log('result.filePaths', result.filePaths);
-        //     if (result.filePaths !== undefined && result.filePaths.length === 1) {
-        //         // this.setState({ file: file[0] });
-        //         this.setState({ custom: {name: result.filePaths[0] } });
-        //         this.setState({ firmware: this.state.custom });
-        //     }
-        // });
+        ipcRenderer.send('firmware:open-file-dialog');
     }
 
     flash() {
