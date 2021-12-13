@@ -5,6 +5,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -34,26 +36,32 @@ jobs:
 
     - name: Prepare
       run: |
-              npm run download-enmon
-              npm run patch
+        npm run download-enmon
+        npm run patch
 
     - name: Build
       shell: bash
       run: |
-            if [ "$RUNNER_OS" == "Linux" ]; then
-                npm run package-linux64
-                npm run package-linux-appimage
-            elif [ "$RUNNER_OS" == "Windows" ]; then
-                npm run package-win64
-            elif [ "$RUNNER_OS" == "macOS" ]; then
-                  npm run package-mac
-            else
-                echo "$RUNNER_OS not supported"
-                exit 1
-            fi
+        if [ "$RUNNER_OS" == "Linux" ]; then
+            npm run package-linux64
+            npm run package-linux-appimage
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+            npm run package-win64
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+              npm run package-mac
+        else
+            echo "$RUNNER_OS not supported"
+            exit 1
+        fi
 
     - name: Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: release
-        path: release/*
+        name: release ${{ matrix.os }}
+        path: |
+          release/*.deb
+          release/*.AppImage
+          release/*.snap
+          release/*.dmg
+          release/*.tar.gz
+          release/*.exe
