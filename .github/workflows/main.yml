@@ -14,7 +14,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+        - os: ubuntu-latest
+          environment: linux
+
+        - os: windows-latest
+          environment: windows
+
+        - os: macos-latest
+          environment: macos
+
     runs-on: ${{ matrix.os }}
+    environment: ${{ matrix.environment }}
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js 16.x
@@ -39,20 +50,24 @@ jobs:
         npm run download-enmon
         npm run patch
 
-    - name: Build
-      shell: bash
+    - name: Build for Linux
+      if: matrix.environment == 'linux'
       run: |
-        if [ "$RUNNER_OS" == "Linux" ]; then
-            npm run package-linux64
-            npm run package-linux-appimage
-        elif [ "$RUNNER_OS" == "Windows" ]; then
-            npm run package-win64
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-              npm run package-mac
-        else
-            echo "$RUNNER_OS not supported"
-            exit 1
-        fi
+          npm run package-linux64
+          npm run package-linux-appimage
+
+    - name: Build for Windows
+      if: matrix.environment == 'windows'
+      env:
+        CSC_LINK: ${{ secrets.CERT_FILE }}
+        CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
+      run: |
+          npm run package-win64
+
+    - name: Build for macOS
+      if: matrix.environment == 'macos'
+      run: |
+          npm run package-mac
 
     - name: Artifacts
       uses: actions/upload-artifact@v2
