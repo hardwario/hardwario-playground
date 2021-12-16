@@ -87,7 +87,8 @@
         "nsis",
         "portable"
       ],
-      "publisherName": "HARDWARIO s.r.o."
+      "publisherName": "HARDWARIO s.r.o.",
+      "signingHashAlgorithms": ["sha256"]
     },
     "linux": {
       "artifactName": "hio-playground-v${version}-linux-${arch}.${ext}",
