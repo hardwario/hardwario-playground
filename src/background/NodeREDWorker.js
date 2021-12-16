@@ -45,6 +45,34 @@ function copyFolderRecursiveSync( source, target ) {
     }
 }
 
+function fixFlowNodeV2(filename) {
+    console.log('fixFlowNodeV2 load:', filename);
+    let flow = JSON.parse(fs.readFileSync(filename, { encoding: 'utf-8' }));
+    if (flow.length < 1) return;
+    let mofify = false;
+    for (let i = 0; i < flow.length; i++) {
+        if (flow[i].type === 'mqtt-broker' && flow[i].compatmode !== undefined) {
+            delete flow[i].compatmode;
+            flow[i] = Object.assign({
+                "protocolVersion": "4",
+                "autoConnect": true,
+                "birthMsg": {},
+                "closeTopic": "",
+                "closePayload": "",
+                "closeMsg": {},
+                "willMsg": {},
+                "sessionExpiry": "",
+                "name": ""
+            }, flow[i]);
+            mofify = true;
+        }
+    }
+    if (mofify) {
+        console.log('fixFlowNodeV2 save:', filename);
+        fs.writeFileSync(filename, JSON.stringify(flow), { encoding: 'utf-8' })
+    }
+}
+
 function setup() {
     const listenPort = 1880;
     const flowFile = "flows.json";
@@ -75,6 +103,12 @@ function setup() {
                     fs.unlinkSync(filepath);
                 }
             });
+
+            try {
+                fixFlowNodeV2(path.join(userDir, 'flows.json'));
+            } catch (error) {
+                console.log('fixFlowNodeV2', error);
+            }
 
             var config = {
                 uiPort: listenPort,
@@ -126,7 +160,7 @@ function setup() {
 
                     resolve();
                 });
-            }).otherwise(function(err) {
+            }).catch(function(err) {
                 RED.log.error(RED.log._("server.failed-to-start"));
                 if (err.stack) {
                     RED.log.error(err.stack);
