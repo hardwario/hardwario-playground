@@ -69,6 +69,8 @@ jobs:
       env:
         CSC_LINK: ${{ secrets.CERT_FILE }}
         CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
+        APPLEID: ${{ secrets.APPLEID }}
+        APPLEIDPASS: ${{ secrets.APPLEIDPASS }}
       run: |
           npm run package-mac
 

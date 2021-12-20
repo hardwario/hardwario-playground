@@ -101,6 +101,7 @@
       "artifactName": "hio-playground-v${version}-${os}-setup-${arch}.${ext}"
     },
     "dmg": {
+      "sign": false,
       "contents": [
         {
           "x": 130,
@@ -113,7 +114,8 @@
           "path": "/Applications"
         }
       ]
-    }
+    },
+    "afterSign": ".github/notarize.js"
   },
   "devDependencies": {
     "ajv": "^8.8.2",
