@@ -66,6 +66,9 @@ jobs:
 
     - name: Build for macOS
       if: matrix.environment == 'macos'
+      env:
+        CSC_LINK: ${{ secrets.CERT_FILE }}
+        CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
       run: |
           npm run package-mac
 
