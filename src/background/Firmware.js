@@ -9,7 +9,7 @@ const rprogress = require('request-progress');
 const notifyAll = require("../utils/notifyAll");
 
 const { flash, port_list } = require("./../utils/flasher/flasher-serial");
-const FIRMWARE_JSON_URL = "https://firmware.bigclown.com/json";
+const FIRMWARE_JSON_URL = "https://firmware.hardwario.com/tower/api/v1/list";
 
 var firmware_list = [];
 
@@ -58,9 +58,9 @@ function loadFirmwareJson(jsonpath) {
 
     let payload = JSON.parse(fs.readFileSync(jsonpath, { encoding: "utf8" })) || [];
 
-    return payload['list'].map((fw)=>{
+    return payload.map((fw)=>{
         if (!fw.articles) fw.articles = [];
-
+        if (!fw.tags) fw.tags = [];
         return fw;
     })
 
