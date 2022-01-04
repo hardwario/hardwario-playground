@@ -4,6 +4,26 @@
     margin: 5px;
 }
 
+.showAll {
+    position: absolute;
+    right: 20px;
+    top: 40px;
+    z-index: 5;
+    user-select: none;
+}
+
+.showAll input {
+    cursor: pointer;
+}
+
+.showAll label {
+    cursor: pointer;
+}
+
+.firmwareSelect {
+    margin-right: 80px;
+}
+
 .openDialogBtn {
     position: absolute;
     right: -14px;
