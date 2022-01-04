@@ -11,7 +11,7 @@
     "url": "git@github.com:bigclownlabs/bch-playground.git"
   },
   "license": "MIT",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -86,7 +86,9 @@
         "portable"
       ],
       "publisherName": "HARDWARIO s.r.o.",
-      "signingHashAlgorithms": ["sha256"]
+      "signingHashAlgorithms": [
+        "sha256"
+      ]
     },
     "linux": {
       "artifactName": "hio-playground-v${version}-linux-${arch}.${ext}",
@@ -167,6 +169,7 @@
     "node-arp": "^1.0.6",
     "node-red": "^2.1.4",
     "node-red-contrib-azure-iotc-bridge": "^1.0.2",
+    "node-red-contrib-blynk-iot": "^0.2.0",
     "node-red-contrib-blynk-ws": "^1.0.6",
     "node-red-contrib-ifttt": "^0.3.1",
     "node-red-dashboard": "^3.1.2",
