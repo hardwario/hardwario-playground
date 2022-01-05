@@ -6,3 +6,8 @@ node_modules/
 builds/
 dist/
 release/
+
+# Other
+bin/enmon
+note
+*.p12

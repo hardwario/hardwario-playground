@@ -1,9 +1,7 @@
 <a href="https://www.hardwario.com/"><img src="https://www.hardwario.com/ci/assets/hw-logo.svg" width="200" alt="HARDWARIO Logo" align="right"></a>
 
 # Hardwario Playground app
-
-[![Travis](https://img.shields.io/travis/hardwario/bch-playground/master.svg)](https://travis-ci.org/hardwario/bch-playground)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/j90ijfjm7awnydkp/branch/master?svg=true)](https://ci.appveyor.com/project/Hardwario/bch-playground/branch/master)
+![Build status](https://github.com/hardwario/bch-playground/actions/workflows/main.yml/badge.svg)
 [![Release](https://img.shields.io/github/release/hardwario/bch-playground.svg)](https://github.com/hardwario/bch-playground/releases)
 [![License](https://img.shields.io/github/license/hardwario/bch-playground.svg)](https://github.com/hardwario/bch-playground/blob/master/LICENSE)
 [![Twitter](https://img.shields.io/twitter/follow/hardwario_en.svg?style=social&label=Follow)](https://twitter.com/hardwario_en)
