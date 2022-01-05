@@ -8,6 +8,7 @@ var settings = new ConfigStore("settings.json", {
     "node-red-bind": "127.0.0.1",
     "enmon-enable": false,
     "enmon-delay": 5,
+    "firmware-show-all": false
 });
 
 function setup() {

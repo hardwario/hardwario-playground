@@ -1,7 +1,7 @@
 "use strict";
 
 const { SerialPortFtdi, port_list } = require("./serialport-ftdi");
-const sleep = require("sleep");
+const sleep = require("./sleep");
 const fs = require('fs');
 
 
@@ -21,7 +21,7 @@ const COMMAND_EX_ERASE_MEMORY = Buffer.from([0x44, 0xbb]);
 
 const ERASE_FULL = 196608;
 
-class Flash_Serial {
+class FlashSerial {
 
   constructor(device) {
 
@@ -68,26 +68,21 @@ class Flash_Serial {
     });
   }
 
-  connect() {
-    return new Promise((resolve, reject) => {
-      (async() => {
+    async connect() {
         for (let i = 0; i < 10; i++) {
-          console.log("_connect", i);
-          try {
-            await this._ser.open();
-            await this._connect();
-
-            return resolve();
-          } catch (error) {
-            console.log('connect error', error);
-            await this._ser.close().catch(()=>{});
-            sleep.msleep(100);
-          }
+            console.log("FlashSerial: try connect", i);
+            try {
+                await this._ser.open();
+                await this._connect();
+                return true;
+            } catch (error) {
+                console.log('FlashSerial: connect error', error);
+                await this._ser.close().catch(() => { });
+                await sleep.msleep(100);
+            }
         }
-        reject("Connection error");
-      }).bind(this)();
-    });
-  }
+        throw 'Connection error';
+    }
 
   disconect() {
       return this._ser.close();
@@ -105,21 +100,24 @@ class Flash_Serial {
           return this._ser.clear_buffer();
         })
         .then(() => {
-          sleep.msleep(50);
+          return sleep.msleep(50);
+        })
+        .then(() => {
           return this._ser.write(buffer);
         })
         .then(() => {
           return this._read(buffer, 1);
         })
         .then((length) => {
-            console.log(length, buffer, buffer.readUInt8());
-          if ((length == 1) && (buffer.readUInt8() == ACK)) {
+          console.log(length, buffer, buffer.readUInt8(0));
+          if ((length == 1) && (buffer.readUInt8(0) == ACK)) {
             resolve();
           } else {
             reject("start bootloader expect ACK");
           }
         })
-        .catch(()=>{
+        .catch((e)=>{
+          console.log(e);
             reject("Error start bootloader");
         });
     });
@@ -134,7 +132,6 @@ class Flash_Serial {
           return this._read(outBuffer, 5);
         })
         .then((length) => {
-
           if ((outBuffer[0] == ACK) && outBuffer[4] == ACK) {
             resolve(outBuffer.subarray(1, 4))
           } else {
@@ -202,36 +199,28 @@ class Flash_Serial {
     });
   }
 
-  _read(readBuffer, length, timeout=1000) {
-    return new Promise((resolve, reject) => {
+    async _read(readBuffer, length, timeout = 1000) {
+        let read_length = 0;
 
-      let read_length = 0;
-
-      (async() => {
-
-        let timer = setTimeout(()=>{
+        let timer = setTimeout(() => {
             console.log("timeout");
             this._ser.close();
         }, timeout);
 
         var ret;
-
         while (read_length < length) {
-            ret = await this._ser.read(readBuffer, read_length, length - read_length).catch((e)=>{
-            clearTimeout(timer);
-            reject(e);
-          });
-          read_length += ret.bytesRead;
+            ret = await this._ser.read(readBuffer, read_length, length - read_length)
+                .catch((e) => {
+                    console.log(e);
+                    clearTimeout(timer);
+                    throw new Error(e.toString());
+                });
+            read_length += ret.bytesRead;
         }
 
         clearTimeout(timer);
-
-        resolve(read_length);
-
-      }).bind(this)();
-
-    });
-  }
+        return read_length;
+    }
 
   memory_read(start_address, length) {
     return new Promise((resolve, reject) => {
@@ -377,24 +366,20 @@ class Flash_Serial {
     });
   }
 
-  erase(length = 196608, reporthook = null) {
-    return new Promise((resolve, reject) => {
+    async erase(length = 196608, reporthook = null) {
+        let max_page = Math.ceil(length / 128) + 1
 
-      let max_page = Math.ceil(length / 128) + 1
+        if (max_page > 1536) {
+            max_page = 1536
+        }
 
-      if (max_page > 1536) {
-        max_page = 1536
-      }
-
-      if (reporthook) reporthook(0, max_page);
-
-      (async function loop() {
+        if (reporthook) reporthook(0, max_page);
         for (let page_start = 0; page_start < max_page; page_start += 80) {
 
             let page_stop = page_start + 80;
 
             if (page_stop > max_page) {
-            page_stop = max_page;
+                page_stop = max_page;
             }
 
             let pages = Array.from({ length: page_stop - page_start }, (v, i) => i + page_start);
@@ -402,34 +387,25 @@ class Flash_Serial {
             try {
                 await this.extended_erase_memory(pages);
             } catch (error) {
-                return reject(error);
+                throw new Error(error);
             }
 
-          if (reporthook) reporthook(page_stop, max_page);
+            if (reporthook) reporthook(page_stop, max_page);
         }
+    }
 
-        resolve();
+    async write(firmware, reporthook = null, start_address = START_ADDRESS) {
+        console.log('firmware', firmware.length);
+        let length = firmware.length;
+        const step = 128;
 
-      }).bind(this)();
-
-    });
-  }
-
-  write(firmware, reporthook = null, start_address = START_ADDRESS) {
-    return new Promise((resolve, reject) => {
-
-      let length = firmware.length;
-      const step = 128;
-
-      if (reporthook) reporthook(0, length);
-
-      (async function loop() {
+        if (reporthook) reporthook(0, length);
         for (let offset = 0; offset < length; offset += step) {
 
             let offset_end = offset + step;
 
             if (offset_end > length) {
-            offset_end = length;
+                offset_end = length;
             }
 
             let buffer = firmware.slice(offset, offset_end);
@@ -437,36 +413,27 @@ class Flash_Serial {
             try {
                 await this.memory_write(start_address + offset, buffer);
             } catch (error) {
-                return reject(error);
+                throw new Error(error);
             }
 
             if (reporthook) reporthook(offset_end, length);
         }
+    }
 
-        resolve();
+    async verify(firmware, reporthook = null, start_address = START_ADDRESS) {
+        let length = firmware.length;
+        const step = 128;
 
-      }).bind(this)();
+        if (reporthook) reporthook(0, length);
 
-    });
-  }
-
-  verify(firmware, reporthook = null, start_address = START_ADDRESS) {
-    return new Promise((resolve, reject) => {
-
-      let length = firmware.length;
-      const step = 128;
-
-      if (reporthook) reporthook(0, length);
-
-      (async function loop() {
         for (let offset = 0; offset < length; offset += step) {
 
             let offset_end = offset + step;
             let read_length = step;
 
             if (offset_end > length) {
-            offset_end = length;
-            read_length = offset_end - offset;
+                offset_end = length;
+                read_length = offset_end - offset;
             }
 
             let orig_buffer = firmware.slice(offset, offset_end);
@@ -480,27 +447,22 @@ class Flash_Serial {
                 try {
                     buffer = await this.memory_read(start_address + offset, read_length);
                 } catch (error) {
-                    return reject(error);
+                    console.log('error: memory_read', error);
+                    continue;
                 }
 
-                if (orig_buffer.equals(buffer)) {
+                if (Buffer.from(orig_buffer).equals(buffer)) {
                     break;
                 }
             }
 
             if (i == 2) {
-                return reject('Not Match')
+                throw new Error('Not Match');
             }
 
-          if (reporthook) reporthook(offset_end, length);
+            if (reporthook) reporthook(offset_end, length);
         }
-
-        resolve();
-
-      }).bind(this)();
-
-    });
-  }
+    }
 
 }
 
@@ -510,9 +472,9 @@ function flash(device, firmware_path, reporthook = null) {
 
         let firmware = fs.readFileSync(firmware_path);
 
-        console.log(firmware.length);
+        console.log('flash firmware length', firmware.length);
 
-        var s = new Flash_Serial(device);
+        var s = new FlashSerial(device);
 
         s.connect()
         .then(() => {
@@ -544,4 +506,4 @@ function flash(device, firmware_path, reporthook = null) {
     });
 }
 
-module.exports = { flash, Flash_Serial, port_list }
+module.exports = { flash, FlashSerial, port_list }

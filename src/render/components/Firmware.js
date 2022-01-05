@@ -1,7 +1,6 @@
 import React, { Component, RaisedButton } from "react";
 import { Button, Alert, Progress } from 'reactstrap';
 const { ipcRenderer, shell } = require("electron");
-// const { dialog } = require('@electron/remote');
 
 import Select from 'react-select';
 
@@ -47,7 +46,8 @@ export default class extends Component {
             firmware: null,
             download: 0,
             version: null,
-            custom: {name:null}
+            custom: {name:null},
+            showAll: ipcRenderer.sendSync('settings/get-sync', 'firmware-show-all'),
         };
 
         this.ipcProgressUpdate = this.ipcProgressUpdate.bind(this);
@@ -61,6 +61,8 @@ export default class extends Component {
         this.formFirmwareSelectOnChange = this.formFirmwareSelectOnChange.bind(this);
         this.formVersionSelectOnChange = this.formVersionSelectOnChange.bind(this);
         this.formFirmwareSelectonInputChange = this.formFirmwareSelectonInputChange.bind(this);
+        this.ipcFileDialogResult = this.ipcFileDialogResult.bind(this);
+        this.showAllToggle = this.showAllToggle.bind(this);
     }
 
     componentDidMount() {
@@ -78,6 +80,8 @@ export default class extends Component {
 
         ipcRenderer.addListener("firmware:download", this.ipcDownload);
 
+        ipcRenderer.addListener("firmware:file-dialog-result", this.ipcFileDialogResult);
+
         ipcRenderer.send("firmware:get-port-list");
 
         ipcRenderer.send("firmware:get-list");
@@ -85,6 +89,8 @@ export default class extends Component {
 
     componentWillUnmount() {
         console.log('firmware:componentWillUnmount');
+
+        ipcRenderer.removeListener("firmware:file-dialog-result", this.ipcFileDialogResult)
 
         ipcRenderer.removeListener("firmware:progress", this.ipcProgressUpdate);
 
@@ -144,21 +150,15 @@ export default class extends Component {
         ipcRenderer.send("firmware:get-port-list");
     }
 
+    ipcFileDialogResult(sender, payload) {
+        this.setState({ custom: { name: payload.filePath } });
+        this.setState({ firmware: this.state.custom });
+    }
+
     openDialogBin(e) {
         e.preventDefault();
         e.stopPropagation();
-
-        // dialog.showOpenDialog({properties: ['openFile'], filters: [{name: '.bin', extensions: ['bin']}]})
-        // .then((result) => {
-        //     console.log('result.canceled', result.canceled);
-        //     if (result.canceled) return;
-        //     console.log('result.filePaths', result.filePaths);
-        //     if (result.filePaths !== undefined && result.filePaths.length === 1) {
-        //         // this.setState({ file: file[0] });
-        //         this.setState({ custom: {name: result.filePaths[0] } });
-        //         this.setState({ firmware: this.state.custom });
-        //     }
-        // });
+        ipcRenderer.send('firmware:open-file-dialog');
     }
 
     flash() {
@@ -196,6 +196,12 @@ export default class extends Component {
         this.setState({ version });
     }
 
+    showAllToggle() {
+        const showAll = !this.state.showAll;
+        this.setState({ showAll });
+        ipcRenderer.send("settings/set", { key: 'firmware-show-all', value: showAll });
+    }
+
     render() {
         return (
             <div id="firmware">
@@ -204,8 +210,9 @@ export default class extends Component {
         <div className="form-group col-10">
             <label htmlFor="formFirmwareSelect">Firmware</label>
             <Select
+            className="firmwareSelect"
             labelKey="name"
-            options={[...this.state.list, this.state.custom]}
+            options={[...this.state.list.filter((item)=>this.state.showAll || item.tags.indexOf('playground') > -1), this.state.custom]}
             placeholder="Choose firmware ..."
             searchable={true}
             onChange={this.formFirmwareSelectOnChange}
@@ -216,6 +223,12 @@ export default class extends Component {
             onInputChange={this.formFirmwareSelectonInputChange}
             style={{"paddingLeft":"-10px"}}
             />
+
+            <div className="showAll" onClick={this.showAllToggle}>
+                <input type="checkbox" size="sm" checked={this.state.showAll} ></input>
+                <label>Show all</label>
+            </div>
+
             <button color="primary" size="sm" className="openDialogBtn" onClick={this.openDialogBin} >...</button>
         </div>
 
@@ -353,18 +366,18 @@ export default class extends Component {
             {
                 this.state.firmware.articles.map((article, index) => {
                     return (
-                        <li class="media">
+                        <li className="media" key={index.toString()}>
                         { (article.video && article.video.length > 0) ?
                             isYoutubeUrl(article.video) ?
-                                <iframe class="mr-3" src={getYoutubeVideoUrl(article.video)} frameBorder="0" allow="encrypted-media" allowFullScreen="1"></iframe>
-                                : <video class="mr-3" src={article.video} controls preload="metadata"></video>
+                                <iframe className="mr-3" src={getYoutubeVideoUrl(article.video)} frameBorder="0" allow="encrypted-media" allowFullScreen="1"></iframe>
+                                : <video className="mr-3" src={article.video} controls preload="metadata"></video>
 
                         : (article.images && article.images.length > 0) ?
-                            <img class="mr-3" src={article.images[0].url} alt="{article.images[0].title}"/>
+                            <img className="mr-3" src={article.images[0].url} alt="{article.images[0].title}"/>
                             : null
                         }
-                        <div class="media-body">
-                            <h5 class="mt-0"><a href={article.url} onClick={openExternal}>{article.title}</a></h5>
+                        <div className="media-body">
+                            <h5 className="mt-0"><a href={article.url} onClick={openExternal}>{article.title}</a></h5>
                             {article.description}
                         </div>
                         </li>

@@ -110,7 +110,7 @@ export default class extends Component {
                                 <NavLink to="/functions" title={nodeRedOffline ? "Node-RED is shut down": null}>{i18n.__("Functions")} {nodeRedOffline ? <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
-                                <a href="https://developers.bigclown.com/basics/bigclown-playground" onClick={openExternal}>{i18n.__("Help")}</a>
+                                <a href="https://tower.hardwario.com/en/latest/basics/hardwario-playground" onClick={openExternal}>{i18n.__("Help")}</a>
                                 {/* <NavLink to="/settings">{i18n.__("settings")}</NavLink> */}
                             </nav>
 

@@ -1,6 +1,6 @@
 "use strict";
 const SerialPort = require("serialport");
-const { app, dialog , ipcMain} = require("electron");
+const { app, dialog, ipcMain} = require("electron");
 const path = require("path");
 const os = require("os");
 const fs = require("fs");
@@ -9,7 +9,7 @@ const rprogress = require('request-progress');
 const notifyAll = require("../utils/notifyAll");
 
 const { flash, port_list } = require("./../utils/flasher/flasher-serial");
-const FIRMWARE_JSON_URL = "https://firmware.bigclown.com/json";
+const FIRMWARE_JSON_URL = "https://firmware.hardwario.com/tower/api/v1/list";
 
 var firmware_list = [];
 
@@ -58,9 +58,9 @@ function loadFirmwareJson(jsonpath) {
 
     let payload = JSON.parse(fs.readFileSync(jsonpath, { encoding: "utf8" })) || [];
 
-    return payload['list'].map((fw)=>{
+    return payload.map((fw)=>{
         if (!fw.articles) fw.articles = [];
-
+        if (!fw.tags) fw.tags = [];
         return fw;
     })
 
@@ -263,6 +263,23 @@ function setup() {
 
     ipcMain.on("firmware:get-list", (event, payload) => {
         event.sender.send("firmware:list", firmware_list || []);
+    });
+
+    let defaultPath = undefined;
+
+    ipcMain.on('firmware:open-file-dialog', (event) => {
+        dialog.showOpenDialog({ properties: ['openFile'], defaultPath, filters: [{ name: '.bin', extensions: ['bin'] }] })
+            .then((result) => {
+                console.log('FirmwareDialog result', result);
+                if (result.canceled) return;
+                if (result.filePaths !== undefined && result.filePaths.length === 1) {
+                    defaultPath = path.dirname(result.filePaths[0]);
+                    console.log('send', result.filePaths[0], defaultPath);
+                    event.sender.send('firmware:file-dialog-result', {
+                        filePath: result.filePaths[0]
+                    });
+                }
+            });
     });
 }
 
