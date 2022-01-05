@@ -87,3 +87,17 @@ jobs:
           release/*.dmg
           release/*.tar.gz
           release/*.exe
+
+    - name: Publish to GitHub Releases
+      if: ${{ github.event_name == 'release' }}
+      uses: softprops/action-gh-release@v0.1.5
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        files: |
+          release/*.deb
+          release/*.AppImage
+          release/*.snap
+          release/*.dmg
+          release/*.tar.gz
+          release/*.exe
