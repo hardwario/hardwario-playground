@@ -222,11 +222,12 @@ export default class extends Component {
             }}
             onInputChange={this.formFirmwareSelectonInputChange}
             style={{"paddingLeft":"-10px"}}
+            noResultsText="No results found - try to check **Show All** option"
             />
 
-            <div className="showAll" onClick={this.showAllToggle}>
-                <input type="checkbox" size="sm" checked={this.state.showAll} ></input>
-                <label>Show all</label>
+            <div className="showAll">
+                <input type="checkbox" size="sm" defaultChecked={this.state.showAll} onChange={this.showAllToggle} id="showAllInput"></input>
+                <label htmlFor="showAllInput">Show all</label>
             </div>
 
             <button color="primary" size="sm" className="openDialogBtn" onClick={this.openDialogBin} >...</button>

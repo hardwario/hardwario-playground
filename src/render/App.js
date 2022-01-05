@@ -128,7 +128,7 @@ export default class extends Component {
                         <Route path="/settings" component={Settings}/>
                         <RouteWithProps path="/" exact component={Devices} model={this.radiomanager} />
                         <RouteIframe path="/functions" src="http://127.0.0.1:1880/" id="node-red" />
-                        <RouteIframe path="/dashboard" src="http://127.0.0.1:1880/ui" />
+                        <RouteIframe path="/dashboard" src="http://127.0.0.1:1880/ui" id="node-red-dashbord" />
                         <RouteWithProps path="/messages" component={MqttLog} model={this.mqttlog}/>
                         <RouteWithProps path="/bridge" component={Bridge} model={this.bridge}/>
                         <Route path="/firmware" component={Firmware} />
