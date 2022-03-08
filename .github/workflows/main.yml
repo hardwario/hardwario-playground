@@ -55,6 +55,7 @@ jobs:
       run: |
           npm run package-linux64
           npm run package-linux-appimage
+          chmod +x release/*.AppImage
 
     - name: Build for Windows
       if: matrix.environment == 'windows'
