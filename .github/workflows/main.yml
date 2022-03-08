@@ -2,13 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
-    paths-ignore:
-      - '**/README.md'
+    branches: [ main, master, update ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ master ]
-  release:
-    types: [published]
+    branches: [ main ]
 
 jobs:
   build:
