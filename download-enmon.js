@@ -16,7 +16,14 @@ if (!fs.existsSync('bin')) {
     fs.mkdirSync('bin');
 }
 
-https.get('https://api.github.com/repos/hardwario/enmon/releases/latest' ,{ headers: headers },
+const platform = os.platform();
+let filename = "bin/enmon";
+
+if (platform === 'win32') {
+    filename += ".exe"
+}
+
+https.get('https://api.github.com/repos/hardwario/enmon/releases/latest', { headers: headers },
     (res) => {
 
         if (res.statusCode !== 200) {
@@ -30,7 +37,6 @@ https.get('https://api.github.com/repos/hardwario/enmon/releases/latest' ,{ head
         });
 
         res.on("end", () => {
-            const platform = os.platform();
 
             try {
                 const json = JSON.parse(body);
@@ -43,19 +49,25 @@ https.get('https://api.github.com/repos/hardwario/enmon/releases/latest' ,{ head
                     https.get(asset[0].browser_download_url, { headers: headers }, (response) => {
                         console.log(response.headers.location)
 
-                        const file = fs.createWriteStream("bin/enmon");
+
+                        const file = fs.createWriteStream(filename);
                         https.get(response.headers.location, (response) => {
                             response.pipe(file);
+                        });
+                        file.on('finish', () => {
+                            file.close();
+                            console.log(`Download Completed: ${filename}`);
+                            fs.chmodSync(filename, 0o775);
                         });
                     });
 
                 } else {
-                    console.log('unknown asset', platform, json.assets);
+                    console.log('Unknown asset', platform, json.assets);
                 }
             } catch (error) {
                 console.error(error.message);
             };
+        });
+    }).on("error", (error) => {
+        console.error(error.message);
     });
-}).on("error", (error) => {
-    console.error(error.message);
-});
