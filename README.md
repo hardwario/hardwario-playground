@@ -61,4 +61,4 @@ In case install of serialport fails, run this script (Ubuntu 16.04)
 https://gist.github.com/katopz/8b766a5cb0ca96c816658e9407e83d00
 
 
-Made with &#x2764;&nbsp; by [**HARDWARIO s.r.o.**](https://www.hardwario.com/) in the heart of Europe.
+Made with &#x2764;&nbsp; by [**HARDWARIO a.s.**](https://www.hardwario.com/) in the heart of Europe.
