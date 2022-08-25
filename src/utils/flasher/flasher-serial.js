@@ -219,6 +219,7 @@ class FlashSerial {
         }
 
         clearTimeout(timer);
+
         return read_length;
     }
 

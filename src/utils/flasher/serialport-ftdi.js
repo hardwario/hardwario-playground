@@ -1,11 +1,12 @@
 "use strict";
 
-const SerialPort = require("serialport");
+const { SerialPort } = require('serialport')
 const sleep = require("./sleep");
 
 class SerialPortFtdi {
     constructor(device) {
-        this._serial = new SerialPort(device, {
+        this._serial = new SerialPort({
+            path: device,
             autoOpen: false,
             baudRate: 921600,
             parity: "even",
@@ -13,6 +14,7 @@ class SerialPortFtdi {
 
         this._serial.on("open", function () {
             console.log('open');
+
             this.connected = true;
         }.bind(this));
 
@@ -27,16 +29,18 @@ class SerialPortFtdi {
         this.clear_buffer = this.clear_buffer.bind(this);
         this.reset_sequence = this.reset_sequence.bind(this);
         this.boot_sequence = this.boot_sequence.bind(this);
-
-        this.write = this._ser.write.bind(this._ser);
-        this.read = this._ser.read.bind(this._ser);
-        this.flush = this._ser.flush.bind(this._ser);
     }
 
     open() {
         return new Promise((resolve, reject) => {
             this._serial.open((error) => {
                 if (error) return reject(error);
+
+                this._ser = this._serial.port;
+
+                this.write = this._ser.write.bind(this._ser);
+                this.read = this._ser.read.bind(this._ser);
+                this.flush = this._ser.flush.bind(this._ser);
 
                 this.clear_buffer()
                     .then(resolve)
