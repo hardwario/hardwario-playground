@@ -1,6 +1,7 @@
 "use strict";
 
-const SerialPort = require("serialport");
+const { SerialPort } = require('serialport')
+const { ReadlineParser } = require('@serialport/parser-readline')
 var mqtt = require("mqtt");
 const path = require('path');
 const fs = require('fs');
@@ -32,7 +33,8 @@ class Gateway {
             fs.mkdirSync(cacheDir);
         }
 
-        this._ser = new SerialPort(device, {
+        this._ser = new SerialPort({
+            path: device,
             autoOpen: false,
             baudRate: 115200,
             parity: "none",
@@ -86,7 +88,7 @@ class Gateway {
             console.error(e);
         });
 
-        const parser = this._ser.pipe(new SerialPort.parsers.Readline({ delimiter: "\n" }));
+        const parser = this._ser.pipe(new ReadlineParser({ delimiter: "\n" }))
         parser.on("data", this._device_readline.bind(this));
 
         this._ser.open();
@@ -99,9 +101,9 @@ class Gateway {
 
     disconnect() {
         if (!this._connected) return;
-        this._ser.binding.write(Buffer.from('["/pairing-mode/stop", null]\n')).then(()=>{
+        this._ser.write(Buffer.from('["/pairing-mode/stop", null]\n'), ()=>{
             this._ser.close();
-        }).catch(console.log);
+        });
     }
 
     getDevice() {
