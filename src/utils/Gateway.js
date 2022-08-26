@@ -260,7 +260,7 @@ class Gateway {
                 return;
             }
 
-            let m = (payload["firmware"] + ":").match(/bcf-gateway-(.*?):/)
+            let m = (payload["firmware"] + ":").match(/(?:bcf|twr)-gateway-(.*?):/)
 
             if (!m) {
                 return;
