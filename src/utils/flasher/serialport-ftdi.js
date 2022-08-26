@@ -4,11 +4,11 @@ const { SerialPort } = require('serialport')
 const sleep = require("./sleep");
 
 class SerialPortFtdi {
-    constructor(device) {
+    constructor(device, baudrate=115200) {
         this._serial = new SerialPort({
             path: device,
             autoOpen: false,
-            baudRate: 921600,
+            baudRate: baudrate,
             parity: "even",
         });
 
