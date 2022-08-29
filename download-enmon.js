@@ -6,9 +6,9 @@ const headers = {
     'User-Agent': 'Mozilla/5.0',
 };
 
-if (process.env.GITHUB_KEY) {
+if (process.env.TOKEN_GITHUB) {
     console.log('Add Authorization');
-    headers['Authorization'] = `token ${process.env.GITHUB_KEY}`;
+    headers['Authorization'] = `token ${process.env.TOKEN_GITHUB}`;
 }
 
 if (!fs.existsSync('bin')) {
