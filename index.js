@@ -12,6 +12,7 @@ const CustomMenu = require("./src/utils/Menu");
 
 // Import background workers
 const NodeREDWorker = require("./src/background/NodeREDWorker");
+const BlocklyWorker = require("./src/background/BlocklyWorker");
 const MqttBroker = require("./src/background/MqttBroker");
 const Settings = require("./src/background/Settings");
 const Firmware = require("./src/background/Firmware");
@@ -126,6 +127,7 @@ NodeREDWorker.setup().finally(()=>{
 })
 Home.setup();
 Enmon.setup();
+BlocklyWorker.setup();
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {

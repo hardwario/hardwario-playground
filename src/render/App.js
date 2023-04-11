@@ -17,6 +17,7 @@ import Gateway from "./components/Gateway";
 import Devices from "./components/Devices";
 import Home from "./components/Home";
 import Bridge from "./components/Bridge";
+import Blockly from "./components/Blockly";
 
 // Import SCSS
 import "../assets/scss/index.scss";
@@ -109,6 +110,7 @@ export default class extends Component {
                                 <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/functions" title={nodeRedOffline ? "Node-RED is shut down": null}>{i18n.__("Functions")} {nodeRedOffline ? <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
+                                <NavLink to="/blockly">{i18n.__("Blockly (Beta)")}</NavLink>
                                 <NavLink to="/firmware">{i18n.__("firmware")}</NavLink>
                                 <a href="https://tower.hardwario.com/en/latest/basics/hardwario-playground" onClick={openExternal}>{i18n.__("Help")}</a>
                                 {/* <NavLink to="/settings">{i18n.__("settings")}</NavLink> */}
@@ -129,9 +131,10 @@ export default class extends Component {
                         <RouteWithProps path="/" exact component={Devices} model={this.radiomanager} />
                         <RouteIframe path="/functions" src="http://127.0.0.1:1880/" id="node-red" />
                         <RouteIframe path="/dashboard" src="http://127.0.0.1:1880/ui" id="node-red-dashbord" />
+                        <Route path="/blockly" component={Blockly} />
                         <RouteWithProps path="/messages" component={MqttLog} model={this.mqttlog}/>
                         <RouteWithProps path="/bridge" component={Bridge} model={this.bridge}/>
-                        <Route path="/firmware" component={Firmware} />
+                        <Route path="/firmware/:fw?" component={Firmware} />
                     </main>
 
                     <ToastContainer position="top-right" autoClose={2000} closeOnClick/>

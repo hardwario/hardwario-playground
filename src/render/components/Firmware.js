@@ -116,6 +116,13 @@ export default class extends Component {
     ipcList(sender, list) {
         // console.log(list);
         this.setState({list});
+        console.log("JSEM TUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+        if(this.props.match.params.fw) {
+            console.log(this.props.match.params.fw);
+            let fw = decodeURIComponent(this.props.match.params.fw);
+            this.setState({ custom: { name: fw } });
+            this.setState({ firmware: this.state.custom });
+        }
     }
 
     ipcProgressUpdate(sender, payload) {
