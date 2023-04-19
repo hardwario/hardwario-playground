@@ -185,6 +185,6 @@
     "serialport": "10.4.0",
     "ubidots-nodered": "^2.0.2",
     "shell": "^0.5.1",
-    "hardwario-blockly-dev": "1.0.10"
+    "hardwario-blockly-dev": "1.0.11"
   }
 }
