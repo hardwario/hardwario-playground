@@ -47,7 +47,6 @@ jobs:
 
     - name: Prepare
       run: |
-        npm run download-enmon
         npm run patch
 
     - name: Build for Linux

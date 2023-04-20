@@ -14,7 +14,8 @@ This repository contains Playground application.
 - NodeRED Dashboard
 - MQTT logger
 - MQTT broker
-- Bigclown Gateway for USB Dongle
+- TOWER Gateway for USB Dongle
+- HARDWARIO Blockly
 - Firmware flasher
 
 ## Contributing

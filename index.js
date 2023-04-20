@@ -18,7 +18,6 @@ const Settings = require("./src/background/Settings");
 const Firmware = require("./src/background/Firmware");
 const Gateway = require("./src/background/Gateway");
 const Home = require("./src/background/Home");
-const Enmon = require("./src/background/enmon");
 
 let windows = [];
 
@@ -126,7 +125,6 @@ NodeREDWorker.setup().finally(()=>{
     }
 })
 Home.setup();
-Enmon.setup();
 BlocklyWorker.setup();
 
 // Quit when all windows are closed.

@@ -26,8 +26,7 @@
     "package-win32": "npm run webpack && electron-builder build --win --ia32",
     "package-win64": "npm run webpack && electron-builder build --win --x64",
     "package-mac": "npm run webpack && electron-builder build --mac",
-    "patch": "node patch/patch.js",
-    "download-enmon": "node download-enmon.js"
+    "patch": "node patch/patch.js"
   },
   "build": {
     "productName": "HARDWARIO Playground",

@@ -6,7 +6,6 @@ import { RouteIframe, RouteWithProps } from "./components/Route";
 
 import RadioManagerModel from "./model/RadioManager";
 import MqttLogModel from "./model/MqttLog";
-import BridgeModel from "./model/Bridge";
 
 
 import MqttLog from "./components/MqttLog";
@@ -16,7 +15,6 @@ import Firmware from "./components/Firmware";
 import Gateway from "./components/Gateway";
 import Devices from "./components/Devices";
 import Home from "./components/Home";
-import Bridge from "./components/Bridge";
 import Blockly from "./components/Blockly";
 
 // Import SCSS
@@ -39,12 +37,10 @@ export default class extends Component {
             gatewayStatus: "unknown",
             noderedStatus: "unknown",
             brokerStatus: "unknown",
-            bridgeStatus: "disabled",
         };
 
         this.radiomanager = new RadioManagerModel();
         this.mqttlog = new MqttLogModel();
-        this.bridge = new BridgeModel();
     }
 
     componentDidMount() {
@@ -65,11 +61,6 @@ export default class extends Component {
                 this.setState({ brokerStatus });
             }
         });
-        ipcRenderer.on("bridge/status", (sender, payload) => {
-            if (this.state.bridgeStatus != payload.status) {
-                this.setState({ bridgeStatus: payload.status });
-            }
-        });
 
         ipcRenderer.on("settings/value/mqtt.ip", (sender, mqttIp) => {
             this.radiomanager.connect("mqtt://" + mqttIp);
@@ -79,7 +70,6 @@ export default class extends Component {
         ipcRenderer.send("gateway/status/get");
         ipcRenderer.send("nodered/status/get");
         ipcRenderer.send("broker/status/get");
-        ipcRenderer.send("bridge/status/get");
         ipcRenderer.send("settings/get", "mqtt.ip");
     }
 
@@ -96,7 +86,6 @@ export default class extends Component {
         let gwOffline = this.state.gatewayStatus == "offline";
         let nodeRedOffline = this.state.noderedStatus == "offline";
         let mqttOffline = this.state.brokerStatus == "offline";
-        let bridgeOffline = this.state.bridgeStatus == "offline";
         return (
             <HashRouter>
                 <div id="app" >
@@ -106,7 +95,6 @@ export default class extends Component {
                             <nav>
                                 {/* <NavLink exact to="/">{i18n.__("home")}</NavLink> */}
                                 <NavLink to="/" exact title={gwOffline ? "No Radio Dongle connected" : null}>{i18n.__("Devices")} {gwOffline ?  <i className="fa fa-warning"></i> : null}</NavLink>
-                                <NavLink to="/bridge" title={bridgeOffline ? "Bridge is not connected" : null}>{i18n.__("bridge")} {bridgeOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/messages" title={mqttOffline ? "Mqtt brouker is shut down" : null}>{i18n.__("Messages")} {mqttOffline ?<i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/functions" title={nodeRedOffline ? "Node-RED is shut down": null}>{i18n.__("Functions")} {nodeRedOffline ? <i className="fa fa-warning"></i> : null}</NavLink>
                                 <NavLink to="/dashboard">{i18n.__("dashboard")}</NavLink>
@@ -133,7 +121,6 @@ export default class extends Component {
                         <RouteIframe path="/dashboard" src="http://127.0.0.1:1880/ui" id="node-red-dashbord" />
                         <Route path="/blockly" component={Blockly} />
                         <RouteWithProps path="/messages" component={MqttLog} model={this.mqttlog}/>
-                        <RouteWithProps path="/bridge" component={Bridge} model={this.bridge}/>
                         <Route path="/firmware/:fw?" component={Firmware} />
                     </main>
 

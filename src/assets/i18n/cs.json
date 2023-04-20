@@ -33,6 +33,5 @@
   "rename": "Přejmenovat",
   "Welcome to the Playground": "Vítejte v Playground",
   "mqtt": "MQTT",
-  "remoteIp": "Vzdálená IP",
-  "bridge": "Bridge"
+  "remoteIp": "Vzdálená IP"
 }
