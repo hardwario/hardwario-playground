@@ -1,8 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const BabiliPlugin = require("babili-webpack-plugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 // Config directories
 const SRC_DIR = path.resolve(__dirname, "src");
@@ -16,19 +15,20 @@ module.exports = {
     output: {
         path: OUTPUT_DIR,
         publicPath: "./",
-        filename: "bundle.js"
+        filename: "bundle.js",
+        assetModuleFilename: 'assets/[hash][ext][query]'
     },
     mode: "production",
     module: {
         rules: [
             {
                 test: /\.css$/,
-                use: ["style-loader", "css-loader"],
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
                 include: [defaultInclude, /node_modules/]
             },
             {
                 test: /\.scss$/,
-                use: ["style-loader", "css-loader", "sass-loader"],
+                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
                 include: defaultInclude
             },
             {
@@ -37,20 +37,18 @@ module.exports = {
             },
             {
                 test: /\.(jpe?g|png|gif)$/,
-                use: [{
-                    loader: "file-loader?name=img/[name]__[hash:base64:5].[ext]", options: {
-                        esModule: false,
-                    },
-                }],
+                type: 'asset/resource',
+                generator: {
+                    filename: 'img/[name]__[hash:5][ext]'
+                },
                 include: defaultInclude
             },
             {
                 test: /\.(eot|svg|ttf|woff|woff2)$/,
-                use: [{
-                    loader: "file-loader?name=font/[name]__[hash:base64:5].[ext]", options: {
-                        esModule: false,
-                    },
-                }],
+                type: 'asset/resource',
+                generator: {
+                    filename: 'font/[name]__[hash:5][ext]'
+                },
                 include: [/node_modules/, SRC_DIR]
             }
         ]
@@ -60,11 +58,12 @@ module.exports = {
         new HtmlWebpackPlugin({
             title: "HARDWARIO Playground v" + process.env.npm_package_version
         }),
-        new ExtractTextPlugin("bundle.css"),
+        new MiniCssExtractPlugin({
+            filename: "bundle.css"
+        }),
         new webpack.DefinePlugin({
             "process.env.NODE_ENV": JSON.stringify("production"),
-        }),
-        new BabiliPlugin()
+        })
     ],
     stats: {
         colors: true,

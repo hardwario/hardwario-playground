@@ -52,4 +52,4 @@ class HomeComponent extends Component {
     }
 }
 
-module.exports = withRouter(HomeComponent);
+export default withRouter(HomeComponent);

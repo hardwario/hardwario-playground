@@ -1,14 +1,19 @@
-$fa-font-path: "~font-awesome/fonts";
-@import '~font-awesome/scss/font-awesome.scss';
-@import "./Home";
-@import "./Navbar";
-@import "./MqttLog";
-@import "./Settings";
-@import "./RadioManager";
-@import "./Firmware";
-@import "./Gateway";
+// $fa-font-path: "~font-awesome/fonts";
+
+// Font Awesome
+// @use "~font-awesome/scss/font-awesome";
+
+// Local partials
+@use "./Home";
+@use "./Navbar";
+@use "./MqttLog";
+@use "./Settings";
+@use "./RadioManager";
+@use "./Firmware";
+@use "./Gateway";
+
 body {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 #app {
