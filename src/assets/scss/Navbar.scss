@@ -10,29 +10,17 @@ $navbar-padding-left: 5px;
     @keyframes slide-left {
         0% {
             width: 100%;
-            a {
-                padding: $navbar-padding-top $navbar-padding-right $navbar-padding-bottom $navbar-padding-left;
-            }
         }
         100% {
             width: 0px;
-            a {
-                padding: 0px;
-            }
         }
     }
     @keyframes slide-right {
         0% {
             width: 0%;
-            a {
-                padding: 0px;
-            }
         }
         100% {
             width: 100%;
-            a {
-                padding: $navbar-padding-top $navbar-padding-right $navbar-padding-bottom $navbar-padding-left;
-            }
         }
     }
     .fade-in {

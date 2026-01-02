@@ -33,7 +33,8 @@ module.exports = {
             },
             {
                 test: /\.jsx?$/,
-                use: ["babel-loader", "shebang-loader"]
+                use: ["babel-loader", "shebang-loader"],
+                exclude: /node_modules/
             },
             {
                 test: /\.(jpe?g|png|gif)$/,
