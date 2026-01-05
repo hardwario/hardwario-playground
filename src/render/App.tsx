@@ -89,43 +89,51 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div id="app" className="flex h-full w-full">
-        {/* Sidebar Navigation */}
-        <div id="navbar" className="h-full">
-          <aside className="navbar animate-slide-right w-[120px]">
-            <nav className="navbar-nav">
+      <div id="app" className="flex flex-col h-full w-full">
+        {/* Top Navigation */}
+        <header id="navbar" className="w-full">
+          <nav className="navbar">
+            <a
+              href="https://www.hardwario.com/"
+              onClick={openExternal}
+              className="navbar-brand"
+            >
+              <img src={logoWhite} className="h-6" alt="HARDWARIO Logo" />
+            </a>
+
+            <div className="navbar-nav">
               <NavLink
                 to="/"
                 end
                 className={({ isActive }) =>
-                  `nav-link flex items-center justify-between ${isActive ? 'active' : ''}`
+                  `nav-link ${isActive ? 'active' : ''}`
                 }
                 title={gwOffline ? 'No Radio Dongle connected' : undefined}
               >
                 {i18n.__('Devices')}
-                {gwOffline && <FiAlertTriangle className="text-hardwario-warning" />}
+                {gwOffline && <FiAlertTriangle className="ml-1 text-hardwario-warning" />}
               </NavLink>
 
               <NavLink
                 to="/messages"
                 className={({ isActive }) =>
-                  `nav-link flex items-center justify-between ${isActive ? 'active' : ''}`
+                  `nav-link ${isActive ? 'active' : ''}`
                 }
                 title={mqttOffline ? 'MQTT broker is shut down' : undefined}
               >
                 {i18n.__('Messages')}
-                {mqttOffline && <FiAlertTriangle className="text-hardwario-warning" />}
+                {mqttOffline && <FiAlertTriangle className="ml-1 text-hardwario-warning" />}
               </NavLink>
 
               <NavLink
                 to="/functions"
                 className={({ isActive }) =>
-                  `nav-link flex items-center justify-between ${isActive ? 'active' : ''}`
+                  `nav-link ${isActive ? 'active' : ''}`
                 }
                 title={nodeRedOffline ? 'Node-RED is shut down' : undefined}
               >
                 {i18n.__('Functions')}
-                {nodeRedOffline && <FiAlertTriangle className="text-hardwario-warning" />}
+                {nodeRedOffline && <FiAlertTriangle className="ml-1 text-hardwario-warning" />}
               </NavLink>
 
               <NavLink
@@ -156,17 +164,9 @@ export default function App() {
               >
                 {i18n.__('Help')}
               </a>
-            </nav>
-
-            <a
-              href="https://www.hardwario.com/"
-              onClick={openExternal}
-              className="block p-3"
-            >
-              <img src={logoWhite} className="w-[100px]" alt="HARDWARIO Logo" />
-            </a>
-          </aside>
-        </div>
+            </div>
+          </nav>
+        </header>
 
         {/* Main Content */}
         <main className="flex-1 bg-white relative overflow-auto">

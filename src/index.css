@@ -145,15 +145,19 @@
 
   /* Navbar styles */
   .navbar {
-    @apply h-full bg-hardwario-gray flex flex-col justify-between;
+    @apply w-full bg-hardwario-gray flex items-center px-4;
+  }
+
+  .navbar-brand {
+    @apply flex items-center py-2 mr-6;
   }
 
   .navbar-nav {
-    @apply flex flex-col;
+    @apply flex items-center;
   }
 
   .nav-link {
-    @apply block px-4 py-3 text-white no-underline transition-colors duration-150;
+    @apply flex items-center px-4 py-3 text-white no-underline transition-colors duration-150;
   }
 
   .nav-link:hover {
