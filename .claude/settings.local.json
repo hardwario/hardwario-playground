@@ -3,7 +3,25 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(timeout 30 npm run dev)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm --version:*)",
+      "Bash(node --version)",
+      "Bash(find:*)",
+      "Bash(for f in src/render/components/*.tsx)",
+      "Bash(do basename=\"$f%.tsx\")",
+      "Bash(echo:*)",
+      "Bash(if [ -f \"$basename.js\" ])",
+      "Bash(then echo \"  has .js version\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(cat:*)",
+      "Bash(for f in src/render/components/Blockly.js src/render/components/Devices.js src/render/components/Firmware.js src/render/components/Gateway.js src/render/components/MqttLog.js src/render/components/RadioManager.js src/render/components/Settings.js src/render/App.js)",
+      "Bash(do if [ -f \"$f\" ])",
+      "Bash(then mv \"$f\" \"$f.bak\")",
+      "Bash(for f in src/render/components/FirmwareInfo.js src/render/components/GatewayList.js src/render/components/Home.js src/render/components/Route.js src/render/model/*.js)",
+      "mcp__ide__getDiagnostics",
+      "Bash(timeout 25 npm run dev:*)",
+      "Bash(timeout 20 npm run dev:*)"
     ]
   }
 }

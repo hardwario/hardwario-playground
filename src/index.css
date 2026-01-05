@@ -1,0 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    @apply h-full w-full overflow-hidden m-0 p-0;
+  }
+
+  body {
+    @apply font-sans text-gray-900 bg-white;
+  }
+
+  /* Sharp corners to match original design */
+  button,
+  input,
+  select,
+  textarea {
+    @apply rounded-none;
+  }
+
+  /* Focus styles */
+  button:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    @apply outline-none ring-2 ring-hardwario-primary ring-offset-1;
+  }
+}
+
+@layer components {
+  /* Button variants */
+  .btn {
+    @apply px-4 py-2 font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-hardwario-primary text-white hover:bg-blue-700;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+  }
+
+  .btn-success {
+    @apply btn bg-green-600 text-white hover:bg-green-700;
+  }
+
+  .btn-warning {
+    @apply btn bg-yellow-500 text-white hover:bg-yellow-600;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-500 text-white hover:bg-gray-600;
+  }
+
+  .btn-sm {
+    @apply px-2 py-1 text-sm;
+  }
+
+  /* Form controls */
+  .form-control {
+    @apply w-full px-3 py-2 border border-gray-300 bg-white transition-colors duration-150;
+  }
+
+  .form-control:focus {
+    @apply border-hardwario-primary;
+  }
+
+  .form-control:disabled {
+    @apply bg-gray-100 cursor-not-allowed;
+  }
+
+  .form-label {
+    @apply block mb-1 font-medium text-gray-700;
+  }
+
+  .form-group {
+    @apply mb-4;
+  }
+
+  /* Alert variants */
+  .alert {
+    @apply px-4 py-3 flex items-center gap-2;
+  }
+
+  .alert-danger {
+    @apply alert bg-red-100 border border-red-400 text-red-700;
+  }
+
+  .alert-success {
+    @apply alert bg-green-100 border border-green-400 text-green-700;
+  }
+
+  .alert-warning {
+    @apply alert bg-yellow-100 border border-yellow-400 text-yellow-700;
+  }
+
+  .alert-info {
+    @apply alert bg-blue-100 border border-blue-400 text-blue-700;
+  }
+
+  /* Progress bar */
+  .progress {
+    @apply h-4 bg-gray-200 overflow-hidden;
+  }
+
+  .progress-bar {
+    @apply h-full transition-all duration-300 ease-out;
+  }
+
+  .progress-bar-danger {
+    @apply progress-bar bg-red-500;
+  }
+
+  .progress-bar-warning {
+    @apply progress-bar bg-yellow-500;
+  }
+
+  .progress-bar-success {
+    @apply progress-bar bg-green-500;
+  }
+
+  .progress-bar-primary {
+    @apply progress-bar bg-hardwario-primary;
+  }
+
+  /* Table styles */
+  .table {
+    @apply w-full border-collapse;
+  }
+
+  .table th,
+  .table td {
+    @apply border border-gray-300 px-4 py-2 text-left;
+  }
+
+  .table th {
+    @apply bg-gray-50 font-semibold;
+  }
+
+  .table-hover tbody tr:hover {
+    @apply bg-gray-50;
+  }
+
+  /* Navbar styles */
+  .navbar {
+    @apply h-full bg-hardwario-gray flex flex-col justify-between;
+  }
+
+  .navbar-nav {
+    @apply flex flex-col;
+  }
+
+  .nav-link {
+    @apply block px-4 py-3 text-white no-underline transition-colors duration-150;
+  }
+
+  .nav-link:hover {
+    @apply bg-hardwario-hover;
+  }
+
+  .nav-link.active {
+    @apply bg-hardwario-dark;
+  }
+
+  /* Card component */
+  .card {
+    @apply bg-white border border-gray-200 shadow-sm;
+  }
+
+  .card-header {
+    @apply px-4 py-3 bg-gray-50 border-b border-gray-200 font-semibold;
+  }
+
+  .card-body {
+    @apply p-4;
+  }
+
+  /* Iframe route wrapper */
+  .route-iframe {
+    @apply w-full h-full border-0;
+  }
+}
+
+@layer utilities {
+  /* Blink animation for pairing mode */
+  .blink {
+    @apply animate-blink;
+  }
+
+  /* Last attached device highlight */
+  .last-attach {
+    @apply bg-hardwario-success;
+  }
+
+  /* Custom scrollbar for dark backgrounds */
+  .scrollbar-dark::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  .scrollbar-dark::-webkit-scrollbar-track {
+    @apply bg-hardwario-dark;
+  }
+
+  .scrollbar-dark::-webkit-scrollbar-thumb {
+    @apply bg-hardwario-hover rounded-sm;
+  }
+
+  .scrollbar-dark::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+}
+
+/* React Select overrides for Tailwind compatibility */
+.react-select__control {
+  @apply border-gray-300 rounded-none min-h-[38px] !important;
+}
+
+.react-select__control--is-focused {
+  @apply border-hardwario-primary ring-2 ring-hardwario-primary ring-offset-1 !important;
+}
+
+.react-select__menu {
+  @apply rounded-none border border-gray-300 shadow-lg !important;
+}
+
+.react-select__option--is-focused {
+  @apply bg-gray-100 !important;
+}
+
+.react-select__option--is-selected {
+  @apply bg-hardwario-primary text-white !important;
+}
+
+/* React Toastify adjustments */
+.Toastify__toast {
+  @apply rounded-none !important;
+}

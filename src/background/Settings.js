@@ -10,13 +10,14 @@ var settings = new ConfigStore("settings.json", {
 });
 
 function setup() {
-    ipcMain.on("settings/get", (event, key) => {
+    // Handle invoke-style requests (used by preload)
+    ipcMain.handle("settings/get", (event, key) => {
         console.log("settings/get", key, settings.get(key));
-        event.sender.send("settings/value/" + key , settings.get(key) );
+        return settings.get(key);
     });
 
-    ipcMain.on("settings/getAll", (event, dummy) => {
-        event.sender.send("settings/all" , settings.getAll() );
+    ipcMain.handle("settings/getAll", () => {
+        return settings.getAll();
     });
 
     ipcMain.on("settings/set", (event, data) => {

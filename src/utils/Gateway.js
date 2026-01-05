@@ -430,6 +430,7 @@ class Gateway {
     }
 
     pub(topic, payload) {
+        console.log("Gateway MQTT publish:", topic, payload);
         this._mqtt.publish(topic, JSON.stringify(payload));
     }
 

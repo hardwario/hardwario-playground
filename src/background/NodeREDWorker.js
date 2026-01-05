@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const { app, ipcMain } = require("electron");
 const { settings } = require('./Settings');
-const isPortReachable = require('is-port-reachable');
+// is-port-reachable is ESM-only, use dynamic import
 
 function copyFileSync( source, target ) {
     var targetFile = target;
@@ -83,8 +83,9 @@ function setup() {
     });
 
     return new Promise(async (resolve, reject) => {
-
-        const reachable = await isPortReachable(listenPort);
+        // Dynamic import for ESM-only package
+        const { default: isPortReachable } = await import('is-port-reachable');
+        const reachable = await isPortReachable(listenPort, { host: '127.0.0.1' });
 
         const isDebug = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) ||
                         /[\\/]electron[\\/]/.test(process.execPath) ||
