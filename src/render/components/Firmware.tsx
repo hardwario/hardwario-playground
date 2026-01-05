@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import Select from 'react-select';
-import { FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
+import {
+  FiAlertCircle, FiCheckCircle, FiCpu, FiDownload, FiFolder,
+  FiExternalLink, FiPlay, FiBook, FiGithub, FiInfo, FiRefreshCw
+} from 'react-icons/fi';
 import type {
   SerialPortInfo,
   FlashProgress,
@@ -53,27 +56,44 @@ function ProgressBar({
   label,
   value,
   color,
+  icon: Icon,
 }: {
   label: string;
   value: number;
-  color: 'danger' | 'warning' | 'success' | 'primary';
+  color: 'red' | 'yellow' | 'green' | 'blue';
+  icon: React.ComponentType<{ className?: string }>;
 }) {
   const colorClasses = {
-    danger: 'progress-bar-danger',
-    warning: 'progress-bar-warning',
-    success: 'progress-bar-success',
-    primary: 'progress-bar-primary',
+    red: 'bg-red-500',
+    yellow: 'bg-yellow-500',
+    green: 'bg-green-500',
+    blue: 'bg-blue-500',
+  };
+
+  const bgClasses = {
+    red: 'bg-red-100',
+    yellow: 'bg-yellow-100',
+    green: 'bg-green-100',
+    blue: 'bg-blue-100',
   };
 
   return (
-    <div className="flex items-center mb-2">
-      <label className="w-20 text-sm">{label}</label>
-      <div className="flex-1 progress">
+    <div className="flex items-center gap-3 mb-3">
+      <div className="flex items-center gap-2 w-24">
+        <Icon className={`w-4 h-4 ${value > 0 ? 'text-gray-700' : 'text-gray-400'}`} />
+        <span className={`text-sm font-medium ${value > 0 ? 'text-gray-700' : 'text-gray-400'}`}>
+          {label}
+        </span>
+      </div>
+      <div className={`flex-1 h-3 rounded-full ${bgClasses[color]} overflow-hidden`}>
         <div
-          className={colorClasses[color]}
+          className={`h-full ${colorClasses[color]} rounded-full transition-all duration-300`}
           style={{ width: `${value}%` }}
         />
       </div>
+      <span className={`text-sm w-12 text-right ${value > 0 ? 'text-gray-700' : 'text-gray-400'}`}>
+        {value}%
+      </span>
     </div>
   );
 }
@@ -231,246 +251,331 @@ export default function Firmware() {
     ? [{ name: 'latest' }, ...firmware.versions]
     : [];
 
+  // Custom styles for react-select
+  const selectStyles = {
+    control: (base: object) => ({
+      ...base,
+      borderColor: '#d1d5db',
+      boxShadow: 'none',
+      '&:hover': { borderColor: '#9ca3af' },
+    }),
+    option: (base: object, state: { isSelected: boolean; isFocused: boolean }) => ({
+      ...base,
+      backgroundColor: state.isSelected ? '#e63946' : state.isFocused ? '#fee2e2' : 'white',
+      color: state.isSelected ? 'white' : '#374151',
+    }),
+  };
+
   return (
-    <div id="firmware" className="p-4">
-      {/* Firmware Selection */}
-      <div className="flex gap-4 mb-4">
-        <div className="flex-1 relative">
-          <label className="form-label">Firmware</label>
-          <div className="pr-24">
-            <Select<FirmwareOption>
-              className="react-select-container"
-              classNamePrefix="react-select"
-              getOptionLabel={(option) => option.name || ''}
-              getOptionValue={(option) => option.name || ''}
-              options={filteredList.filter((f) => f.name)}
-              placeholder="Choose firmware ..."
-              isSearchable
-              onChange={handleFirmwareChange}
-              value={firmware}
-              noOptionsMessage={() => "No results found - try to check 'Show All' option"}
-            />
+    <div className="h-full overflow-auto bg-gray-50">
+      <div className="p-4 max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Firmware Flasher</h1>
+          <p className="text-gray-500 mt-1">Flash firmware to your HARDWARIO devices</p>
+        </div>
+
+        {/* Main Card */}
+        <div className="bg-white border border-gray-200 shadow-sm mb-6">
+          {/* Firmware Selection Header */}
+          <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+            <h2 className="font-semibold text-gray-800">Select Firmware</h2>
           </div>
 
-          <div className="absolute right-20 top-9 flex items-center gap-1 z-10">
-            <input
-              type="checkbox"
-              checked={showAll}
-              onChange={handleShowAllToggle}
-              id="showAllInput"
-              className="cursor-pointer"
-            />
-            <label htmlFor="showAllInput" className="cursor-pointer text-sm">
-              Show all
-            </label>
-          </div>
-
-          <button
-            onClick={handleOpenDialog}
-            className="absolute right-0 top-8 px-3 py-2 bg-gray-200 hover:bg-gray-300 z-10"
-          >
-            ...
-          </button>
-        </div>
-
-        <div className="w-32">
-          <label className="form-label">Version</label>
-          <Select<VersionOption>
-            className="react-select-container"
-            classNamePrefix="react-select"
-            getOptionLabel={(option) => option.name}
-            getOptionValue={(option) => option.name}
-            placeholder="Version..."
-            options={versionOptions}
-            value={version}
-            onChange={(v) => setVersion(v)}
-            isDisabled={!firmware}
-            isClearable={false}
-          />
-        </div>
-      </div>
-
-      {/* Device and Progress */}
-      <div className="flex gap-4 mb-4">
-        <div className="w-64">
-          <label className="form-label">Device</label>
-          <select
-            className="form-control mb-2"
-            disabled={isRun}
-            value={port}
-            onChange={(e) => setPort(e.target.value)}
-          >
-            {ports.length === 0 && <option>(no device available)</option>}
-            {ports.map((p, index) => (
-              <option value={p.path} key={index}>
-                {p.path}
-                {p.serialNumber ? ` ${p.serialNumber}` : ''}
-              </option>
-            ))}
-          </select>
-
-          <button
-            className="btn-danger w-full"
-            disabled={ports.length === 0 || isRun || !firmware}
-            onClick={handleFlash}
-          >
-            Flash firmware
-          </button>
-        </div>
-
-        <div className="flex-1">
-          {download > 0 && (
-            <ProgressBar label="Download" value={download} color="primary" />
-          )}
-          <ProgressBar label="Erase" value={progress.erase} color="danger" />
-          <ProgressBar label="Write" value={progress.write} color="warning" />
-          <ProgressBar label="Verify" value={progress.verify} color="success" />
-        </div>
-      </div>
-
-      {/* Status Alerts */}
-      {error && (
-        <div className="alert-danger mb-4">
-          <FiAlertCircle className="flex-shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {done && (
-        <div className="alert-success mb-4">
-          <FiCheckCircle className="flex-shrink-0" />
-          <span>Done</span>
-        </div>
-      )}
-
-      {/* Firmware Details */}
-      {firmware && (
-        <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200">
-          <div>
-            {firmware.description && (
-              <div className="mb-4">
-                <label className="form-label">Description</label>
-                <p className="text-gray-700">{firmware.description}</p>
-              </div>
-            )}
-
-            {firmware.article && (
-              <div className="mb-4">
-                <label className="form-label">Article</label>
-                <p>
-                  <a
-                    href={firmware.article}
-                    onClick={openExternal}
-                    className="text-hardwario-primary hover:underline"
+          <div className="p-4">
+            {/* Firmware Selection Row */}
+            <div className="flex gap-4 mb-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Firmware</label>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <Select<FirmwareOption>
+                      styles={selectStyles}
+                      getOptionLabel={(option) => option.name || ''}
+                      getOptionValue={(option) => option.name || ''}
+                      options={filteredList.filter((f) => f.name)}
+                      placeholder="Choose firmware..."
+                      isSearchable
+                      onChange={handleFirmwareChange}
+                      value={firmware}
+                      noOptionsMessage={() => "No results found - try 'Show All' option"}
+                    />
+                  </div>
+                  <button
+                    onClick={handleOpenDialog}
+                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 transition-colors flex items-center gap-2"
+                    title="Browse for firmware file"
                   >
-                    {firmware.article}
-                  </a>
-                </p>
+                    <FiFolder className="w-4 h-4" />
+                  </button>
+                </div>
+                <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showAll}
+                    onChange={handleShowAllToggle}
+                    className="rounded border-gray-300 text-hardwario-primary focus:ring-hardwario-primary"
+                  />
+                  <span className="text-sm text-gray-600">Show all firmware</span>
+                </label>
+              </div>
+
+              <div className="w-36">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Version</label>
+                <Select<VersionOption>
+                  styles={selectStyles}
+                  getOptionLabel={(option) => option.name}
+                  getOptionValue={(option) => option.name}
+                  placeholder="Version"
+                  options={versionOptions}
+                  value={version}
+                  onChange={(v) => setVersion(v)}
+                  isDisabled={!firmware}
+                  isClearable={false}
+                />
+              </div>
+            </div>
+
+            {/* Device Selection and Flash */}
+            <div className="flex gap-4 pt-4 border-t border-gray-100">
+              <div className="w-64">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Target Device</label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-hardwario-primary focus:border-transparent mb-3"
+                  disabled={isRun}
+                  value={port}
+                  onChange={(e) => setPort(e.target.value)}
+                >
+                  {ports.length === 0 && <option>(no device available)</option>}
+                  {ports.map((p, index) => (
+                    <option value={p.path} key={index}>
+                      {p.path}
+                      {p.serialNumber ? ` (${p.serialNumber})` : ''}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  className={`
+                    w-full px-4 py-3 font-medium transition-all duration-200 flex items-center justify-center gap-2
+                    ${isRun
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-hardwario-danger hover:bg-red-600'
+                    }
+                    text-white disabled:opacity-50 disabled:cursor-not-allowed
+                  `}
+                  disabled={ports.length === 0 || isRun || !firmware}
+                  onClick={handleFlash}
+                >
+                  {isRun ? (
+                    <>
+                      <FiRefreshCw className="w-5 h-5 animate-spin" />
+                      Flashing...
+                    </>
+                  ) : (
+                    <>
+                      <FiPlay className="w-5 h-5" />
+                      Flash Firmware
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Progress Section */}
+              <div className="flex-1 bg-gray-50 rounded p-4">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Flash Progress</h3>
+                {download > 0 && (
+                  <ProgressBar label="Download" value={download} color="blue" icon={FiDownload} />
+                )}
+                <ProgressBar label="Erase" value={progress.erase} color="red" icon={FiCpu} />
+                <ProgressBar label="Write" value={progress.write} color="yellow" icon={FiDownload} />
+                <ProgressBar label="Verify" value={progress.verify} color="green" icon={FiCheckCircle} />
+              </div>
+            </div>
+
+            {/* Status Alerts */}
+            {error && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded flex items-start gap-3">
+                <FiAlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-red-800">Flash Failed</h4>
+                  <p className="text-sm text-red-600 mt-1">{error}</p>
+                </div>
               </div>
             )}
 
-            {firmware.video && (
-              <div className="mb-4">
-                <label className="form-label">Video</label>
-                <p>
-                  <a
-                    href={firmware.video}
-                    onClick={openExternal}
-                    className="text-hardwario-primary hover:underline"
-                  >
-                    {firmware.video}
-                  </a>
-                </p>
-              </div>
-            )}
-
-            {firmware.repository && (
-              <div className="mb-4">
-                <label className="form-label">Repository</label>
-                <p>
-                  <a
-                    href={firmware.repository}
-                    onClick={openExternal}
-                    className="text-hardwario-primary hover:underline"
-                  >
-                    {firmware.repository}
-                  </a>
-                </p>
+            {done && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded flex items-start gap-3">
+                <FiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-green-800">Flash Complete</h4>
+                  <p className="text-sm text-green-600 mt-1">Firmware has been successfully flashed to your device.</p>
+                </div>
               </div>
             )}
           </div>
+        </div>
 
-          <div>
-            {firmware.images && firmware.images.length > 0 && (
-              <img
-                src={firmware.images[0].url}
-                alt={firmware.images[0].title}
-                className="max-w-full h-auto mb-4"
-              />
-            )}
+        {/* Firmware Details Card */}
+        {firmware && (firmware.description || firmware.article || firmware.video || firmware.repository || firmware.images) && (
+          <div className="bg-white border border-gray-200 shadow-sm">
+            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
+              <FiInfo className="w-4 h-4 text-gray-500" />
+              <h2 className="font-semibold text-gray-800">Firmware Details</h2>
+            </div>
 
-            {firmware.video && isYoutubeUrl(firmware.video) && (
-              <iframe
-                src={getYoutubeVideoUrl(firmware.video) || ''}
-                className="w-full aspect-video"
-                frameBorder="0"
-                allow="encrypted-media"
-                allowFullScreen
-                title="Firmware Video"
-              />
-            )}
-          </div>
+            <div className="p-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Column - Info */}
+                <div className="space-y-4">
+                  {firmware.description && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Description</h3>
+                      <p className="text-gray-700">{firmware.description}</p>
+                    </div>
+                  )}
 
-          {/* Articles */}
-          {firmware.articles && firmware.articles.length > 0 && (
-            <div className="col-span-2">
-              <label className="form-label">Articles</label>
-              <ul className="space-y-4">
-                {firmware.articles.map((article, index) => (
-                  <li key={index} className="flex gap-4">
-                    {article.video && isYoutubeUrl(article.video) ? (
+                  {firmware.article && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Documentation</h3>
+                      <a
+                        href={firmware.article}
+                        onClick={openExternal}
+                        className="inline-flex items-center gap-2 text-hardwario-primary hover:underline"
+                      >
+                        <FiBook className="w-4 h-4" />
+                        View Article
+                        <FiExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
+
+                  {firmware.video && !isYoutubeUrl(firmware.video) && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Video Tutorial</h3>
+                      <a
+                        href={firmware.video}
+                        onClick={openExternal}
+                        className="inline-flex items-center gap-2 text-hardwario-primary hover:underline"
+                      >
+                        <FiPlay className="w-4 h-4" />
+                        Watch Video
+                        <FiExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
+
+                  {firmware.repository && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Source Code</h3>
+                      <a
+                        href={firmware.repository}
+                        onClick={openExternal}
+                        className="inline-flex items-center gap-2 text-hardwario-primary hover:underline"
+                      >
+                        <FiGithub className="w-4 h-4" />
+                        View Repository
+                        <FiExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Column - Media */}
+                <div>
+                  {firmware.images && firmware.images.length > 0 && (
+                    <img
+                      src={firmware.images[0].url}
+                      alt={firmware.images[0].title}
+                      className="w-full h-auto rounded border border-gray-200"
+                    />
+                  )}
+
+                  {firmware.video && isYoutubeUrl(firmware.video) && (
+                    <div className="aspect-video rounded overflow-hidden border border-gray-200">
                       <iframe
-                        src={getYoutubeVideoUrl(article.video) || ''}
-                        className="w-48 aspect-video flex-shrink-0"
+                        src={getYoutubeVideoUrl(firmware.video) || ''}
+                        className="w-full h-full"
                         frameBorder="0"
                         allow="encrypted-media"
                         allowFullScreen
-                        title={article.title}
+                        title="Firmware Video"
                       />
-                    ) : article.video ? (
-                      <video
-                        src={article.video}
-                        controls
-                        preload="metadata"
-                        className="w-48 flex-shrink-0"
-                      />
-                    ) : article.images && article.images.length > 0 ? (
-                      <img
-                        src={article.images[0].url}
-                        alt={article.images[0].title}
-                        className="w-48 h-auto flex-shrink-0"
-                      />
-                    ) : null}
-
-                    <div>
-                      <h5 className="font-semibold mb-1">
-                        <a
-                          href={article.url}
-                          onClick={openExternal}
-                          className="text-hardwario-primary hover:underline"
-                        >
-                          {article.title}
-                        </a>
-                      </h5>
-                      <p className="text-gray-600">{article.description}</p>
                     </div>
-                  </li>
-                ))}
-              </ul>
+                  )}
+                </div>
+              </div>
+
+              {/* Articles Section */}
+              {firmware.articles && firmware.articles.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-500 mb-4">Related Articles</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {firmware.articles.map((article, index) => (
+                      <div
+                        key={index}
+                        className="flex gap-4 p-3 bg-gray-50 rounded border border-gray-100 hover:border-gray-200 transition-colors"
+                      >
+                        {article.video && isYoutubeUrl(article.video) ? (
+                          <div className="w-32 aspect-video flex-shrink-0 rounded overflow-hidden">
+                            <iframe
+                              src={getYoutubeVideoUrl(article.video) || ''}
+                              className="w-full h-full"
+                              frameBorder="0"
+                              allow="encrypted-media"
+                              allowFullScreen
+                              title={article.title}
+                            />
+                          </div>
+                        ) : article.video ? (
+                          <video
+                            src={article.video}
+                            controls
+                            preload="metadata"
+                            className="w-32 flex-shrink-0 rounded"
+                          />
+                        ) : article.images && article.images.length > 0 ? (
+                          <img
+                            src={article.images[0].url}
+                            alt={article.images[0].title}
+                            className="w-32 h-auto flex-shrink-0 rounded object-cover"
+                          />
+                        ) : null}
+
+                        <div className="min-w-0 flex-1">
+                          <a
+                            href={article.url}
+                            onClick={openExternal}
+                            className="font-medium text-gray-900 hover:text-hardwario-primary line-clamp-2"
+                          >
+                            {article.title}
+                          </a>
+                          <p className="text-sm text-gray-500 mt-1 line-clamp-2">{article.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+
+        {/* Empty State when no firmware selected */}
+        {!firmware && (
+          <div className="bg-white border border-gray-200 shadow-sm">
+            <div className="py-12 px-4 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                <FiCpu className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Select Firmware to Flash</h3>
+              <p className="text-gray-500 max-w-md mx-auto">
+                Choose a firmware from the dropdown above or browse for a local firmware file to flash to your device.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

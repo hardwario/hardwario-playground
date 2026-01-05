@@ -8,9 +8,11 @@ interface DevicesProps {
 
 export default function Devices({ radioManager }: DevicesProps) {
   return (
-    <div id="devices">
-      <Gateway />
-      <RadioManager radioManager={radioManager} />
+    <div className="h-full overflow-auto">
+      <div className="p-4 max-w-4xl mx-auto">
+        <Gateway />
+        <RadioManager radioManager={radioManager} />
+      </div>
     </div>
   );
 }
