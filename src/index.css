@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply font-sans text-gray-900 bg-white;
+    @apply font-sans text-hardwario-nearblack bg-white;
   }
 
   /* Sharp corners to match original design */
@@ -143,29 +143,29 @@
     @apply bg-gray-50;
   }
 
-  /* Navbar styles */
+  /* Navbar styles - Modern white design */
   .navbar {
-    @apply w-full bg-hardwario-gray flex items-center px-4;
+    @apply w-full bg-white flex items-center px-2 sm:px-4 h-14 border-b border-gray-200 shadow-sm;
   }
 
   .navbar-brand {
-    @apply flex items-center py-2 mr-6;
+    @apply flex items-center h-full pr-3 sm:pr-6 border-r border-gray-200 flex-shrink-0;
   }
 
   .navbar-nav {
-    @apply flex items-center;
+    @apply flex items-center h-full ml-1 sm:ml-2 overflow-visible;
   }
 
   .nav-link {
-    @apply flex items-center px-4 py-3 text-white no-underline transition-colors duration-150;
+    @apply flex items-center px-2 sm:px-4 h-full text-gray-600 no-underline transition-all duration-150 text-xs sm:text-sm font-medium border-b-2 border-transparent whitespace-nowrap flex-shrink-0;
   }
 
   .nav-link:hover {
-    @apply bg-hardwario-hover;
+    @apply text-hardwario-primary bg-gray-50;
   }
 
   .nav-link.active {
-    @apply bg-hardwario-dark;
+    @apply text-hardwario-primary border-b-2 border-hardwario-primary bg-blue-50/50;
   }
 
   /* Card component */
@@ -204,7 +204,7 @@
   }
 
   .scrollbar-dark::-webkit-scrollbar-track {
-    @apply bg-hardwario-dark;
+    @apply bg-hardwario-nearblack;
   }
 
   .scrollbar-dark::-webkit-scrollbar-thumb {

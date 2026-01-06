@@ -6,11 +6,12 @@ interface RouteIframeProps {
   path: string;
   src: string;
   id: string;
+  alwaysVisible?: boolean;
 }
 
 type LoadingState = 'loading' | 'ready' | 'error';
 
-export default function RouteIframe({ path, src, id }: RouteIframeProps) {
+export default function RouteIframe({ path, src, id, alwaysVisible = false }: RouteIframeProps) {
   const location = useLocation();
   const [visible, setVisible] = useState(true);
   const [reloadKey, setReloadKey] = useState(0);
@@ -43,7 +44,7 @@ export default function RouteIframe({ path, src, id }: RouteIframeProps) {
 
   if (!visible) return null;
 
-  const isActive = location.pathname === path;
+  const isActive = alwaysVisible || location.pathname === path;
 
   const handleLoad = () => {
     setLoadingState('ready');
@@ -107,7 +108,7 @@ export default function RouteIframe({ path, src, id }: RouteIframeProps) {
 
   return (
     <div
-      className="route-iframe absolute inset-0"
+      className={`route-iframe absolute inset-0 ${alwaysVisible ? 'z-0' : ''}`}
       style={{ display: isActive ? 'block' : 'none' }}
     >
       {/* Loading Overlay */}

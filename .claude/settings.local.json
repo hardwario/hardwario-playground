@@ -21,7 +21,8 @@
       "Bash(for f in src/render/components/FirmwareInfo.js src/render/components/GatewayList.js src/render/components/Home.js src/render/components/Route.js src/render/model/*.js)",
       "mcp__ide__getDiagnostics",
       "Bash(timeout 25 npm run dev:*)",
-      "Bash(timeout 20 npm run dev:*)"
+      "Bash(timeout 20 npm run dev:*)",
+      "WebFetch(domain:www.hardwario.com)"
     ]
   }
 }

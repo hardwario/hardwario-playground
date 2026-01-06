@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fi';
 import { BsPinAngleFill, BsPinAngle } from 'react-icons/bs';
 import type { useMqttLog, MqttMessage } from '../hooks/useMqttLog';
+import * as i18n from '../../utils/i18n';
 
 interface MqttLogProps {
   mqttLog: ReturnType<typeof useMqttLog>;
@@ -67,18 +68,18 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
     e.preventDefault();
     if (pubTopic.trim()) {
       publish(pubTopic, pubPayload);
-      toast.success('Message published');
+      toast.success(i18n.__('Message published'));
     }
   }, [pubTopic, pubPayload, publish]);
 
   const handleCopyTopic = useCallback((message: MqttMessage) => {
     copy(message.topic);
-    toast.success('Topic copied');
+    toast.success(i18n.__('Topic copied'));
   }, []);
 
   const handleCopyPayload = useCallback((message: MqttMessage) => {
     copy(message.payload);
-    toast.success('Payload copied');
+    toast.success(i18n.__('Payload copied'));
   }, []);
 
   const handleKeyDownPub = useCallback((e: React.KeyboardEvent) => {
@@ -98,7 +99,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
       {/* Header */}
       <div className="flex-shrink-0 px-4 py-3 bg-white border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h2 className="font-semibold text-gray-800">MQTT Messages</h2>
+          <h2 className="font-semibold text-gray-800">{i18n.__('MQTT Messages')}</h2>
 
           {/* Connection Status */}
           <div className="flex items-center gap-2">
@@ -110,7 +111,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                 </span>
                 <span className="text-sm text-green-600 font-medium flex items-center gap-1">
                   <FiWifi className="w-3 h-3" />
-                  Connected
+                  {i18n.__('Connected')}
                 </span>
               </>
             ) : (
@@ -118,7 +119,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                 <span className="h-2.5 w-2.5 rounded-full bg-gray-400"></span>
                 <span className="text-sm text-gray-500 flex items-center gap-1">
                   <FiWifiOff className="w-3 h-3" />
-                  Disconnected
+                  {i18n.__('Disconnected')}
                 </span>
               </>
             )}
@@ -126,7 +127,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
 
           {/* Message Count */}
           <span className="px-2 py-0.5 text-xs font-medium bg-gray-200 text-gray-700 rounded-full">
-            {messages.length} messages
+            {messages.length} {i18n.__('messages')}
           </span>
         </div>
 
@@ -138,14 +139,14 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
               onChange={(e) => setAutoScroll(e.target.checked)}
               className="rounded border-gray-300"
             />
-            Auto-scroll
+            {i18n.__('Auto-scroll')}
           </label>
           <button
             onClick={clear}
             className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-1"
           >
             <FiTrash2 className="w-4 h-4" />
-            Clear
+            {i18n.__('Clear')}
           </button>
         </div>
       </div>
@@ -157,7 +158,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
           <div className="flex-shrink-0 px-4 py-2 bg-amber-50 border-b border-amber-200">
             <div className="flex items-center gap-2 mb-2">
               <BsPinAngleFill className="w-4 h-4 text-amber-600" />
-              <span className="text-sm font-medium text-amber-800">Pinned Messages</span>
+              <span className="text-sm font-medium text-amber-800">{i18n.__('Pinned Messages')}</span>
             </div>
             <div className="space-y-1">
               {highlightedMessages.map((item) => (
@@ -173,7 +174,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                   <button
                     onClick={() => removeHighlightedMessage(item.topic)}
                     className="flex-shrink-0 p-1 text-gray-400 hover:text-red-500 transition-colors"
-                    title="Unpin"
+                    title={i18n.__('Unpin')}
                   >
                     <FiX className="w-4 h-4" />
                   </button>
@@ -193,11 +194,11 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
               <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                 <FiMessageSquare className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{i18n.__('No messages yet')}</h3>
               <p className="text-gray-500 max-w-sm">
                 {connected
-                  ? 'Messages will appear here when received from subscribed topics.'
-                  : 'Connect to MQTT broker to start receiving messages.'}
+                  ? i18n.__('Messages will appear here when received from subscribed topics.')
+                  : i18n.__('Connect to MQTT broker to start receiving messages.')}
               </p>
             </div>
           ) : (
@@ -213,7 +214,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                       <span
                         className="font-medium text-hardwario-primary cursor-pointer hover:underline"
                         onClick={() => handleCopyTopic(item)}
-                        title="Click to copy topic"
+                        title={i18n.__('Copy topic')}
                       >
                         {item.topic}
                       </span>
@@ -222,14 +223,14 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                       <button
                         onClick={() => handleCopyTopic(item)}
                         className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                        title="Copy topic"
+                        title={i18n.__('Copy topic')}
                       >
                         <FiHash className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleCopyPayload(item)}
                         className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                        title="Copy payload"
+                        title={i18n.__('Copy payload')}
                       >
                         <FiCopy className="w-3.5 h-3.5" />
                       </button>
@@ -237,7 +238,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                         <button
                           onClick={() => addHighlightedMessage(item)}
                           className="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded transition-colors"
-                          title="Pin message"
+                          title={i18n.__('Pin message')}
                         >
                           <BsPinAngle className="w-3.5 h-3.5" />
                         </button>
@@ -245,7 +246,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                         <button
                           onClick={() => removeHighlightedMessage(item.topic)}
                           className="p-1.5 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
-                          title="Unpin message"
+                          title={i18n.__('Unpin message')}
                         >
                           <BsPinAngleFill className="w-3.5 h-3.5" />
                         </button>
@@ -268,7 +269,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
         {/* Subscriptions */}
         <div className="px-4 py-3 border-b border-gray-100">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-medium text-gray-700">Subscriptions</span>
+            <span className="text-sm font-medium text-gray-700">{i18n.__('Subscriptions')}</span>
             <span className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
               {subscribed.length}
             </span>
@@ -278,7 +279,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
               <input
                 type="text"
                 className="w-full pl-3 pr-10 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-hardwario-primary focus:border-transparent"
-                placeholder="Enter topic to subscribe (e.g., node/#)"
+                placeholder={i18n.__('Enter topic to subscribe (e.g., node/#)')}
                 value={subTopic}
                 onChange={(e) => setSubTopic(e.target.value)}
                 onKeyDown={handleKeyDownSub}
@@ -290,7 +291,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
               className="px-4 py-2 bg-hardwario-primary text-white font-medium hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
             >
               <FiPlus className="w-4 h-4" />
-              Subscribe
+              {i18n.__('Subscribe')}
             </button>
           </div>
           {subscribed.length > 0 && (
@@ -305,7 +306,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                   <button
                     onClick={() => unsubscribe(topic)}
                     className="ml-1 p-0.5 hover:bg-blue-100 rounded transition-colors"
-                    title="Unsubscribe"
+                    title={i18n.__('Unsubscribe')}
                   >
                     <FiX className="w-3 h-3" />
                   </button>
@@ -317,12 +318,12 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
 
         {/* Publish */}
         <div className="px-4 py-3">
-          <span className="text-sm font-medium text-gray-700 mb-2 block">Publish Message</span>
+          <span className="text-sm font-medium text-gray-700 mb-2 block">{i18n.__('Publish Message')}</span>
           <div className="flex gap-2">
             <input
               type="text"
               className="w-1/3 px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-hardwario-primary focus:border-transparent"
-              placeholder="Topic"
+              placeholder={i18n.__('Topic')}
               value={pubTopic}
               onChange={(e) => setPubTopic(e.target.value)}
               onKeyDown={handleKeyDownPub}
@@ -330,7 +331,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
             <input
               type="text"
               className="flex-1 px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-hardwario-primary focus:border-transparent"
-              placeholder="Payload (JSON or text)"
+              placeholder={i18n.__('Payload (JSON or text)')}
               value={pubPayload}
               onChange={(e) => setPubPayload(e.target.value)}
               onKeyDown={handleKeyDownPub}
@@ -341,7 +342,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
               className="px-4 py-2 bg-green-500 text-white font-medium hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
             >
               <FiSend className="w-4 h-4" />
-              Publish
+              {i18n.__('Publish')}
             </button>
           </div>
         </div>

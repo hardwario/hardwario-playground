@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FiAlertCircle, FiWifi, FiWifiOff, FiRefreshCw, FiHelpCircle } from 'react-icons/fi';
 import type { SerialPortInfo, GatewayStatus } from '../../../electron/preload';
+import * as i18n from '../../utils/i18n';
 
 export default function Gateway() {
   const [ports, setPorts] = useState<SerialPortInfo[]>([]);
@@ -9,24 +10,19 @@ export default function Gateway() {
   const [error, setError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   useEffect(() => {
+    // Listen for port list updates (polling is handled by App.tsx)
     const unsubPortList = window.electronAPI.gateway.onPortList((newPorts) => {
       setPorts((prevPorts) => {
-        let changed = false;
-
-        if (prevPorts.length === newPorts.length) {
+        let changed = prevPorts.length !== newPorts.length;
+        if (!changed) {
           for (let i = 0; i < newPorts.length; i++) {
             if (prevPorts[i].path !== newPorts[i].path) {
               changed = true;
               break;
             }
           }
-        } else {
-          changed = true;
         }
-
         if (changed) {
           setSelectedPort((prevSelected) => {
             if (prevSelected === '' && newPorts.length > 0) {
@@ -38,13 +34,8 @@ export default function Gateway() {
           });
           return newPorts;
         }
-
         return prevPorts;
       });
-
-      timerRef.current = setTimeout(() => {
-        window.electronAPI.gateway.getPortList();
-      }, 1000);
     });
 
     const unsubStatus = window.electronAPI.gateway.onStatus((payload: GatewayStatus) => {
@@ -61,16 +52,12 @@ export default function Gateway() {
     });
 
     window.electronAPI.gateway.getDevice();
-    window.electronAPI.gateway.getPortList();
     window.electronAPI.gateway.getStatus();
 
     return () => {
       unsubPortList();
       unsubStatus();
       unsubDevice();
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
     };
   }, []);
 
@@ -100,7 +87,7 @@ export default function Gateway() {
       {/* Header */}
       <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h2 className="font-semibold text-gray-800">Radio Dongle</h2>
+          <h2 className="font-semibold text-gray-800">{i18n.__('Radio Dongle')}</h2>
           {/* Status Indicator */}
           <div className="flex items-center gap-2">
             {gatewayOnline ? (
@@ -109,12 +96,12 @@ export default function Gateway() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                 </span>
-                <span className="text-sm text-green-600 font-medium">Connected</span>
+                <span className="text-sm text-green-600 font-medium">{i18n.__('Connected')}</span>
               </>
             ) : (
               <>
                 <span className="h-2.5 w-2.5 rounded-full bg-gray-400"></span>
-                <span className="text-sm text-gray-500">Disconnected</span>
+                <span className="text-sm text-gray-500">{i18n.__('Disconnected')}</span>
               </>
             )}
           </div>
@@ -122,7 +109,7 @@ export default function Gateway() {
         <button
           onClick={handleRefresh}
           className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-          title="Refresh device list"
+          title={i18n.__('Refresh device list')}
         >
           <FiRefreshCw className="w-4 h-4" />
         </button>
@@ -144,9 +131,9 @@ export default function Gateway() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
               <FiWifiOff className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No device found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{i18n.__('No device found')}</h3>
             <p className="text-gray-500 mb-4 max-w-sm mx-auto">
-              Connect your HARDWARIO Radio Dongle via USB to get started.
+              {i18n.__('Connect your HARDWARIO Radio Dongle via USB to get started.')}
             </p>
             <a
               href="https://www.hardwario.com/doc/basics/quick-start-guide/#troubleshooting"
@@ -154,7 +141,7 @@ export default function Gateway() {
               className="inline-flex items-center gap-1 text-hardwario-primary hover:underline text-sm"
             >
               <FiHelpCircle className="w-4 h-4" />
-              Need help? View troubleshooting guide
+              {i18n.__('Need help? View troubleshooting guide')}
             </a>
           </div>
         ) : (
@@ -162,7 +149,7 @@ export default function Gateway() {
           <div className="flex items-center gap-3">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select Device
+                {i18n.__('Manage Devices')}
               </label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-hardwario-primary focus:border-transparent transition-shadow"
@@ -181,7 +168,7 @@ export default function Gateway() {
 
             <div className="pt-6">
               <button
-                disabled={ports.length === 0 || isConnecting}
+                disabled={(!gatewayOnline && ports.length === 0) || isConnecting}
                 className={`
                   px-6 py-2 font-medium transition-all duration-200 flex items-center gap-2
                   ${gatewayOnline
@@ -194,17 +181,17 @@ export default function Gateway() {
                 {isConnecting ? (
                   <>
                     <FiRefreshCw className="w-4 h-4 animate-spin" />
-                    Connecting...
+                    {i18n.__('Connecting...')}
                   </>
                 ) : gatewayOnline ? (
                   <>
                     <FiWifiOff className="w-4 h-4" />
-                    Disconnect
+                    {i18n.__('Disconnect')}
                   </>
                 ) : (
                   <>
                     <FiWifi className="w-4 h-4" />
-                    Connect
+                    {i18n.__('Connect')}
                   </>
                 )}
               </button>

@@ -112,6 +112,12 @@ export interface ElectronAPI {
     getVersion: () => Promise<string>;
     getPath: (name: string) => Promise<string>;
   };
+  zoom: {
+    zoomIn: () => void;
+    zoomOut: () => void;
+    reset: () => void;
+    get: () => Promise<number>;
+  };
 }
 
 const electronAPI: ElectronAPI = {
@@ -197,6 +203,13 @@ const electronAPI: ElectronAPI = {
   app: {
     getVersion: () => ipcRenderer.invoke('app/getVersion'),
     getPath: (name: string) => ipcRenderer.invoke('app/getPath', name),
+  },
+
+  zoom: {
+    zoomIn: () => ipcRenderer.send('zoom:in'),
+    zoomOut: () => ipcRenderer.send('zoom:out'),
+    reset: () => ipcRenderer.send('zoom:reset'),
+    get: () => ipcRenderer.invoke('zoom:get'),
   },
 };
 

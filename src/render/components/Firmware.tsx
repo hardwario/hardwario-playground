@@ -12,6 +12,7 @@ import type {
   FirmwareItem,
   FileDialogResult,
 } from '../../../electron/preload';
+import * as i18n from '../../utils/i18n';
 
 // YouTube URL helpers
 const youtubeUrlRegex = /^(?:(?:https?:)?\/\/)?(?:www\.)?(?:m\.)?(?:youtu(?:be)?\.com\/(?:v\/|embed\/|watch(?:\/|\?v=))|youtu\.be\/)((?:\w|-){11})(?:\S+)?$/;
@@ -271,22 +272,22 @@ export default function Firmware() {
       <div className="p-4 max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Firmware Flasher</h1>
-          <p className="text-gray-500 mt-1">Flash firmware to your HARDWARIO devices</p>
+          <h1 className="text-2xl font-bold text-gray-900">{i18n.__('Firmware Flasher')}</h1>
+          <p className="text-gray-500 mt-1">{i18n.__('Flash firmware to your HARDWARIO devices')}</p>
         </div>
 
         {/* Main Card */}
         <div className="bg-white border border-gray-200 shadow-sm mb-6">
           {/* Firmware Selection Header */}
           <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-            <h2 className="font-semibold text-gray-800">Select Firmware</h2>
+            <h2 className="font-semibold text-gray-800">{i18n.__('Select Firmware')}</h2>
           </div>
 
           <div className="p-4">
             {/* Firmware Selection Row */}
             <div className="flex gap-4 mb-4">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Firmware</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{i18n.__('Firmware')}</label>
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <Select<FirmwareOption>
@@ -294,17 +295,17 @@ export default function Firmware() {
                       getOptionLabel={(option) => option.name || ''}
                       getOptionValue={(option) => option.name || ''}
                       options={filteredList.filter((f) => f.name)}
-                      placeholder="Choose firmware..."
+                      placeholder={i18n.__('Choose firmware...')}
                       isSearchable
                       onChange={handleFirmwareChange}
                       value={firmware}
-                      noOptionsMessage={() => "No results found - try 'Show All' option"}
+                      noOptionsMessage={() => i18n.__("No results found - try 'Show All' option")}
                     />
                   </div>
                   <button
                     onClick={handleOpenDialog}
                     className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 transition-colors flex items-center gap-2"
-                    title="Browse for firmware file"
+                    title={i18n.__('Browse for firmware file')}
                   >
                     <FiFolder className="w-4 h-4" />
                   </button>
@@ -316,17 +317,17 @@ export default function Firmware() {
                     onChange={handleShowAllToggle}
                     className="rounded border-gray-300 text-hardwario-primary focus:ring-hardwario-primary"
                   />
-                  <span className="text-sm text-gray-600">Show all firmware</span>
+                  <span className="text-sm text-gray-600">{i18n.__('Show all firmware')}</span>
                 </label>
               </div>
 
               <div className="w-36">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Version</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{i18n.__('Version')}</label>
                 <Select<VersionOption>
                   styles={selectStyles}
                   getOptionLabel={(option) => option.name}
                   getOptionValue={(option) => option.name}
-                  placeholder="Version"
+                  placeholder={i18n.__('Version')}
                   options={versionOptions}
                   value={version}
                   onChange={(v) => setVersion(v)}
@@ -339,14 +340,14 @@ export default function Firmware() {
             {/* Device Selection and Flash */}
             <div className="flex gap-4 pt-4 border-t border-gray-100">
               <div className="w-64">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Target Device</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{i18n.__('Target Device')}</label>
                 <select
                   className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-hardwario-primary focus:border-transparent mb-3"
                   disabled={isRun}
                   value={port}
                   onChange={(e) => setPort(e.target.value)}
                 >
-                  {ports.length === 0 && <option>(no device available)</option>}
+                  {ports.length === 0 && <option>{i18n.__('(no device available)')}</option>}
                   {ports.map((p, index) => (
                     <option value={p.path} key={index}>
                       {p.path}
@@ -370,12 +371,12 @@ export default function Firmware() {
                   {isRun ? (
                     <>
                       <FiRefreshCw className="w-5 h-5 animate-spin" />
-                      Flashing...
+                      {i18n.__('Flashing...')}
                     </>
                   ) : (
                     <>
                       <FiPlay className="w-5 h-5" />
-                      Flash Firmware
+                      {i18n.__('Flash Firmware')}
                     </>
                   )}
                 </button>
@@ -383,13 +384,13 @@ export default function Firmware() {
 
               {/* Progress Section */}
               <div className="flex-1 bg-gray-50 rounded p-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Flash Progress</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-3">{i18n.__('Flash Progress')}</h3>
                 {download > 0 && (
-                  <ProgressBar label="Download" value={download} color="blue" icon={FiDownload} />
+                  <ProgressBar label={i18n.__('Download')} value={download} color="blue" icon={FiDownload} />
                 )}
-                <ProgressBar label="Erase" value={progress.erase} color="red" icon={FiCpu} />
-                <ProgressBar label="Write" value={progress.write} color="yellow" icon={FiDownload} />
-                <ProgressBar label="Verify" value={progress.verify} color="green" icon={FiCheckCircle} />
+                <ProgressBar label={i18n.__('Erase')} value={progress.erase} color="red" icon={FiCpu} />
+                <ProgressBar label={i18n.__('Write')} value={progress.write} color="yellow" icon={FiDownload} />
+                <ProgressBar label={i18n.__('Verify')} value={progress.verify} color="green" icon={FiCheckCircle} />
               </div>
             </div>
 
@@ -398,7 +399,7 @@ export default function Firmware() {
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded flex items-start gap-3">
                 <FiAlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-red-800">Flash Failed</h4>
+                  <h4 className="font-medium text-red-800">{i18n.__('Flash Failed')}</h4>
                   <p className="text-sm text-red-600 mt-1">{error}</p>
                 </div>
               </div>
@@ -408,8 +409,8 @@ export default function Firmware() {
               <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded flex items-start gap-3">
                 <FiCheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-green-800">Flash Complete</h4>
-                  <p className="text-sm text-green-600 mt-1">Firmware has been successfully flashed to your device.</p>
+                  <h4 className="font-medium text-green-800">{i18n.__('Flash Complete')}</h4>
+                  <p className="text-sm text-green-600 mt-1">{i18n.__('Firmware has been successfully flashed to your device.')}</p>
                 </div>
               </div>
             )}
@@ -421,7 +422,7 @@ export default function Firmware() {
           <div className="bg-white border border-gray-200 shadow-sm">
             <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
               <FiInfo className="w-4 h-4 text-gray-500" />
-              <h2 className="font-semibold text-gray-800">Firmware Details</h2>
+              <h2 className="font-semibold text-gray-800">{i18n.__('Firmware Details')}</h2>
             </div>
 
             <div className="p-4">
@@ -430,21 +431,21 @@ export default function Firmware() {
                 <div className="space-y-4">
                   {firmware.description && (
                     <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Description</h3>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">{i18n.__('Description')}</h3>
                       <p className="text-gray-700">{firmware.description}</p>
                     </div>
                   )}
 
                   {firmware.article && (
                     <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Documentation</h3>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">{i18n.__('Documentation')}</h3>
                       <a
                         href={firmware.article}
                         onClick={openExternal}
                         className="inline-flex items-center gap-2 text-hardwario-primary hover:underline"
                       >
                         <FiBook className="w-4 h-4" />
-                        View Article
+                        {i18n.__('View Article')}
                         <FiExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -452,14 +453,14 @@ export default function Firmware() {
 
                   {firmware.video && !isYoutubeUrl(firmware.video) && (
                     <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Video Tutorial</h3>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">{i18n.__('Video Tutorial')}</h3>
                       <a
                         href={firmware.video}
                         onClick={openExternal}
                         className="inline-flex items-center gap-2 text-hardwario-primary hover:underline"
                       >
                         <FiPlay className="w-4 h-4" />
-                        Watch Video
+                        {i18n.__('Watch Video')}
                         <FiExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -467,14 +468,14 @@ export default function Firmware() {
 
                   {firmware.repository && (
                     <div>
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Source Code</h3>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">{i18n.__('Source Code')}</h3>
                       <a
                         href={firmware.repository}
                         onClick={openExternal}
                         className="inline-flex items-center gap-2 text-hardwario-primary hover:underline"
                       >
                         <FiGithub className="w-4 h-4" />
-                        View Repository
+                        {i18n.__('View Repository')}
                         <FiExternalLink className="w-3 h-3" />
                       </a>
                     </div>
@@ -509,7 +510,7 @@ export default function Firmware() {
               {/* Articles Section */}
               {firmware.articles && firmware.articles.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-500 mb-4">Related Articles</h3>
+                  <h3 className="text-sm font-medium text-gray-500 mb-4">{i18n.__('Related Articles')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {firmware.articles.map((article, index) => (
                       <div
@@ -568,9 +569,9 @@ export default function Firmware() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
                 <FiCpu className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Select Firmware to Flash</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{i18n.__('Select Firmware to Flash')}</h3>
               <p className="text-gray-500 max-w-md mx-auto">
-                Choose a firmware from the dropdown above or browse for a local firmware file to flash to your device.
+                {i18n.__('Choose a firmware from the dropdown above or browse for a local firmware file to flash to your device.')}
               </p>
             </div>
           </div>

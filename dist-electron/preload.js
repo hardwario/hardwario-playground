@@ -64,6 +64,12 @@ const electronAPI = {
   app: {
     getVersion: () => electron.ipcRenderer.invoke("app/getVersion"),
     getPath: (name) => electron.ipcRenderer.invoke("app/getPath", name)
+  },
+  zoom: {
+    zoomIn: () => electron.ipcRenderer.send("zoom:in"),
+    zoomOut: () => electron.ipcRenderer.send("zoom:out"),
+    reset: () => electron.ipcRenderer.send("zoom:reset"),
+    get: () => electron.ipcRenderer.invoke("zoom:get")
   }
 };
 electron.contextBridge.exposeInMainWorld("electronAPI", electronAPI);
