@@ -149,7 +149,7 @@
   }
 
   .navbar-brand {
-    @apply flex items-center h-full pr-3 sm:pr-6 border-r border-gray-200 flex-shrink-0;
+    @apply flex items-center h-full pr-3 sm:pr-6 flex-shrink-0;
   }
 
   .navbar-nav {

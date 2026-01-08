@@ -142,9 +142,9 @@ export default function RouteIframe({ path, src, id, alwaysVisible = false }: Ro
             </p>
             <button
               onClick={handleRetry}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-hardwario-primary text-white font-medium hover:bg-blue-600 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase bg-gray-100 text-gray-700 hover:bg-gray-200 rounded transition-all"
             >
-              <FiRefreshCw className="w-4 h-4" />
+              <FiRefreshCw className="w-3.5 h-3.5" />
               Retry
             </button>
           </div>

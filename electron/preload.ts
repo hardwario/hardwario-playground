@@ -5,6 +5,7 @@ export interface SerialPortInfo {
   path: string;
   serialNumber?: string;
   manufacturer?: string;
+  productId?: string;
 }
 
 export interface GatewayStatus {

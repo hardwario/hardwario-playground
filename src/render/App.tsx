@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { HashRouter, Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { FiAlertTriangle, FiWifi, FiWifiOff, FiRefreshCw, FiX, FiZoomIn, FiZoomOut, FiChevronDown, FiGlobe } from 'react-icons/fi';
+import { FiAlertTriangle, FiWifi, FiWifiOff, FiRefreshCw, FiX, FiZoomIn, FiZoomOut, FiChevronDown, FiGlobe, FiCpu, FiMessageSquare, FiDownload, FiRadio } from 'react-icons/fi';
 import type { SerialPortInfo } from '../../electron/preload';
 
 import { useRadioManager } from './hooks/useRadioManager';
@@ -12,7 +12,6 @@ import MqttLog from './components/MqttLog';
 import Settings from './components/Settings';
 import Firmware from './components/Firmware';
 import Devices from './components/Devices';
-import Blockly from './components/Blockly';
 import RouteIframe from './components/RouteIframe';
 
 // Import i18n
@@ -23,12 +22,10 @@ import logo from '../assets/images/hw-logo-pos.svg';
 
 // Modal title keys for each route (will be translated)
 const modalTitleKeys: Record<string, string> = {
-  '/': 'Devices',
+  '/devices': 'Devices',
   '/messages': 'Messages',
   '/settings': 'Settings',
-  '/blockly': 'Blockly',
   '/firmware': 'Firmware',
-  '/dashboard': 'Dashboard',
 };
 
 // Hardware dropdown component for Devices, Messages, and Firmware (responsive)
@@ -37,7 +34,7 @@ function HardwareDropdown({ gwOffline, mqttOffline }: { gwOffline: boolean; mqtt
   const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
 
-  const isActive = location.pathname === '/' || location.pathname === '/messages' || location.pathname.startsWith('/firmware');
+  const isActive = location.pathname === '/devices' || location.pathname === '/messages' || location.pathname.startsWith('/firmware');
   const hasWarning = gwOffline || mqttOffline;
 
   // Close dropdown when clicking outside
@@ -52,47 +49,53 @@ function HardwareDropdown({ gwOffline, mqttOffline }: { gwOffline: boolean; mqtt
   }, []);
 
   return (
-    <div className="relative h-full md:hidden" ref={dropdownRef}>
+    <div className="relative flex items-center md:hidden" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`nav-link uppercase h-full flex items-center gap-1 ${isActive ? 'active' : ''}`}
+        className={`flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
+          ${isActive
+            ? 'bg-hardwario-primary text-white'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
       >
+        <FiCpu className="w-3.5 h-3.5" />
         {i18n.__('Hardware')}
-        {hasWarning && <FiAlertTriangle className="ml-1 text-amber-500" />}
-        <FiChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        {hasWarning && <FiAlertTriangle className="ml-0.5 text-amber-500" />}
+        <FiChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       {isOpen && (
-        <div className="absolute top-full left-0 bg-white border border-gray-200 shadow-lg min-w-[160px] z-[100]">
+        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 shadow-lg min-w-[160px] z-[100] rounded">
           <NavLink
-            to="/"
-            end
+            to="/devices"
             className={({ isActive }) =>
-              `flex items-center px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
+              `flex items-center gap-2 px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
             }
             onClick={() => setIsOpen(false)}
             title={gwOffline ? 'No Radio Dongle connected' : undefined}
           >
+            <FiCpu className="w-4 h-4" />
             {i18n.__('Devices')}
-            {gwOffline && <FiAlertTriangle className="ml-1.5 text-amber-500" />}
+            {gwOffline && <FiAlertTriangle className="ml-1 text-amber-500" />}
           </NavLink>
           <NavLink
             to="/messages"
             className={({ isActive }) =>
-              `flex items-center px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
+              `flex items-center gap-2 px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
             }
             onClick={() => setIsOpen(false)}
             title={mqttOffline ? 'MQTT broker is shut down' : undefined}
           >
+            <FiMessageSquare className="w-4 h-4" />
             {i18n.__('Messages')}
-            {mqttOffline && <FiAlertTriangle className="ml-1.5 text-amber-500" />}
+            {mqttOffline && <FiAlertTriangle className="ml-1 text-amber-500" />}
           </NavLink>
           <NavLink
             to="/firmware"
             className={({ isActive }) =>
-              `block px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
+              `flex items-center gap-2 px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
             }
             onClick={() => setIsOpen(false)}
           >
+            <FiDownload className="w-4 h-4" />
             {i18n.__('Firmware')}
           </NavLink>
         </div>
@@ -101,59 +104,6 @@ function HardwareDropdown({ gwOffline, mqttOffline }: { gwOffline: boolean; mqtt
   );
 }
 
-// Tools dropdown component for Dashboard and Blockly
-function ToolsDropdown() {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
-
-  const isActive = location.pathname === '/dashboard' || location.pathname === '/blockly';
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  return (
-    <div className="relative h-full" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`nav-link uppercase h-full flex items-center gap-1 ${isActive ? 'active' : ''}`}
-      >
-        {i18n.__('Tools')}
-        <FiChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-      {isOpen && (
-        <div className="absolute top-full left-0 bg-white border border-gray-200 shadow-lg min-w-[160px] z-[100]">
-          <NavLink
-            to="/dashboard"
-            className={({ isActive }) =>
-              `block px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
-            }
-            onClick={() => setIsOpen(false)}
-          >
-            {i18n.__('Dashboard')}
-          </NavLink>
-          <NavLink
-            to="/blockly"
-            className={({ isActive }) =>
-              `block px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
-            }
-            onClick={() => setIsOpen(false)}
-          >
-            {i18n.__('Blockly')}
-          </NavLink>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // Language switcher component
 function LanguageSwitcher({ language, setLanguage, availableLanguages }: {
@@ -225,7 +175,7 @@ function ModalPage({ children, title }: { children: React.ReactNode; title?: str
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50" onClick={handleClose}>
       <div
-        className="bg-white w-[90%] h-[90%] max-w-6xl flex flex-col shadow-2xl"
+        className="bg-white max-w-2xl h-[90%] flex flex-col shadow-2xl rounded"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-4 py-3 bg-gray-100 border-b border-gray-200">
@@ -435,53 +385,53 @@ export default function App() {
             </a>
 
             <div className="navbar-nav">
-              <NavLink
-                to="/functions"
-                className={({ isActive }) =>
-                  `nav-link uppercase ${isActive ? 'active' : ''}`
-                }
-                title={nodeRedOffline ? 'Node-RED is shut down' : undefined}
-              >
-                {i18n.__('Functions')}
-                {nodeRedOffline && <FiAlertTriangle className="ml-1.5 text-amber-500" />}
-              </NavLink>
-
               {/* Hardware dropdown - visible only on small screens */}
               <HardwareDropdown gwOffline={gwOffline} mqttOffline={mqttOffline} />
 
               {/* Individual links - visible only on medium+ screens */}
               <NavLink
-                to="/"
-                end
+                to="/devices"
                 className={({ isActive }) =>
-                  `nav-link uppercase hidden md:flex ${isActive ? 'active' : ''}`
+                  `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
+                  ${isActive
+                    ? 'bg-hardwario-primary text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
                 }
                 title={gwOffline ? 'No Radio Dongle connected' : undefined}
               >
+                <FiCpu className="w-3.5 h-3.5" />
                 {i18n.__('Devices')}
-                {gwOffline && <FiAlertTriangle className="ml-1.5 text-amber-500" />}
+                {gwOffline && <FiAlertTriangle className="ml-0.5 text-amber-500" />}
               </NavLink>
 
               <NavLink
                 to="/messages"
                 className={({ isActive }) =>
-                  `nav-link uppercase hidden md:flex ${isActive ? 'active' : ''}`
+                  `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
+                  ${isActive
+                    ? 'bg-hardwario-primary text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
                 }
                 title={mqttOffline ? 'MQTT broker is shut down' : undefined}
               >
+                <FiMessageSquare className="w-3.5 h-3.5" />
                 {i18n.__('Messages')}
-                {mqttOffline && <FiAlertTriangle className="ml-1.5 text-amber-500" />}
+                {mqttOffline && <FiAlertTriangle className="ml-0.5 text-amber-500" />}
               </NavLink>
 
               <NavLink
                 to="/firmware"
-                className={({ isActive }) => `nav-link uppercase hidden md:flex ${isActive ? 'active' : ''}`}
+                className={({ isActive }) =>
+                  `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
+                  ${isActive
+                    ? 'bg-hardwario-primary text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                }
               >
+                <FiDownload className="w-3.5 h-3.5" />
                 {i18n.__('Firmware')}
               </NavLink>
 
-              {/* Tools Dropdown */}
-              <ToolsDropdown />
             </div>
 
             {/* Right side - Controls */}
@@ -544,7 +494,7 @@ export default function App() {
                   ) : (
                     ports.map((port, index) => (
                       <option value={port.path} key={index}>
-                        {port.path}
+                        {port.path}{port.productId ? ` (PID_${port.productId})` : ''}
                       </option>
                     ))
                   )}
@@ -583,17 +533,31 @@ export default function App() {
                 <button
                   disabled={!gatewayOnline}
                   className={`
-                    px-2 sm:px-3 py-1.5 text-xs font-semibold rounded transition-all
+                    px-2 sm:px-3 py-1.5 text-xs font-semibold uppercase rounded flex items-center gap-1.5 transition-all
                     ${radioManager.pairingMode
-                      ? 'bg-amber-100 text-amber-700 border border-amber-300 animate-pulse'
+                      ? 'bg-amber-500 hover:bg-amber-600 text-white'
                       : 'bg-hardwario-primary text-white hover:bg-hardwario-medium'}
                     disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:border disabled:border-gray-200
                   `}
                   onClick={handlePairingToggle}
                   title={radioManager.pairingMode ? i18n.__('Stop Pairing') : i18n.__('Start Pairing')}
                 >
-                  <span className="hidden sm:inline">{radioManager.pairingMode ? i18n.__('Stop Pairing') : i18n.__('Start Pairing')}</span>
-                  <span className="sm:hidden">{radioManager.pairingMode ? i18n.__('Stop') : i18n.__('Pair')}</span>
+                  {radioManager.pairingMode ? (
+                    <>
+                      <span className="flex h-2 w-2 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                      </span>
+                      <span className="hidden sm:inline">{i18n.__('Stop Pairing')}</span>
+                      <span className="sm:hidden">{i18n.__('Stop')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiRadio className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">{i18n.__('Start Pairing')}</span>
+                      <span className="sm:hidden">{i18n.__('Pair')}</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -607,14 +571,12 @@ export default function App() {
 
           {/* Modal routes - appear on top of Functions */}
           <Routes>
-            <Route path="/" element={<ModalPage><Devices radioManager={radioManager} /></ModalPage>} />
+            <Route path="/" element={null} />
+            <Route path="/devices" element={<ModalPage><Devices radioManager={radioManager} /></ModalPage>} />
             <Route path="/messages" element={<ModalPage><MqttLog mqttLog={mqttLog} /></ModalPage>} />
             <Route path="/settings" element={<ModalPage><Settings /></ModalPage>} />
-            <Route path="/blockly" element={<ModalPage><Blockly /></ModalPage>} />
             <Route path="/firmware" element={<ModalPage><Firmware /></ModalPage>} />
             <Route path="/firmware/:fw" element={<ModalPage><Firmware /></ModalPage>} />
-            <Route path="/dashboard" element={<ModalPage title="Dashboard"><RouteIframe path="/dashboard" src="http://127.0.0.1:1880/ui" id="node-red-dashboard" alwaysVisible /></ModalPage>} />
-            <Route path="/functions" element={null} />
           </Routes>
         </main>
 

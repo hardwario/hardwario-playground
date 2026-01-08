@@ -269,7 +269,7 @@ export default function Firmware() {
 
   return (
     <div className="h-full overflow-auto bg-gray-50">
-      <div className="p-4 max-w-5xl mx-auto">
+      <div className="p-4">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">{i18n.__('Firmware Flasher')}</h1>
@@ -304,10 +304,10 @@ export default function Firmware() {
                   </div>
                   <button
                     onClick={handleOpenDialog}
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 transition-colors flex items-center gap-2"
+                    className="px-3 py-1.5 text-xs font-semibold uppercase bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center gap-1.5 transition-all"
                     title={i18n.__('Browse for firmware file')}
                   >
-                    <FiFolder className="w-4 h-4" />
+                    <FiFolder className="w-3.5 h-3.5" />
                   </button>
                 </div>
                 <label className="flex items-center gap-2 mt-2 cursor-pointer">
@@ -358,24 +358,24 @@ export default function Firmware() {
 
                 <button
                   className={`
-                    w-full px-4 py-3 font-medium transition-all duration-200 flex items-center justify-center gap-2
+                    w-full px-3 py-1.5 text-xs font-semibold uppercase rounded flex items-center justify-center gap-1.5 transition-all
                     ${isRun
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-hardwario-danger hover:bg-red-600'
+                      ? 'bg-gray-400 cursor-not-allowed text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }
-                    text-white disabled:opacity-50 disabled:cursor-not-allowed
+                    disabled:opacity-50 disabled:cursor-not-allowed
                   `}
                   disabled={ports.length === 0 || isRun || !firmware}
                   onClick={handleFlash}
                 >
                   {isRun ? (
                     <>
-                      <FiRefreshCw className="w-5 h-5 animate-spin" />
+                      <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
                       {i18n.__('Flashing...')}
                     </>
                   ) : (
                     <>
-                      <FiPlay className="w-5 h-5" />
+                      <FiPlay className="w-3.5 h-3.5" />
                       {i18n.__('Flash Firmware')}
                     </>
                   )}

@@ -143,9 +143,9 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
           </label>
           <button
             onClick={clear}
-            className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors flex items-center gap-1"
+            className="px-3 py-1.5 text-xs font-semibold uppercase text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-all flex items-center gap-1.5"
           >
-            <FiTrash2 className="w-4 h-4" />
+            <FiTrash2 className="w-3.5 h-3.5" />
             {i18n.__('Clear')}
           </button>
         </div>
@@ -288,9 +288,9 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
             <button
               disabled={!connected || !subTopic.trim()}
               onClick={handleSubscribe}
-              className="px-4 py-2 bg-hardwario-primary text-white font-medium hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-3 py-1.5 text-xs font-semibold uppercase bg-gray-100 text-gray-700 hover:bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
             >
-              <FiPlus className="w-4 h-4" />
+              <FiPlus className="w-3.5 h-3.5" />
               {i18n.__('Subscribe')}
             </button>
           </div>
@@ -339,9 +339,9 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
             <button
               disabled={!connected || !pubTopic.trim()}
               onClick={handlePublish}
-              className="px-4 py-2 bg-green-500 text-white font-medium hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-3 py-1.5 text-xs font-semibold uppercase bg-gray-100 text-gray-700 hover:bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-1.5"
             >
-              <FiSend className="w-4 h-4" />
+              <FiSend className="w-3.5 h-3.5" />
               {i18n.__('Publish')}
             </button>
           </div>

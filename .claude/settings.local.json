@@ -22,7 +22,12 @@
       "mcp__ide__getDiagnostics",
       "Bash(timeout 25 npm run dev:*)",
       "Bash(timeout 20 npm run dev:*)",
-      "WebFetch(domain:www.hardwario.com)"
+      "WebFetch(domain:www.hardwario.com)",
+      "Bash(magick:*)",
+      "Bash(where:*)",
+      "Bash(pip show:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)"
     ]
   }
 }

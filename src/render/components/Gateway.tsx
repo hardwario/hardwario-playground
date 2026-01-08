@@ -148,9 +148,6 @@ export default function Gateway() {
           /* Device Selection */
           <div className="flex items-center gap-3">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {i18n.__('Manage Devices')}
-              </label>
               <select
                 className="w-full px-3 py-2 border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-hardwario-primary focus:border-transparent transition-shadow"
                 value={selectedPort}
@@ -160,37 +157,37 @@ export default function Gateway() {
                 {ports.map((port, index) => (
                   <option value={port.path} key={index}>
                     {port.path}
-                    {port.serialNumber ? ` (${port.serialNumber})` : ''}
+                    {port.productId ? ` (PID_${port.productId})` : ''}
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="pt-6">
+            <div>
               <button
                 disabled={(!gatewayOnline && ports.length === 0) || isConnecting}
                 className={`
-                  px-6 py-2 font-medium transition-all duration-200 flex items-center gap-2
+                  px-3 py-1.5 text-xs font-semibold uppercase rounded flex items-center gap-1.5 transition-all
                   ${gatewayOnline
                     ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : 'bg-green-500 hover:bg-green-600 text-white'}
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}
                   disabled:opacity-50 disabled:cursor-not-allowed
                 `}
                 onClick={handleButtonClick}
               >
                 {isConnecting ? (
                   <>
-                    <FiRefreshCw className="w-4 h-4 animate-spin" />
+                    <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
                     {i18n.__('Connecting...')}
                   </>
                 ) : gatewayOnline ? (
                   <>
-                    <FiWifiOff className="w-4 h-4" />
+                    <FiWifiOff className="w-3.5 h-3.5" />
                     {i18n.__('Disconnect')}
                   </>
                 ) : (
                   <>
-                    <FiWifi className="w-4 h-4" />
+                    <FiWifi className="w-3.5 h-3.5" />
                     {i18n.__('Connect')}
                   </>
                 )}
