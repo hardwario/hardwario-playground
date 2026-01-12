@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { HashRouter, Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { FiAlertTriangle, FiWifi, FiWifiOff, FiRefreshCw, FiX, FiZoomIn, FiZoomOut, FiChevronDown, FiGlobe, FiCpu, FiMessageSquare, FiDownload } from 'react-icons/fi';
+import { FiAlertTriangle, FiWifi, FiWifiOff, FiRefreshCw, FiX, FiZoomIn, FiZoomOut, FiChevronDown, FiGlobe, FiCpu, FiMessageSquare, FiDownload, FiHelpCircle, FiExternalLink, FiBook, FiVideo } from 'react-icons/fi';
 import type { SerialPortInfo } from '../../electron/preload';
 
 import { useRadioManager } from './hooks/useRadioManager';
@@ -13,7 +13,6 @@ import Settings from './components/Settings';
 import Firmware from './components/Firmware';
 import Devices from './components/Devices';
 import RouteIframe from './components/RouteIframe';
-import HelpButton from './components/HelpButton';
 
 // Import i18n
 import * as i18n from '../utils/i18n';
@@ -465,6 +464,58 @@ export default function App() {
                 </button>
               </div>
 
+              {/* Help Dropdown */}
+              <div className="relative flex items-center px-2 h-full border-l border-gray-200">
+                <div className="relative group">
+                  <button
+                    className="p-1.5 text-gray-500 hover:text-hardwario-primary hover:bg-gray-100 rounded transition-colors"
+                    title={i18n.__('Help & Resources')}
+                  >
+                    <FiHelpCircle className="w-4 h-4" />
+                  </button>
+                  <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <div className="p-2">
+                      <a
+                        href="https://forum.hardwario.com/"
+                        onClick={openExternal}
+                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                      >
+                        <FiMessageSquare className="w-4 h-4 text-blue-500" />
+                        <span>{i18n.__('Community Forum')}</span>
+                        <FiExternalLink className="w-3 h-3 text-gray-400 ml-auto" />
+                      </a>
+                      <a
+                        href="https://www.youtube.com/watch?v=3AR432bguOY&list=PLKYvTRORAnx6a9tETvF95o35mykuysuOw"
+                        onClick={openExternal}
+                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                      >
+                        <FiVideo className="w-4 h-4 text-purple-500" />
+                        <span>{i18n.__('Video Tutorials')}</span>
+                        <FiExternalLink className="w-3 h-3 text-gray-400 ml-auto" />
+                      </a>
+                      <a
+                        href="https://docs.hardwario.com/"
+                        onClick={openExternal}
+                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                      >
+                        <FiBook className="w-4 h-4 text-green-500" />
+                        <span>{i18n.__('Documentation')}</span>
+                        <FiExternalLink className="w-3 h-3 text-gray-400 ml-auto" />
+                      </a>
+                      <a
+                        href="https://docs.hardwario.com/tower/mqtt-protocol/topics-reference"
+                        onClick={openExternal}
+                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                      >
+                        <FiCpu className="w-4 h-4 text-amber-500" />
+                        <span>{i18n.__('MQTT Topics')}</span>
+                        <FiExternalLink className="w-3 h-3 text-gray-400 ml-auto" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Gateway Controls */}
               <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-full border-l border-gray-200">
                 {/* Connection Status Indicator */}
@@ -561,7 +612,6 @@ export default function App() {
         </main>
 
         <ToastContainer position="top-right" autoClose={2000} closeOnClick />
-        <HelpButton />
       </div>
     </HashRouter>
   );
