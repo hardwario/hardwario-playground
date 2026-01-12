@@ -273,7 +273,6 @@ export default function Firmware() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">{i18n.__('Firmware Flasher')}</h1>
-          <p className="text-gray-500 mt-1">{i18n.__('Flash firmware to your HARDWARIO devices')}</p>
         </div>
 
         {/* Main Card */}

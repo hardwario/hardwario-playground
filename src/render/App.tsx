@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { HashRouter, Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { FiAlertTriangle, FiWifi, FiWifiOff, FiRefreshCw, FiX, FiZoomIn, FiZoomOut, FiChevronDown, FiGlobe, FiCpu, FiMessageSquare, FiDownload, FiRadio } from 'react-icons/fi';
+import { FiAlertTriangle, FiWifi, FiWifiOff, FiRefreshCw, FiX, FiZoomIn, FiZoomOut, FiChevronDown, FiGlobe, FiCpu, FiMessageSquare, FiDownload } from 'react-icons/fi';
 import type { SerialPortInfo } from '../../electron/preload';
 
 import { useRadioManager } from './hooks/useRadioManager';
@@ -13,12 +13,14 @@ import Settings from './components/Settings';
 import Firmware from './components/Firmware';
 import Devices from './components/Devices';
 import RouteIframe from './components/RouteIframe';
+import HelpButton from './components/HelpButton';
 
 // Import i18n
 import * as i18n from '../utils/i18n';
 
-// Import logo
-import logo from '../assets/images/hw-logo-pos.svg';
+// Import logos
+import logoShort from '../assets/images/hw-logo-pos.svg';
+import logoLong from '../assets/images/hardwario-playground.svg';
 
 // Modal title keys for each route (will be translated)
 const modalTitleKeys: Record<string, string> = {
@@ -161,7 +163,7 @@ function LanguageSwitcher({ language, setLanguage, availableLanguages }: {
 }
 
 // Modal wrapper component
-function ModalPage({ children, title }: { children: React.ReactNode; title?: string }) {
+function ModalPage({ children, title, wide }: { children: React.ReactNode; title?: string; wide?: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -175,7 +177,7 @@ function ModalPage({ children, title }: { children: React.ReactNode; title?: str
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50" onClick={handleClose}>
       <div
-        className="bg-white max-w-2xl h-[90%] flex flex-col shadow-2xl rounded"
+        className={`bg-white h-[90%] flex flex-col shadow-2xl rounded ${wide ? 'max-w-4xl w-full mx-4' : 'max-w-2xl'}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-4 py-3 bg-gray-100 border-b border-gray-200">
@@ -354,14 +356,6 @@ export default function App() {
     window.electronAPI.gateway.connect(selectedPort);
   }, [gatewayOnline, selectedPort]);
 
-  const handlePairingToggle = useCallback(() => {
-    if (radioManager.pairingMode) {
-      radioManager.pairingStop();
-    } else {
-      radioManager.pairingStart();
-    }
-  }, [radioManager]);
-
   const openExternal = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const href = e.currentTarget.href;
@@ -381,7 +375,8 @@ export default function App() {
               onClick={openExternal}
               className="navbar-brand"
             >
-              <img src={logo} className="h-6" alt="HARDWARIO Logo" />
+              <img src={logoShort} className="h-6 block lg:hidden" alt="HARDWARIO Logo" />
+              <img src={logoLong} className="h-6 hidden lg:block" alt="HARDWARIO Playground" />
             </a>
 
             <div className="navbar-nav">
@@ -474,13 +469,27 @@ export default function App() {
               <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-full border-l border-gray-200">
                 {/* Connection Status Indicator */}
                 <div className="flex items-center gap-2">
-                  <div
-                    className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${gatewayOnline ? 'bg-green-500' : 'bg-gray-300'}`}
-                    title={gatewayOnline ? i18n.__('Connected') : i18n.__('Disconnected')}
-                  ></div>
-                  <span className="hidden lg:inline text-xs text-gray-500 font-medium">
-                    {gatewayOnline ? i18n.__('Connected') : i18n.__('Disconnected')}
-                  </span>
+                  {radioManager.pairingMode ? (
+                    <>
+                      <span className="flex h-2.5 w-2.5 relative flex-shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                      </span>
+                      <span className="hidden lg:inline text-xs text-amber-600 font-medium uppercase">
+                        {i18n.__('Pairing')}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${gatewayOnline ? 'bg-green-500' : 'bg-gray-300'}`}
+                        title={gatewayOnline ? i18n.__('Connected') : i18n.__('Disconnected')}
+                      ></div>
+                      <span className="hidden lg:inline text-xs text-gray-500 font-medium uppercase">
+                        {gatewayOnline ? i18n.__('Connected') : i18n.__('Disconnected')}
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <select
@@ -503,7 +512,7 @@ export default function App() {
                 <button
                   disabled={(!gatewayOnline && ports.length === 0) || isConnecting}
                   className={`
-                    px-2 sm:px-3 py-1.5 text-xs font-semibold rounded flex items-center gap-1 sm:gap-1.5 transition-all
+                    px-2 sm:px-3 py-1.5 text-xs font-semibold uppercase rounded flex items-center gap-1 sm:gap-1.5 transition-all
                     ${gatewayOnline
                       ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
                       : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200'}
@@ -530,35 +539,6 @@ export default function App() {
                   )}
                 </button>
 
-                <button
-                  disabled={!gatewayOnline}
-                  className={`
-                    px-2 sm:px-3 py-1.5 text-xs font-semibold uppercase rounded flex items-center gap-1.5 transition-all
-                    ${radioManager.pairingMode
-                      ? 'bg-amber-500 hover:bg-amber-600 text-white'
-                      : 'bg-hardwario-primary text-white hover:bg-hardwario-medium'}
-                    disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:border disabled:border-gray-200
-                  `}
-                  onClick={handlePairingToggle}
-                  title={radioManager.pairingMode ? i18n.__('Stop Pairing') : i18n.__('Start Pairing')}
-                >
-                  {radioManager.pairingMode ? (
-                    <>
-                      <span className="flex h-2 w-2 relative">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                      </span>
-                      <span className="hidden sm:inline">{i18n.__('Stop Pairing')}</span>
-                      <span className="sm:hidden">{i18n.__('Stop')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <FiRadio className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">{i18n.__('Start Pairing')}</span>
-                      <span className="sm:hidden">{i18n.__('Pair')}</span>
-                    </>
-                  )}
-                </button>
               </div>
             </div>
           </nav>
@@ -575,12 +555,13 @@ export default function App() {
             <Route path="/devices" element={<ModalPage><Devices radioManager={radioManager} /></ModalPage>} />
             <Route path="/messages" element={<ModalPage><MqttLog mqttLog={mqttLog} /></ModalPage>} />
             <Route path="/settings" element={<ModalPage><Settings /></ModalPage>} />
-            <Route path="/firmware" element={<ModalPage><Firmware /></ModalPage>} />
-            <Route path="/firmware/:fw" element={<ModalPage><Firmware /></ModalPage>} />
+            <Route path="/firmware" element={<ModalPage wide><Firmware /></ModalPage>} />
+            <Route path="/firmware/:fw" element={<ModalPage wide><Firmware /></ModalPage>} />
           </Routes>
         </main>
 
         <ToastContainer position="top-right" autoClose={2000} closeOnClick />
+        <HelpButton />
       </div>
     </HashRouter>
   );
