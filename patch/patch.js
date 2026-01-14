@@ -11,8 +11,13 @@ console.log('destDir', destDir);
 fse.copySync(srcDir, destDir, { overwrite: true });
 console.log("Copy success!");
 
-// Patch file BufferList.js
+// Patch file BufferList.js (only if it exists - older mqtt versions)
 const fileName = path.join(process.cwd(), '/node_modules/mqtt/node_modules/bl/BufferList.js');
-console.log('fileName', fileName);
-let text = fs.readFileSync(fileName, { encoding: 'utf-8' });
-fs.writeFileSync(fileName, text.replace(/function copy \(/, 'function \('), { encoding: 'utf-8' });
+if (fs.existsSync(fileName)) {
+    console.log('Patching BufferList.js:', fileName);
+    let text = fs.readFileSync(fileName, { encoding: 'utf-8' });
+    fs.writeFileSync(fileName, text.replace(/function copy \(/, 'function \('), { encoding: 'utf-8' });
+    console.log("BufferList.js patched!");
+} else {
+    console.log('BufferList.js not found - skipping patch (not needed for mqtt 5.x)');
+}

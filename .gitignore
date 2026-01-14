@@ -5,7 +5,14 @@ node_modules/
 # BUILD #
 builds/
 dist/
+dist-electron/
 release/
+
+# IDE and tools
+.claude/
+*.bak
+tmpclaude-*
+nul
 
 # Other
 bin/enmon

@@ -24,6 +24,7 @@
     "package-win64": "npm run electron:build && electron-builder build --win --x64",
     "package-mac": "npm run electron:build && electron-builder build --mac",
     "typecheck": "tsc --noEmit",
+    "patch": "node patch/patch.js",
     "rebuild-native": "electron-builder install-app-deps",
     "postinstall": "electron-builder install-app-deps || echo Native module rebuild failed - use Node.js 18 LTS for serial port support"
   },
@@ -62,6 +63,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
+    "fs-extra": "^11.2.0",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",

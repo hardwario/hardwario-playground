@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, master, update ]
+    branches: [main, master]
   pull_request:
-    branches: [ main ]
+    branches: [main, master]
   release:
     types: [published]
 
@@ -15,87 +15,88 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
-        - os: ubuntu-latest
-          environment: linux
+          - os: ubuntu-latest
+            environment: linux
 
-        - os: windows-latest
-          environment: windows
+          - os: windows-latest
+            environment: windows
 
-        - os: macos-latest
-          environment: macos
+          - os: macos-latest
+            environment: macos
 
     runs-on: ${{ matrix.os }}
     environment: ${{ matrix.environment }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js 16.x
-      uses: actions/setup-node@v2
-      with:
-        node-version: 16.x
-        cache: 'npm'
+      - uses: actions/checkout@v4
 
-    - name: Install node-gyp
-      run: npm install --global node-gyp@latest
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
 
-    - name: patch node gyp on windows to support Visual Studio 2019
-      if: matrix.os == 'windows-latest'
-      shell: powershell
-      run: npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
+      - name: Install node-gyp
+        run: npm install --global node-gyp@latest
 
-    - name: Install
-      run: npm install
+      - name: Patch node gyp on Windows to support Visual Studio
+        if: matrix.os == 'windows-latest'
+        shell: powershell
+        run: npm prefix -g | % {npm config set node_gyp "$_\node_modules\node-gyp\bin\node-gyp.js"}
 
-    - name: Prepare
-      run: |
-        npm run patch
+      - name: Install dependencies
+        run: npm install
 
-    - name: Build for Linux
-      if: matrix.environment == 'linux'
-      run: |
+      - name: Prepare
+        run: npm run patch
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build for Linux
+        if: matrix.environment == 'linux'
+        run: |
           npm run package-linux64
-          npm run package-linux-appimage
-          chmod +x release/*.AppImage
 
-    - name: Build for Windows
-      if: matrix.environment == 'windows'
-      env:
-        CSC_LINK: ${{ secrets.CERT_FILE }}
-        CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
-      run: |
+      - name: Build for Windows
+        if: matrix.environment == 'windows'
+        env:
+          CSC_LINK: ${{ secrets.CERT_FILE }}
+          CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
+        run: |
           npm run package-win64
 
-    - name: Build for macOS
-      if: matrix.environment == 'macos'
-      env:
-        CSC_LINK: ${{ secrets.CERT_FILE }}
-        CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
-        APPLEID: ${{ secrets.APPLEID }}
-        APPLEIDPASS: ${{ secrets.APPLEIDPASS }}
-      run: |
+      - name: Build for macOS
+        if: matrix.environment == 'macos'
+        env:
+          CSC_LINK: ${{ secrets.CERT_FILE }}
+          CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
+          APPLEID: ${{ secrets.APPLEID }}
+          APPLEIDPASS: ${{ secrets.APPLEIDPASS }}
+        run: |
           npm run package-mac
 
-    - name: Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: release ${{ matrix.os }}
-        path: |
-          release/*.deb
-          release/*.AppImage
-          release/*.snap
-          release/*.dmg
-          release/*.tar.gz
-          release/*.exe
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.os }}
+          path: |
+            release/*.deb
+            release/*.AppImage
+            release/*.snap
+            release/*.dmg
+            release/*.tar.gz
+            release/*.exe
 
-    - name: Publish to GitHub Releases
-      if: ${{ github.event_name == 'release' }}
-      uses: softprops/action-gh-release@v0.1.5
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        files: |
-          release/*.deb
-          release/*.AppImage
-          release/*.snap
-          release/*.dmg
-          release/*.tar.gz
-          release/*.exe
+      - name: Publish to GitHub Releases
+        if: ${{ github.event_name == 'release' }}
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          files: |
+            release/*.deb
+            release/*.AppImage
+            release/*.snap
+            release/*.dmg
+            release/*.tar.gz
+            release/*.exe

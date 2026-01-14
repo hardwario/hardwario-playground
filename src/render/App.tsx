@@ -134,8 +134,6 @@ function LanguageSwitcher({ language, setLanguage, availableLanguages }: {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentLang = availableLanguages.find(l => l.code === language);
-
   return (
     <div className="relative h-full flex items-center" ref={dropdownRef}>
       <button
@@ -359,7 +357,6 @@ export default function App() {
   }, []);
 
   const gwOffline = gatewayStatus === 'offline';
-  const nodeRedOffline = noderedStatus === 'offline';
   const mqttOffline = brokerStatus === 'offline';
 
   // Gateway connection handlers

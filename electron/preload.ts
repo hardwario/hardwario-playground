@@ -215,6 +215,3 @@ const electronAPI: ElectronAPI = {
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);
-
-// Export types for use in renderer
-export type { ElectronAPI };
