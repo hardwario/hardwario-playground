@@ -1,8 +1,14 @@
-const { notarize } = require('electron-notarize');
+const { notarize } = require('@electron/notarize');
 
 exports.default = async function notarizing(context) {
   const { electronPlatformName, appOutDir } = context;
   if (electronPlatformName !== 'darwin') {
+    return;
+  }
+
+  // Skip notarization if credentials are not available
+  if (!process.env.APPLEID || !process.env.APPLEIDPASS) {
+    console.log('Skipping notarization: Apple credentials not provided');
     return;
   }
 

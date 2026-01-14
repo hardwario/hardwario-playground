@@ -62,6 +62,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@electron/notarize": "^2.3.0",
     "@electron/rebuild": "^3.6.0",
     "@types/node": "^20.11.5",
     "fs-extra": "^11.2.0",
@@ -139,7 +140,8 @@
       "publisherName": "HARDWARIO s.r.o.",
       "signingHashAlgorithms": [
         "sha256"
-      ]
+      ],
+      "signDlls": false
     },
     "linux": {
       "artifactName": "hio-playground-v${version}-linux-${arch}.${ext}",

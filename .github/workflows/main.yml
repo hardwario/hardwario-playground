@@ -67,8 +67,11 @@ jobs:
       - name: Build for Windows
         if: matrix.environment == 'windows'
         env:
-          CSC_LINK: ${{ secrets.CERT_FILE }}
-          CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
+          # Code signing disabled - certificate expired Aug 2024
+          # Uncomment these lines when you have a new certificate:
+          # CSC_LINK: ${{ secrets.CERT_FILE }}
+          # CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
         run: |
           npm run package-win64
 
