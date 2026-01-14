@@ -147,7 +147,7 @@
       "artifactName": "hio-playground-v${version}-linux-${arch}.${ext}",
       "target": [
         "deb",
-        "snap",
+        "AppImage",
         "tar.gz"
       ],
       "category": "Utility"
