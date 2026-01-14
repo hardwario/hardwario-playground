@@ -25,8 +25,8 @@
     "package-mac": "npm run electron:build && electron-builder build --mac",
     "typecheck": "tsc --noEmit",
     "patch": "node patch/patch.js",
-    "rebuild-native": "electron-builder install-app-deps",
-    "postinstall": "electron-builder install-app-deps || echo Native module rebuild failed - use Node.js 18 LTS for serial port support"
+    "rebuild": "electron-rebuild",
+    "postinstall": "electron-rebuild || echo Native module rebuild failed - use Node.js 18 LTS for serial port support"
   },
   "dependencies": {
     "@hardwario/node-red-contrib-hardwario": "^1.0.1",
@@ -62,6 +62,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@electron/rebuild": "^3.6.0",
     "@types/node": "^20.11.5",
     "fs-extra": "^11.2.0",
     "@types/react": "^18.2.48",
@@ -123,8 +124,7 @@
     ],
     "electronVersion": "28.2.0",
     "publish": null,
-    "npmRebuild": true,
-    "buildDependenciesFromSource": true,
+    "npmRebuild": false,
     "mac": {
       "artifactName": "hio-playground-v${version}-macos-${arch}.${ext}",
       "category": "public.app-category.utilities",
