@@ -82,6 +82,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
           APPLEID: ${{ secrets.APPLEID }}
           APPLEIDPASS: ${{ secrets.APPLEIDPASS }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           npm run package-mac
 

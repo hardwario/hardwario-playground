@@ -7,8 +7,8 @@ exports.default = async function notarizing(context) {
   }
 
   // Skip notarization if credentials are not available
-  if (!process.env.APPLEID || !process.env.APPLEIDPASS) {
-    console.log('Skipping notarization: Apple credentials not provided');
+  if (!process.env.APPLEID || !process.env.APPLEIDPASS || !process.env.APPLE_TEAM_ID) {
+    console.log('Skipping notarization: Apple credentials not provided (APPLEID, APPLEIDPASS, APPLE_TEAM_ID)');
     return;
   }
 
@@ -19,5 +19,6 @@ exports.default = async function notarizing(context) {
     appPath: `${appOutDir}/${appName}.app`,
     appleId: process.env.APPLEID,
     appleIdPassword: process.env.APPLEIDPASS,
+    teamId: process.env.APPLE_TEAM_ID,
   });
 };
