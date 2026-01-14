@@ -1,7 +1,7 @@
 "use strict";
 
 // Import parts of electron to use
-const { app, BrowserWindow, Menu, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, Menu, ipcMain, dialog, globalShortcut } = require("electron");
 const path = require("path");
 const url = require("url");
 const fs = require("fs");
@@ -69,6 +69,15 @@ function createWindow() {
     // Open the DevTools automatically if developing
     if (dev) {
       mainWindow.webContents.openDevTools();
+    }
+  });
+
+  // Register keyboard shortcuts for DevTools
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    // F12 or Ctrl+Shift+I to open DevTools
+    if (input.key === 'F12' || (input.control && input.shift && input.key.toLowerCase() === 'i')) {
+      mainWindow.webContents.toggleDevTools();
+      event.preventDefault();
     }
   });
 

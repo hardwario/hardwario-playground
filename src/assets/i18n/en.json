@@ -145,5 +145,47 @@
   "Confirm delete": "Confirm delete",
   "Rename device": "Rename device",
   "Remove device": "Remove device",
-  "Just paired": "Just paired"
+  "Just paired": "Just paired",
+
+  "Help & Resources": "Help & Resources",
+  "Community Forum": "Community Forum",
+  "Video Tutorials": "Video Tutorials",
+  "MQTT Topics": "MQTT Topics",
+  "Pairing": "Pairing",
+
+  "Setup": "Setup",
+  "Flash": "Flash",
+  "Downloading...": "Downloading...",
+  "Erasing...": "Erasing...",
+  "Writing...": "Writing...",
+  "Verifying...": "Verifying...",
+  "Select firmware and connect your device": "Select firmware and connect your device",
+  "Browse for file": "Browse for file",
+  "No device connected": "No device connected",
+  "Connect your HARDWARIO device via USB cable": "Connect your HARDWARIO device via USB cable",
+  "Ready to flash": "Ready to flash",
+  "Do not disconnect your device": "Do not disconnect your device",
+  "Flash Complete!": "Flash Complete!",
+  "Your device has been successfully updated": "Your device has been successfully updated",
+  "Flash Another": "Flash Another",
+  "Try Again": "Try Again",
+  "Start Over": "Start Over",
+  "Start Flashing": "Start Flashing",
+
+  "New to HARDWARIO? Start with the video tutorials!": "New to HARDWARIO? Start with the video tutorials!",
+  "ID copied": "ID copied",
+  "Name copied": "Name copied",
+  "Copy name": "Copy name",
+  "Copy ID": "Copy ID",
+  "Languages": "Languages",
+
+  "No Radio Dongle connected": "No Radio Dongle connected",
+  "MQTT broker is shut down": "MQTT broker is shut down",
+
+  "Ask questions and get help from the community": "Ask questions and get help from the community",
+  "Watch step-by-step video guides": "Watch step-by-step video guides",
+  "Read the official documentation": "Read the official documentation",
+  "MQTT Topics Reference": "MQTT Topics Reference",
+  "Browse available MQTT topics and commands": "Browse available MQTT topics and commands",
+  "Blockly IDE": "Blockly IDE"
 }

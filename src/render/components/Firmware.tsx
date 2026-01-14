@@ -283,11 +283,16 @@ export default function Firmware() {
       color: state.isSelected ? 'white' : '#374151',
       padding: '12px 16px',
     }),
+    menuPortal: (base: object) => ({
+      ...base,
+      zIndex: 9999,
+    }),
   };
 
   return (
-    <div className="h-full overflow-auto bg-gray-50">
-      <div className="p-6 max-w-2xl mx-auto">
+    <div className="h-full flex flex-col">
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-auto p-4 pb-4">
         <StepIndicator currentStep={step} done={done} />
 
         {/* Step 1: Setup */}
@@ -317,6 +322,8 @@ export default function Firmware() {
                       onChange={handleFirmwareSelect}
                       value={firmware}
                       noOptionsMessage={() => i18n.__("No results found - try 'Show All' option")}
+                      menuPortalTarget={document.body}
+                      menuPosition="fixed"
                     />
                   </div>
                   <button
@@ -350,6 +357,8 @@ export default function Firmware() {
                     value={version}
                     onChange={(v) => setVersion(v)}
                     isClearable={false}
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
                   />
                 </div>
               )}
@@ -405,16 +414,6 @@ export default function Firmware() {
                   </div>
                 </div>
               )}
-
-              {/* Flash Button */}
-              <button
-                onClick={handleFlash}
-                disabled={!canFlash}
-                className="w-full px-4 py-4 bg-hardwario-primary text-white font-semibold uppercase rounded-lg hover:bg-hardwario-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-lg mt-2"
-              >
-                <FiCpu className="w-5 h-5" />
-                {i18n.__('Start Flashing')}
-              </button>
             </div>
           </div>
         )}
@@ -488,6 +487,20 @@ export default function Firmware() {
           </div>
         )}
       </div>
+
+      {/* Sticky Footer with Flash Button - only in setup step */}
+      {step === 'setup' && (
+        <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
+          <button
+            onClick={handleFlash}
+            disabled={!canFlash}
+            className="w-full px-4 py-4 bg-hardwario-primary text-white font-semibold uppercase rounded-lg hover:bg-hardwario-medium transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+          >
+            <FiCpu className="w-5 h-5" />
+            {i18n.__('Start Flashing')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

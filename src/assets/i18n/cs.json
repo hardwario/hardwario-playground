@@ -145,5 +145,47 @@
   "Confirm delete": "Potvrdit smazání",
   "Rename device": "Přejmenovat zařízení",
   "Remove device": "Odebrat zařízení",
-  "Just paired": "Právě spárováno"
+  "Just paired": "Právě spárováno",
+
+  "Help & Resources": "Nápověda a zdroje",
+  "Community Forum": "Komunitní fórum",
+  "Video Tutorials": "Video návody",
+  "MQTT Topics": "MQTT témata",
+  "Pairing": "Párování",
+
+  "Setup": "Nastavení",
+  "Flash": "Nahrát",
+  "Downloading...": "Stahování...",
+  "Erasing...": "Mazání...",
+  "Writing...": "Zápis...",
+  "Verifying...": "Ověřování...",
+  "Select firmware and connect your device": "Vyberte firmware a připojte zařízení",
+  "Browse for file": "Vybrat soubor",
+  "No device connected": "Žádné zařízení nepřipojeno",
+  "Connect your HARDWARIO device via USB cable": "Připojte HARDWARIO zařízení přes USB kabel",
+  "Ready to flash": "Připraveno k nahrání",
+  "Do not disconnect your device": "Neodpojujte zařízení",
+  "Flash Complete!": "Nahrávání dokončeno!",
+  "Your device has been successfully updated": "Vaše zařízení bylo úspěšně aktualizováno",
+  "Flash Another": "Nahrát další",
+  "Try Again": "Zkusit znovu",
+  "Start Over": "Začít znovu",
+  "Start Flashing": "Spustit nahrávání",
+
+  "New to HARDWARIO? Start with the video tutorials!": "Nováček v HARDWARIO? Začněte s video návody!",
+  "ID copied": "ID zkopírováno",
+  "Name copied": "Název zkopírován",
+  "Copy name": "Kopírovat název",
+  "Copy ID": "Kopírovat ID",
+  "Languages": "Jazyky",
+
+  "No Radio Dongle connected": "Radio Dongle není připojen",
+  "MQTT broker is shut down": "MQTT broker je vypnutý",
+
+  "Ask questions and get help from the community": "Ptejte se a získejte pomoc od komunity",
+  "Watch step-by-step video guides": "Sledujte video návody krok za krokem",
+  "Read the official documentation": "Přečtěte si oficiální dokumentaci",
+  "MQTT Topics Reference": "Přehled MQTT témat",
+  "Browse available MQTT topics and commands": "Procházejte dostupná MQTT témata a příkazy",
+  "Blockly IDE": "Blockly IDE"
 }

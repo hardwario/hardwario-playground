@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiCode, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
+import * as i18n from '../../utils/i18n';
 
 type LoadingState = 'loading' | 'ready' | 'error';
 
@@ -82,7 +83,7 @@ export default function Blockly() {
         key={loadingState === 'loading' ? 'loading' : 'ready'}
         src="http://127.0.0.1:8000"
         className={`w-full h-full border-0 ${loadingState === 'ready' ? 'opacity-100' : 'opacity-0'}`}
-        title="Blockly IDE"
+        title={i18n.__('Blockly IDE')}
         onLoad={handleLoad}
         onError={handleError}
       />

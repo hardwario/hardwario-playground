@@ -29,6 +29,14 @@ const modalTitleKeys: Record<string, string> = {
   '/firmware': 'Firmware',
 };
 
+// Modal icons for each route
+const modalIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  '/devices': FiCpu,
+  '/messages': FiMessageSquare,
+  '/settings': FiGlobe,
+  '/firmware': FiDownload,
+};
+
 // Hardware dropdown component for Devices, Messages, and Firmware (responsive)
 function HardwareDropdown({ gwOffline, mqttOffline }: { gwOffline: boolean; mqttOffline: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,7 +79,7 @@ function HardwareDropdown({ gwOffline, mqttOffline }: { gwOffline: boolean; mqtt
               `flex items-center gap-2 px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
             }
             onClick={() => setIsOpen(false)}
-            title={gwOffline ? 'No Radio Dongle connected' : undefined}
+            title={gwOffline ? i18n.__('No Radio Dongle connected') : undefined}
           >
             <FiCpu className="w-4 h-4" />
             {i18n.__('Devices')}
@@ -83,7 +91,7 @@ function HardwareDropdown({ gwOffline, mqttOffline }: { gwOffline: boolean; mqtt
               `flex items-center gap-2 px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
             }
             onClick={() => setIsOpen(false)}
-            title={mqttOffline ? 'MQTT broker is shut down' : undefined}
+            title={mqttOffline ? i18n.__('MQTT broker is shut down') : undefined}
           >
             <FiMessageSquare className="w-4 h-4" />
             {i18n.__('Messages')}
@@ -172,19 +180,29 @@ function ModalPage({ children, title, wide }: { children: React.ReactNode; title
 
   const titleKey = title || modalTitleKeys[location.pathname] || '';
   const modalTitle = titleKey ? i18n.__(titleKey) : '';
+  const IconComponent = modalIcons[location.pathname];
 
   return (
-    <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50" onClick={handleClose}>
+    <div
+      className="absolute inset-0 z-20 flex items-center justify-center bg-black/50"
+      onClick={handleClose}
+    >
       <div
-        className={`bg-white h-[90%] flex flex-col shadow-2xl rounded ${wide ? 'max-w-4xl w-full mx-4' : 'max-w-2xl'}`}
+        className={`flex flex-col shadow-2xl rounded ${wide ? 'w-[900px] h-auto max-h-[80vh] my-10' : 'w-[900px] h-[70vh]'}`}
+        style={{
+          background: 'linear-gradient(to right, #f3f4f6 0%, #f9fafb 20%, #ffffff 50%, #f9fafb 80%, #f3f4f6 100%)'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-4 py-3 bg-gray-100 border-b border-gray-200">
-          <h2 className="font-semibold text-lg text-hardwario-nearblack">{modalTitle}</h2>
+          <h2 className="font-semibold text-lg text-hardwario-nearblack uppercase flex items-center gap-2">
+            {IconComponent && <IconComponent className="w-5 h-5" />}
+            {modalTitle}
+          </h2>
           <button
             onClick={handleClose}
             className="p-1 hover:bg-gray-200 rounded transition-colors"
-            title="Close"
+            title={i18n.__('Close')}
           >
             <FiX className="w-5 h-5 text-gray-600" />
           </button>
@@ -391,7 +409,7 @@ export default function App() {
                     ? 'bg-hardwario-primary text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
                 }
-                title={gwOffline ? 'No Radio Dongle connected' : undefined}
+                title={gwOffline ? i18n.__('No Radio Dongle connected') : undefined}
               >
                 <FiCpu className="w-3.5 h-3.5" />
                 {i18n.__('Devices')}
@@ -406,7 +424,7 @@ export default function App() {
                     ? 'bg-hardwario-primary text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
                 }
-                title={mqttOffline ? 'MQTT broker is shut down' : undefined}
+                title={mqttOffline ? i18n.__('MQTT broker is shut down') : undefined}
               >
                 <FiMessageSquare className="w-3.5 h-3.5" />
                 {i18n.__('Messages')}
@@ -526,7 +544,7 @@ export default function App() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                       </span>
-                      <span className="hidden lg:inline text-xs text-amber-600 font-medium uppercase">
+                      <span className="hidden lg:inline text-xs text-amber-600 font-medium">
                         {i18n.__('Pairing')}
                       </span>
                     </>
@@ -536,7 +554,7 @@ export default function App() {
                         className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${gatewayOnline ? 'bg-green-500' : 'bg-gray-300'}`}
                         title={gatewayOnline ? i18n.__('Connected') : i18n.__('Disconnected')}
                       ></div>
-                      <span className="hidden lg:inline text-xs text-gray-500 font-medium uppercase">
+                      <span className="hidden lg:inline text-xs text-gray-500 font-medium">
                         {gatewayOnline ? i18n.__('Connected') : i18n.__('Disconnected')}
                       </span>
                     </>
