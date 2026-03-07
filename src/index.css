@@ -145,15 +145,15 @@
 
   /* Navbar styles - Modern white design */
   .navbar {
-    @apply w-full bg-white flex items-center px-2 sm:px-4 h-14 border-b border-gray-200 shadow-sm;
+    @apply w-full bg-white flex items-center px-2 sm:px-4 min-h-14 h-auto p-2 border-b border-gray-200 shadow-sm;
   }
 
   .navbar-brand {
-    @apply flex items-center h-full pr-3 sm:pr-6 flex-shrink-0;
+    @apply flex items-center h-full pr-3 sm:pr-2 flex-shrink-0;
   }
 
   .navbar-nav {
-    @apply flex items-center h-full ml-1 sm:ml-2 overflow-visible;
+    @apply flex items-center h-full overflow-visible;
   }
 
   .nav-link {

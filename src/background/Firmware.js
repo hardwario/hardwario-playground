@@ -250,7 +250,7 @@ function setup() {
                 return sendErrorAndUnlock("Device has been probably disconnect.")
             }
 
-            return sendErrorAndUnlock("Please try to press FLASH FIRMWARE again.");
+            return sendErrorAndUnlock("Check if the device is not connected anywhere else (Playground or other application). After that please try to press FLASH FIRMWARE again.");
         });
 
     });

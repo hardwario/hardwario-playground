@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Select from 'react-select';
 import { HashRouter, Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import { FiAlertTriangle, FiWifi, FiWifiOff, FiRefreshCw, FiX, FiZoomIn, FiZoomOut, FiChevronDown, FiGlobe, FiCpu, FiMessageSquare, FiDownload, FiHelpCircle, FiExternalLink, FiBook, FiVideo } from 'react-icons/fi';
+import { ToastContainer, toast } from 'react-toastify';
+import { FiAlertTriangle, FiWifi, FiWifiOff, FiRefreshCw, FiX, FiZoomIn, FiZoomOut, FiChevronDown, FiGlobe, FiCpu, FiMessageSquare, FiDownload, FiHelpCircle, FiExternalLink, FiBook, FiVideo, FiGrid } from 'react-icons/fi';
 import type { SerialPortInfo } from '../../electron/preload';
 
 import { useRadioManager } from './hooks/useRadioManager';
@@ -20,6 +21,7 @@ import * as i18n from '../utils/i18n';
 // Import logos
 import logoShort from '../assets/images/hw-logo-pos.svg';
 import logoLong from '../assets/images/hardwario-playground.svg';
+import logoNoText from '../assets/images/hw-mark-pos.svg';
 
 // Modal title keys for each route (will be translated)
 const modalTitleKeys: Record<string, string> = {
@@ -45,6 +47,14 @@ function HardwareDropdown({ gwOffline, mqttOffline }: { gwOffline: boolean; mqtt
 
   const isActive = location.pathname === '/devices' || location.pathname === '/messages' || location.pathname.startsWith('/firmware');
   const hasWarning = gwOffline || mqttOffline;
+
+  const openExternal = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const href = e.currentTarget.href;
+    if (href) {
+      window.electronAPI.shell.openExternal(href);
+    }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -96,6 +106,16 @@ function HardwareDropdown({ gwOffline, mqttOffline }: { gwOffline: boolean; mqtt
             <FiMessageSquare className="w-4 h-4" />
             {i18n.__('Messages')}
             {mqttOffline && <FiAlertTriangle className="ml-1 text-amber-500" />}
+          </NavLink>
+          <NavLink
+            to="http://localhost:1880/ui"
+            className={({ isActive }) =>
+              `flex items-center gap-2 px-4 py-2 text-sm uppercase text-gray-600 hover:bg-gray-50 hover:text-hardwario-primary ${isActive ? 'bg-blue-50/50 text-hardwario-primary' : ''}`
+            }
+            onClick={openExternal}
+          >
+            <FiGrid className="w-3.5 h-3.5" />
+            {i18n.__('Dashboard')}
           </NavLink>
           <NavLink
             to="/firmware"
@@ -154,9 +174,8 @@ function LanguageSwitcher({ language, setLanguage, availableLanguages }: {
                 setLanguage(lang.code);
                 setIsOpen(false);
               }}
-              className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 hover:text-hardwario-primary ${
-                language === lang.code ? 'bg-blue-50/50 text-hardwario-primary font-medium' : 'text-gray-600'
-              }`}
+              className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 hover:text-hardwario-primary ${language === lang.code ? 'bg-blue-50/50 text-hardwario-primary font-medium' : 'text-gray-600'
+                }`}
             >
               {lang.name}
             </button>
@@ -186,7 +205,7 @@ function ModalPage({ children, title, wide }: { children: React.ReactNode; title
       onClick={handleClose}
     >
       <div
-        className={`flex flex-col shadow-2xl rounded ${wide ? 'w-[900px] h-auto max-h-[80vh] my-10' : 'w-[900px] h-[70vh]'}`}
+        className={`flex flex-col shadow-2xl rounded ${wide ? 'w-[90svw] h-auto max-h-[80vh] my-10' : 'w-[90svw] h-[80vh]'}`}
         style={{
           background: 'linear-gradient(to right, #f3f4f6 0%, #f9fafb 20%, #ffffff 50%, #f9fafb 80%, #f3f4f6 100%)'
         }}
@@ -224,6 +243,7 @@ export default function App() {
   const [selectedPort, setSelectedPort] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Language hook
   const { language, setLanguage, availableLanguages } = useLanguage();
@@ -237,17 +257,42 @@ export default function App() {
 
   // Zoom state
   const [zoomLevel, setZoomLevel] = useState(100);
+  const ZOOM_MIN = 50;
+  const ZOOM_MAX = 200;
+
+  useEffect(() => {
+    window.electronAPI.nodered.setDirty(false);
+
+    const handleMessage = (event: MessageEvent) => {
+      const data = event.data;
+
+      if (!data || data.source !== 'hardwario-nodered-dirty-bridge' || data.type !== 'dirty-state') {
+        return;
+      }
+
+      window.electronAPI.nodered.setDirty(!!data.dirty);
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      window.electronAPI.nodered.setDirty(false);
+    };
+  }, []);
 
   // Zoom handlers
   const handleZoomIn = useCallback(() => {
+    if (zoomLevel >= ZOOM_MAX) return;
     window.electronAPI.zoom.zoomIn();
     window.electronAPI.zoom.get().then(setZoomLevel);
-  }, []);
+  }, [zoomLevel]);
 
   const handleZoomOut = useCallback(() => {
+    if (zoomLevel <= ZOOM_MIN) return;
     window.electronAPI.zoom.zoomOut();
     window.electronAPI.zoom.get().then(setZoomLevel);
-  }, []);
+  }, [zoomLevel]);
 
   const handleZoomReset = useCallback(() => {
     window.electronAPI.zoom.reset();
@@ -261,6 +306,17 @@ export default function App() {
     const unsubGateway = window.electronAPI.gateway.onStatus((payload) => {
       setGatewayStatus(payload.status);
       setIsConnecting(false);
+
+      // Clear any pending connection timeout
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+        connectionTimeoutRef.current = null;
+      }
+
+      // Show connection status toast
+      if (payload.status === 'offline' && payload.error) {
+        toast.error(`${i18n.__('Connection failed')}: ${payload.error}`);
+      }
     });
 
     const unsubNodered = window.electronAPI.nodered.onStatus((status) => {
@@ -280,12 +336,20 @@ export default function App() {
     });
 
     // Subscribe to port list updates
-    const unsubPortList = window.electronAPI.gateway.onPortList((newPorts) => {
+    const unsubPortList = window.electronAPI.gateway.onPortList((rawPorts) => {
+      let newPorts = [];
+      if (rawPorts.some(p => p.parentId)) {
+        newPorts = rawPorts.filter(p => p.parentId?.includes('usb-dongle'));
+      }
+      else {
+        newPorts = rawPorts.filter(p => p.serialNumber?.includes('usb-dongle'));
+      }
       setPorts((prevPorts) => {
         let changed = prevPorts.length !== newPorts.length;
         if (!changed) {
           for (let i = 0; i < newPorts.length; i++) {
-            if (prevPorts[i].path !== newPorts[i].path) {
+            if (prevPorts[i].path !== newPorts[i].path ||
+              prevPorts[i].serialNumber !== newPorts[i].serialNumber) {
               changed = true;
               break;
             }
@@ -353,6 +417,9 @@ export default function App() {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -367,6 +434,14 @@ export default function App() {
     }
     if (selectedPort === '') return;
     setIsConnecting(true);
+
+    // Add timeout to prevent infinite connecting state
+    connectionTimeoutRef.current = setTimeout(() => {
+      setIsConnecting(false);
+      connectionTimeoutRef.current = null;
+      toast.error(i18n.__('Connection timeout - device may be busy or unavailable'));
+    }, 1000); // 10 second timeout
+
     window.electronAPI.gateway.connect(selectedPort);
   }, [gatewayOnline, selectedPort]);
 
@@ -376,6 +451,20 @@ export default function App() {
     if (href) {
       window.electronAPI.shell.openExternal(href);
     }
+  };
+
+  const formatPortLabel = (port: SerialPortInfo) => {
+    const parts = [port.path];
+    if (port.parentId) {
+      parts.push(`${port.parentId.split('\\').slice(-1)[0]}`);
+    }
+    else {
+      if (port.serialNumber) {
+        parts.push(`${port.serialNumber}`);
+      }
+    }
+
+    return parts.join(" ");
   };
 
   return (
@@ -389,8 +478,9 @@ export default function App() {
               onClick={openExternal}
               className="navbar-brand"
             >
-              <img src={logoShort} className="h-6 block lg:hidden" alt="HARDWARIO Logo" />
-              <img src={logoLong} className="h-6 hidden lg:block" alt="HARDWARIO Playground" />
+              <img src={logoNoText} className="h-6 block lg:hidden" alt="HARDWARIO Logo" />
+              <img src={logoShort} className="h-6 hidden lg:block xl:hidden" alt="HARDWARIO Logo" />
+              <img src={logoLong} className="h-6 hidden xl:block" alt="HARDWARIO Playground" />
             </a>
 
             <div className="navbar-nav">
@@ -398,53 +488,69 @@ export default function App() {
               <HardwareDropdown gwOffline={gwOffline} mqttOffline={mqttOffline} />
 
               {/* Individual links - visible only on medium+ screens */}
-              <NavLink
-                to="/devices"
-                className={({ isActive }) =>
-                  `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
+              <div className="flex flex-wrap gap-1">
+                <NavLink
+                  to="/devices"
+                  className={({ isActive }) =>
+                    `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
                   ${isActive
-                    ? 'bg-hardwario-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
-                }
-                title={gwOffline ? i18n.__('No Radio Dongle connected') : undefined}
-              >
-                <FiCpu className="w-3.5 h-3.5" />
-                {i18n.__('Devices')}
-                {gwOffline && <FiAlertTriangle className="ml-0.5 text-amber-500" />}
-              </NavLink>
+                      ? 'bg-hardwario-primary text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                  }
+                  title={gwOffline ? i18n.__('No Radio Dongle connected') : undefined}
+                >
+                  <FiCpu className="w-3.5 h-3.5" />
+                  {i18n.__('Devices')}
+                  {gwOffline && <FiAlertTriangle className="ml-0.5 text-amber-500" />}
+                </NavLink>
 
-              <NavLink
-                to="/messages"
-                className={({ isActive }) =>
-                  `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
+                <NavLink
+                  to="/messages"
+                  className={({ isActive }) =>
+                    `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
                   ${isActive
-                    ? 'bg-hardwario-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
-                }
-                title={mqttOffline ? i18n.__('MQTT broker is shut down') : undefined}
-              >
-                <FiMessageSquare className="w-3.5 h-3.5" />
-                {i18n.__('Messages')}
-                {mqttOffline && <FiAlertTriangle className="ml-0.5 text-amber-500" />}
-              </NavLink>
+                      ? 'bg-hardwario-primary text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                  }
+                  title={mqttOffline ? i18n.__('MQTT broker is shut down') : undefined}
+                >
+                  <FiMessageSquare className="w-3.5 h-3.5" />
+                  {i18n.__('Messages')}
+                  {mqttOffline && <FiAlertTriangle className="ml-0.5 text-amber-500" />}
+                </NavLink>
 
-              <NavLink
-                to="/firmware"
-                className={({ isActive }) =>
-                  `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
+                <NavLink
+                  to="http://localhost:1880/ui"
+                  title={i18n.__('Dashboard')}
+                  className={({ isActive }) =>
+                    `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
                   ${isActive
-                    ? 'bg-hardwario-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
-                }
-              >
-                <FiDownload className="w-3.5 h-3.5" />
-                {i18n.__('Firmware')}
-              </NavLink>
+                      ? 'bg-hardwario-primary text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                  }
+                  onClick={openExternal}
+                >
+                  <FiGrid className="w-3.5 h-3.5" />
+                </NavLink>
+
+                <NavLink
+                  to="/firmware"
+                  className={({ isActive }) =>
+                    `hidden md:flex items-center gap-1.5 px-3 py-1.5 mx-1 text-xs font-semibold uppercase rounded transition-all
+                  ${isActive
+                      ? 'bg-hardwario-primary text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`
+                  }
+                >
+                  <FiDownload className="w-3.5 h-3.5" />
+                  {i18n.__('Firmware')}
+                </NavLink>
+              </div>
 
             </div>
 
             {/* Right side - Controls */}
-            <div className="ml-auto flex items-center h-full flex-shrink-0">
+            <div className="ml-auto flex items-center h-full min-w-0">
               {/* Language Switcher */}
               <div className="px-2 h-full flex items-center border-l border-gray-200">
                 <LanguageSwitcher
@@ -454,11 +560,12 @@ export default function App() {
                 />
               </div>
 
-              {/* Zoom Controls - hidden on smaller screens */}
-              <div className="hidden lg:flex items-center gap-0.5 px-3 h-full border-l border-gray-200">
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-0.5 px-3 h-full border-l border-gray-200">
                 <button
                   onClick={handleZoomOut}
-                  className="p-1.5 text-gray-500 hover:text-hardwario-primary hover:bg-gray-100 rounded transition-colors"
+                  disabled={zoomLevel <= ZOOM_MIN}
+                  className="p-1.5 text-gray-500 hover:text-hardwario-primary hover:bg-gray-100 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-500"
                   title={i18n.__('Zoom Out')}
                 >
                   <FiZoomOut className="w-4 h-4" />
@@ -472,7 +579,8 @@ export default function App() {
                 </button>
                 <button
                   onClick={handleZoomIn}
-                  className="p-1.5 text-gray-500 hover:text-hardwario-primary hover:bg-gray-100 rounded transition-colors"
+                  disabled={zoomLevel >= ZOOM_MAX}
+                  className="p-1.5 text-gray-500 hover:text-hardwario-primary hover:bg-gray-100 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-500"
                   title={i18n.__('Zoom In')}
                 >
                   <FiZoomIn className="w-4 h-4" />
@@ -532,7 +640,7 @@ export default function App() {
               </div>
 
               {/* Gateway Controls */}
-              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-full border-l border-gray-200">
+              <div className="flex items-center gap-1 px-2 h-full border-l border-gray-200">
                 {/* Connection Status Indicator */}
                 <div className="flex items-center gap-2">
                   {radioManager.pairingMode ? (
@@ -541,7 +649,7 @@ export default function App() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                       </span>
-                      <span className="hidden lg:inline text-xs text-amber-600 font-medium">
+                      <span className="hidden xl:inline text-xs text-amber-600 font-medium">
                         {i18n.__('Pairing')}
                       </span>
                     </>
@@ -551,34 +659,53 @@ export default function App() {
                         className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${gatewayOnline ? 'bg-green-500' : 'bg-gray-300'}`}
                         title={gatewayOnline ? i18n.__('Connected') : i18n.__('Disconnected')}
                       ></div>
-                      <span className="hidden lg:inline text-xs text-gray-500 font-medium">
+                      <span className="hidden xl:inline text-xs text-gray-500 font-medium">
                         {gatewayOnline ? i18n.__('Connected') : i18n.__('Disconnected')}
                       </span>
                     </>
                   )}
                 </div>
 
-                <select
-                  className="px-1 sm:px-2 py-1.5 text-xs sm:text-sm border border-gray-300 rounded bg-white text-gray-700 min-w-[80px] sm:min-w-[100px] focus:outline-none focus:ring-1 focus:ring-hardwario-primary focus:border-hardwario-primary"
-                  value={selectedPort}
-                  onChange={(e) => setSelectedPort(e.target.value)}
-                  disabled={gatewayOnline || ports.length === 0}
-                >
-                  {ports.length === 0 ? (
-                    <option value="">{i18n.__('No device')}</option>
-                  ) : (
-                    ports.map((port, index) => (
-                      <option value={port.path} key={index}>
-                        {port.path}{port.productId ? ` (PID_${port.productId})` : ''}
-                      </option>
-                    ))
-                  )}
-                </select>
-
+                <Select<{ value: string; label: string }>
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      minHeight: '28px',
+                      height: '28px',
+                      fontSize: '0.75rem',
+                      borderColor: '#d1d5db',
+                      boxShadow: 'none',
+                      minWidth: '80px',
+                      maxWidth: '150px',
+                      '&:hover': { borderColor: '#9ca3af' },
+                    }),
+                    valueContainer: (base) => ({ ...base, padding: '0 6px', flexWrap: 'nowrap' }),
+                    placeholder: (base) => ({ ...base, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }),
+                    indicatorsContainer: (base) => ({ ...base, height: '28px' }),
+                    dropdownIndicator: (base) => ({ ...base, padding: '0 4px' }),
+                    option: (base, state) => ({
+                      ...base,
+                      fontSize: '0.75rem',
+                      backgroundColor: state.isSelected ? '#1f2937' : state.isFocused ? '#f3f4f6' : 'white',
+                      color: state.isSelected ? 'white' : '#374151',
+                      padding: '6px 12px',
+                    }),
+                    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  }}
+                  options={ports.map((p) => ({ value: p.path, label: formatPortLabel(p) }))}
+                  value={selectedPort ? { value: selectedPort, label: formatPortLabel(ports.find(p => p.path === selectedPort) ?? { path: selectedPort }) } : null}
+                  onChange={(selected) => selected && setSelectedPort(selected.value)}
+                  isDisabled={gatewayOnline || ports.length === 0}
+                  isClearable={false}
+                  isSearchable={false}
+                  placeholder={i18n.__('No device')}
+                  menuPortalTarget={document.body}
+                  menuPosition="fixed"
+                />
                 <button
                   disabled={(!gatewayOnline && ports.length === 0) || isConnecting}
                   className={`
-                    px-2 sm:px-3 py-1.5 text-xs font-semibold uppercase rounded flex items-center gap-1 sm:gap-1.5 transition-all
+                    px-2 py-1.5 text-xs font-semibold uppercase rounded flex items-center gap-1 transition-all
                     ${gatewayOnline
                       ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
                       : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200'}
@@ -590,21 +717,20 @@ export default function App() {
                   {isConnecting ? (
                     <>
                       <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span className="hidden sm:inline">{i18n.__('Connecting')}</span>
+                      <span className="hidden lg:inline">{i18n.__('Connecting')}</span>
                     </>
                   ) : gatewayOnline ? (
                     <>
                       <FiWifiOff className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">{i18n.__('Disconnect')}</span>
+                      <span className="hidden lg:inline">{i18n.__('Disconnect')}</span>
                     </>
                   ) : (
                     <>
                       <FiWifi className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">{i18n.__('Connect')}</span>
+                      <span className="hidden lg:inline">{i18n.__('Connect')}</span>
                     </>
                   )}
                 </button>
-
               </div>
             </div>
           </nav>

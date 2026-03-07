@@ -21,6 +21,8 @@ function setup(productionMenu = false) {
         Menu.setApplicationMenu(null);
     }
 
+    ipcMain.removeHandler('zoom:get');
+
     // IPC handlers for zoom controls
     ipcMain.on('zoom:in', () => {
         const win = BrowserWindow.getFocusedWindow();

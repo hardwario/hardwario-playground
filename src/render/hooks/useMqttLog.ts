@@ -14,6 +14,7 @@ interface UseMqttLogReturn {
   messages: MqttMessage[];
   subscribed: string[];
   highlightedMessages: MqttMessage[];
+  mqttUrl: string | null;
   subscribe: (topic: string) => void;
   unsubscribe: (topic: string) => void;
   unsubscribeAll: () => void;
@@ -199,6 +200,7 @@ export function useMqttLog(mqttUrl: string | null): UseMqttLogReturn {
     messages,
     subscribed,
     highlightedMessages: Object.values(highlightedMessages),
+    mqttUrl,
     subscribe,
     unsubscribe,
     unsubscribeAll,
@@ -212,6 +214,7 @@ export function useMqttLog(mqttUrl: string | null): UseMqttLogReturn {
     messages,
     subscribed,
     highlightedMessages,
+    mqttUrl,
     subscribe,
     unsubscribe,
     unsubscribeAll,

@@ -117,7 +117,7 @@ export default function RadioManager({ radioManager }: RadioManagerProps) {
           </div>
           <div>
             <p className="text-sm font-medium text-amber-800">{i18n.__('Pairing mode active')}</p>
-            <p className="text-xs text-amber-600">{i18n.__('Press the button on your device to pair it')}</p>
+            <p className="text-xs text-amber-600">{i18n.__('Reset device')}</p>
           </div>
         </div>
       )}
@@ -133,7 +133,7 @@ export default function RadioManager({ radioManager }: RadioManagerProps) {
             <h3 className="text-lg font-medium text-gray-900 mb-2">{i18n.__('No devices paired')}</h3>
             <p className="text-gray-500 mb-4 max-w-sm mx-auto">
               {gatewayConnected
-                ? i18n.__("Click 'Start Pairing' and press the button on your device to add it.")
+                ? i18n.__("Click 'Start Pairing' and reset device.")
                 : i18n.__('Connect a Radio Dongle first, then pair your devices.')}
             </p>
           </div>

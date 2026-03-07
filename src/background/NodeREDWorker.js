@@ -8,12 +8,12 @@ const { app, ipcMain } = require("electron");
 const { settings } = require('./Settings');
 // is-port-reachable is ESM-only, use dynamic import
 
-function copyFileSync( source, target ) {
+function copyFileSync(source, target) {
     var targetFile = target;
 
-    if ( fs.existsSync( target ) ) {
-        if ( fs.lstatSync( target ).isDirectory() ) {
-            targetFile = path.join( target, path.basename( source ) );
+    if (fs.existsSync(target)) {
+        if (fs.lstatSync(target).isDirectory()) {
+            targetFile = path.join(target, path.basename(source));
         }
     }
 
@@ -24,24 +24,26 @@ function copyFileSync( source, target ) {
     fs.writeFileSync(targetFile, fs.readFileSync(source));
 }
 
-function copyFolderRecursiveSync( source, target ) {
+const dirtyBridgeScript = path.join(app.getAppPath(), 'src', 'utils', 'noderedDirtyBridge.js');
+
+function copyFolderRecursiveSync(source, target) {
     var files = [];
 
-    var targetFolder = path.join( target, path.basename( source ) );
-    if ( !fs.existsSync( targetFolder ) ) {
-        fs.mkdirSync( targetFolder, {recursive: true}, err => {} );
+    var targetFolder = path.join(target, path.basename(source));
+    if (!fs.existsSync(targetFolder)) {
+        fs.mkdirSync(targetFolder, { recursive: true }, err => { });
     }
 
-    if ( fs.lstatSync( source ).isDirectory() ) {
-        files = fs.readdirSync( source );
-        files.forEach( function ( file ) {
-            var curSource = path.join( source, file );
-            if ( fs.lstatSync( curSource ).isDirectory() ) {
-                copyFolderRecursiveSync( curSource, targetFolder );
+    if (fs.lstatSync(source).isDirectory()) {
+        files = fs.readdirSync(source);
+        files.forEach(function (file) {
+            var curSource = path.join(source, file);
+            if (fs.lstatSync(curSource).isDirectory()) {
+                copyFolderRecursiveSync(curSource, targetFolder);
             } else {
-                copyFileSync( curSource, targetFolder );
+                copyFileSync(curSource, targetFolder);
             }
-        } );
+        });
     }
 }
 
@@ -88,14 +90,14 @@ function setup() {
         const reachable = await isPortReachable(listenPort, { host: '127.0.0.1' });
 
         const isDebug = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) ||
-                        /[\\/]electron[\\/]/.test(process.execPath) ||
-                        process.argv.indexOf("--debug-node-red") != -1;
+            /[\\/]electron[\\/]/.test(process.execPath) ||
+            process.argv.indexOf("--debug-node-red") != -1;
 
         if (!reachable) {
-            const userDir =  path.join(app.getPath("userData"), "node-red");
+            const userDir = path.join(app.getPath("userData"), "node-red");
             const sourceDir = path.join(__dirname, "..", "assets", "node-red");
 
-            copyFolderRecursiveSync(sourceDir, app.getPath("userData") );
+            copyFolderRecursiveSync(sourceDir, app.getPath("userData"));
 
             // Delete old flow
             ['climate-monitor.json', 'motion-detector.json', 'power-controller.json', 'co2-monitor.json'].forEach((filename) => {
@@ -119,6 +121,11 @@ function setup() {
                 userDir,
                 flowFile,
                 functionGlobalContext: {}, // enables global context
+                editorTheme: {
+                    page: {
+                        scripts: [dirtyBridgeScript],
+                    },
+                },
                 logging: {
                     // Console logging
                     console: {
@@ -130,8 +137,8 @@ function setup() {
                     myCustomLogger: {
                         level: 'debug',
                         metrics: true,
-                        handler: function(settings) {
-                            return function(msg) {
+                        handler: function (settings) {
+                            return function (msg) {
                                 if (msg.level == 50) {
                                     let m = msg.msg.match(/\[out\] > grpc@.*? install (.+)/);
                                     if (m) {
@@ -156,12 +163,12 @@ function setup() {
             http_app.use(config.httpNodeRoot, RED.httpNode);
 
             RED.start().then(function () {
-                server.listen(listenPort, settings.get("node-red-bind"), ()=>{
+                server.listen(listenPort, settings.get("node-red-bind"), () => {
                     status = "online";
 
                     resolve();
                 });
-            }).catch(function(err) {
+            }).catch(function (err) {
                 RED.log.error(RED.log._("server.failed-to-start"));
                 if (err.stack) {
                     RED.log.error(err.stack);

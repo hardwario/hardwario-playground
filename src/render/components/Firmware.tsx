@@ -36,7 +36,7 @@ function StepIndicator({ currentStep, done }: { currentStep: Step; done: boolean
   ];
 
   return (
-    <div className="flex items-center justify-center gap-3 mb-6">
+    <div className="flex items-center justify-center gap-3 mb-6 relative">
       {steps.map((step, index) => {
         const isActive = currentStep === step.key;
         const isCompleted = (step.key === 'setup' && currentStep === 'flash') || (step.key === 'flash' && done);
@@ -289,6 +289,20 @@ export default function Firmware() {
     }),
   };
 
+  const formatFirmwarePortLabel = (port: SerialPortInfo) => {
+    const parts = [port.path];
+    if (port.parentId) {
+      parts.push(`${port.parentId.split('\\').slice(-1)[0]}`);
+    }
+    else {
+      if (port.serialNumber) {
+        parts.push(`${port.serialNumber}`);
+      }
+    }
+
+    return parts.join(" ");
+  };
+
   return (
     <div className="h-full flex flex-col">
       {/* Scrollable content */}
@@ -308,33 +322,53 @@ export default function Firmware() {
 
             <div className="space-y-5">
               {/* Firmware */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{i18n.__('Firmware')}</label>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <Select<FirmwareOption>
+              <div className="grid grid-cols-[6fr,1fr,1fr,auto] gap-x-2">
+                {firmware && firmware.versions && firmware.versions.length > 0 ? (
+                  <>
+                    <label className="block text-sm col-span-2 font-medium text-gray-700 mb-2">{i18n.__('Firmware')}</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{i18n.__('Version')}</label>
+                  </>
+                ) : <label className="block text-sm col-span-3 font-medium text-gray-700 mb-2">{i18n.__('Firmware')}</label>
+                }
+                <div className={firmware && firmware.versions && firmware.versions.length > 0 ? "col-span-2" : "col-span-3"}>
+                  <Select<FirmwareOption>
+                    styles={selectStyles}
+                    getOptionLabel={(option) => option.name || ''}
+                    getOptionValue={(option) => option.name || ''}
+                    options={filteredList.filter((f) => f.name)}
+                    placeholder={i18n.__('Choose firmware...')}
+                    isSearchable
+                    onChange={handleFirmwareSelect}
+                    value={firmware}
+                    noOptionsMessage={() => i18n.__("No results found - try 'Show All' option")}
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                  />
+                </div>
+                {/* Version */}
+                {firmware && firmware.versions && firmware.versions.length > 0 && (
+                  <div>
+                    <Select<VersionOption>
                       styles={selectStyles}
-                      getOptionLabel={(option) => option.name || ''}
-                      getOptionValue={(option) => option.name || ''}
-                      options={filteredList.filter((f) => f.name)}
-                      placeholder={i18n.__('Choose firmware...')}
-                      isSearchable
-                      onChange={handleFirmwareSelect}
-                      value={firmware}
-                      noOptionsMessage={() => i18n.__("No results found - try 'Show All' option")}
+                      getOptionLabel={(option) => option.name}
+                      getOptionValue={(option) => option.name}
+                      options={versionOptions}
+                      value={version}
+                      onChange={(v) => setVersion(v)}
+                      isClearable={false}
                       menuPortalTarget={document.body}
                       menuPosition="fixed"
                     />
                   </div>
-                  <button
-                    onClick={handleOpenDialog}
-                    className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all"
-                    title={i18n.__('Browse for file')}
-                  >
-                    <FiFolder className="w-5 h-5" />
-                  </button>
-                </div>
-                <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                )}
+                <button
+                  onClick={handleOpenDialog}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all"
+                  title={i18n.__('Browse for file')}
+                >
+                  <FiFolder className="w-5 h-5" />
+                </button>
+                <label className="flex items-center gap-2 mt-2 cursor-pointer col-span-3">
                   <input
                     type="checkbox"
                     checked={showAll}
@@ -344,24 +378,6 @@ export default function Firmware() {
                   <span className="text-sm text-gray-600">{i18n.__('Show all firmware')}</span>
                 </label>
               </div>
-
-              {/* Version */}
-              {firmware && firmware.versions && firmware.versions.length > 0 && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{i18n.__('Version')}</label>
-                  <Select<VersionOption>
-                    styles={selectStyles}
-                    getOptionLabel={(option) => option.name}
-                    getOptionValue={(option) => option.name}
-                    options={versionOptions}
-                    value={version}
-                    onChange={(v) => setVersion(v)}
-                    isClearable={false}
-                    menuPortalTarget={document.body}
-                    menuPosition="fixed"
-                  />
-                </div>
-              )}
 
               {/* Device */}
               <div>
@@ -376,17 +392,16 @@ export default function Firmware() {
                     <FiRefreshCw className="w-4 h-4 text-amber-400 animate-spin" />
                   </div>
                 ) : (
-                  <select
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-hardwario-primary focus:border-transparent"
-                    value={port}
-                    onChange={(e) => setPort(e.target.value)}
-                  >
-                    {ports.map((p, index) => (
-                      <option value={p.path} key={index}>
-                        {p.path}{p.serialNumber ? ` (${p.serialNumber})` : ''}
-                      </option>
-                    ))}
-                  </select>
+                  <Select<{ value: string; label: string }>
+                    styles={selectStyles}
+                    options={ports.map((p) => ({ value: p.path, label: formatFirmwarePortLabel(p) }))}
+                    value={port ? { value: port, label: formatFirmwarePortLabel(ports.find(p => p.path === port) ?? { path: port }) } : null}
+                    onChange={(selected) => selected && setPort(selected.value)}
+                    isClearable={false}
+                    isSearchable={false}
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                  />
                 )}
               </div>
 
@@ -432,7 +447,7 @@ export default function Firmware() {
                 <div className="mt-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
                   <span className="font-medium">{firmware?.name}</span>
                   <span className="text-gray-400 mx-1">
-                    v{version?.name === 'latest' && firmware?.versions?.[0]?.name
+                    {version?.name === 'latest' && firmware?.versions?.[0]?.name
                       ? firmware.versions[0].name
                       : version?.name || firmware?.versions?.[0]?.name || 'latest'}
                   </span>

@@ -4,6 +4,7 @@ import electron from 'vite-plugin-electron';
 import renderer from 'vite-plugin-electron-renderer';
 import { resolve } from 'path';
 import fs from 'fs';
+import pkg from './package.json';
 
 // Ensure dist-electron has CommonJS package.json
 const ensureDistElectronPkgJson = () => ({
@@ -32,6 +33,14 @@ export default defineConfig({
     },
   },
   plugins: [
+    {
+      name: 'html-version',
+      transformIndexHtml(html) {
+        const tag = process.env.APP_VERSION || '';
+        const version = /^\d|^v\d/.test(tag) ? tag.replace(/^v/, '') : pkg.version;
+        return html.replace('%APP_VERSION%', version);
+      },
+    },
     react(),
     electron([
       {

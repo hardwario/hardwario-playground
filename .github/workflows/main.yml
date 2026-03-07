@@ -63,12 +63,15 @@ jobs:
 
       - name: Build for Linux
         if: matrix.environment == 'linux'
+        env:
+          APP_VERSION: ${{ github.ref_name }}
         run: |
           npm run package-linux64
 
       - name: Build for Windows
         if: matrix.environment == 'windows'
         env:
+          APP_VERSION: ${{ github.ref_name }}
           # Code signing disabled - certificate expired Aug 2024
           # Uncomment these lines when you have a new certificate:
           # CSC_LINK: ${{ secrets.CERT_FILE }}
@@ -76,10 +79,13 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
         run: |
           npm run package-win64
+          mv release/hio-playground-v${APP_VERSION}-win-setup.exe release/hio-playground-v${APP_VERSION}-windows-setup.exe
+
 
       - name: Build for macOS
         if: matrix.environment == 'macos'
         env:
+          APP_VERSION: ${{ github.ref_name }}
           CSC_LINK: ${{ secrets.CERT_FILE }}
           CSC_KEY_PASSWORD: ${{ secrets.CERT_PASS }}
           APPLEID: ${{ secrets.APPLEID }}

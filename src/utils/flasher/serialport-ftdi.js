@@ -2,9 +2,10 @@
 
 const { SerialPort } = require('serialport')
 const sleep = require("./sleep");
+const { enrichPortsWithParent } = require("../windowsPortParent");
 
 class SerialPortFtdi {
-    constructor(device, baudrate=115200) {
+    constructor(device, baudrate = 115200) {
         this._serial = new SerialPort({
             path: device,
             autoOpen: false,
@@ -91,11 +92,12 @@ class SerialPortFtdi {
 
 function port_list(callback) {
     SerialPort.list()
-        .then((ports) => {
-            callback(ports.filter((port) => {
+        .then(async (ports) => {
+            const filtered = ports.filter((port) => {
                 return port.manufacturer == "0403" || port.vendorId == "0403";
-            }));
+            });
 
+            callback(await enrichPortsWithParent(filtered));
         })
         .catch(() => {
             callback([]);

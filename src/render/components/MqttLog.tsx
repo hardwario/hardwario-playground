@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import { toast } from 'react-toastify';
 import copy from 'copy-to-clipboard';
 import {
@@ -32,6 +32,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
     messages,
     subscribed,
     highlightedMessages,
+    mqttUrl,
     subscribe,
     unsubscribe,
     clear,
@@ -48,6 +49,19 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
 
   const messagesRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (messagesRef.current) {
+      const container = messagesRef.current;
+      if (autoScroll) {
+        // Jump directly to bottom without smooth scroll at the opening of the window
+        container.scrollTop = container.scrollHeight;
+      } else {
+        // Keep current scroll position when new messages arrive
+        container.scrollTop = container.scrollHeight - container.clientHeight;
+      }
+    }
+  }, []);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -95,7 +109,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
   }, [handleSubscribe]);
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-gray-50 overflow-hidden">
       {/* Header */}
       <div className="flex-shrink-0 px-4 py-3 bg-white border-b border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -110,16 +124,14 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                 </span>
                 <span className="text-sm text-green-600 font-medium flex items-center gap-1">
-                  <FiWifi className="w-3 h-3" />
-                  {i18n.__('Connected')}
+                  {i18n.__('Connected to broker')} <span className="text-gray-800 text-xs font-mono">{mqttUrl?.slice(7)}</span>
                 </span>
               </>
             ) : (
               <>
                 <span className="h-2.5 w-2.5 rounded-full bg-gray-400"></span>
                 <span className="text-sm text-gray-500 flex items-center gap-1">
-                  <FiWifiOff className="w-3 h-3" />
-                  {i18n.__('Disconnected')}
+                  {i18n.__('Disconnected from broker')}
                 </span>
               </>
             )}
@@ -169,7 +181,21 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <span className="text-gray-400 text-xs font-mono">{formatTime(item.time)}</span>
                     <span className="font-medium text-gray-800 truncate">{item.topic}</span>
+                    <button
+                        onClick={() => handleCopyTopic(item)}
+                        className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                        title={i18n.__('Copy topic')}
+                      >
+                        <FiHash className="w-3.5 h-3.5" />
+                      </button>
                     <span className="text-gray-600 truncate">{item.payload}</span>
+                    <button
+                        onClick={() => handleCopyPayload(item)}
+                        className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                        title={i18n.__('Copy payload')}
+                      >
+                        <FiCopy className="w-3.5 h-3.5" />
+                      </button>
                   </div>
                   <button
                     onClick={() => removeHighlightedMessage(item.topic)}
@@ -187,7 +213,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
         {/* Messages List */}
         <div
           ref={messagesRef}
-          className="flex-1 overflow-auto p-4"
+          className="flex-1 overflow-auto p-4 min-h-[150px]"
         >
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
@@ -218,8 +244,6 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                       >
                         {item.topic}
                       </span>
-                    </div>
-                    <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleCopyTopic(item)}
                         className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
@@ -227,6 +251,8 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
                       >
                         <FiHash className="w-3.5 h-3.5" />
                       </button>
+                    </div>
+                    <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleCopyPayload(item)}
                         className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
@@ -265,7 +291,7 @@ export default function MqttLog({ mqttLog }: MqttLogProps) {
       </div>
 
       {/* Bottom Panel */}
-      <div className="flex-shrink-0 bg-white border-t border-gray-200">
+      <div className="flex-shrink-0 overflow-auto max-h-[45%] bg-white border-t border-gray-200">
         {/* Subscriptions */}
         <div className="px-4 py-3 border-b border-gray-100">
           <div className="flex items-center gap-2 mb-2">

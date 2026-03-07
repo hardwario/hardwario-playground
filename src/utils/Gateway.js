@@ -5,6 +5,7 @@ const { ReadlineParser } = require('@serialport/parser-readline')
 var mqtt = require("mqtt");
 const path = require('path');
 const fs = require('fs');
+const { enrichPortsWithParent } = require("./windowsPortParent");
 
 const gateway_topics = [
     "/nodes/get",
@@ -42,7 +43,7 @@ class Gateway {
 
         try {
             this._cache_nodes = JSON.parse(fs.readFileSync(this._cacheDirNodesJson), { encoding: "utf8" });
-        } catch(error) {}
+        } catch (error) { }
 
         this._ser.on("open", function () {
             this._connected = true;
@@ -53,7 +54,7 @@ class Gateway {
                 this._ser.write("\n");
                 this.write("/info/get");
 
-                this._timeout = setTimeout(()=>{
+                this._timeout = setTimeout(() => {
                     if (!this._connected) return;
                     if (onError) onError("There is no answer from the device. Please, make sure the device is the Radio Dongle and has the correct firmware.");
                     this._ser.close();
@@ -101,7 +102,7 @@ class Gateway {
 
     disconnect() {
         if (!this._connected) return;
-        this._ser.write(Buffer.from('["/pairing-mode/stop", null]\n'), ()=>{
+        this._ser.write(Buffer.from('["/pairing-mode/stop", null]\n'), () => {
             this._ser.close();
         });
     }
@@ -134,8 +135,7 @@ class Gateway {
 
         let t = topic.split("/");
 
-        if ((t.length > 3) && (t[t.length - 2] == 'color'))
-        {
+        if ((t.length > 3) && (t[t.length - 2] == 'color')) {
             if (payload.length == 6) {
                 payload = '"#' + payload + '"';
             }
@@ -191,7 +191,7 @@ class Gateway {
         } catch (error) {
             if (line.indexOf("/info") > 0) {
                 this.write("/info/get");
-            }else{
+            } else {
                 console.log("Gateway readline " + error);
             }
             return;
@@ -214,7 +214,7 @@ class Gateway {
             topic = topic.substr(12);
 
             if (topic == "/info") {
-                payload["firmware"] = payload["firmware"].replace("kit-","").replace("wireless-");
+                payload["firmware"] = payload["firmware"].replace("kit-", "").replace("wireless-");
                 // auto rename from firemware name
                 if (this._alias.id[id] == undefined) {
                     let new_alias_base = payload["firmware"];
@@ -300,7 +300,7 @@ class Gateway {
 
             for (let i in payload) {
                 let node = payload[i];
-                if (typeof node === "string") node = {id: node};
+                if (typeof node === "string") node = { id: node };
 
                 this._add_node(node.id);
 
@@ -447,15 +447,12 @@ class Gateway {
 
 function port_list(callback) {
     SerialPort.list()
-        .then((ports) => {
-
-            // for (let i=0, l=ports.length; i<l; i++) {
-            //     console.log(ports[i].serialNumber);
-            // }
-
-            callback(ports.filter((port) => {
+        .then(async (ports) => {
+            const filtered = ports.filter((port) => {
                 return port.manufacturer == "0403" || port.vendorId == "0403";
-            }));
+            });
+
+            callback(await enrichPortsWithParent(filtered));
         })
         .catch(() => {
             callback([]);

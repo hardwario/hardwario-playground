@@ -6,6 +6,9 @@ export interface SerialPortInfo {
   serialNumber?: string;
   manufacturer?: string;
   productId?: string;
+  vendorId?: string;
+  pnpId?: string;
+  parentId?: string;
 }
 
 export interface GatewayStatus {
@@ -97,6 +100,7 @@ export interface ElectronAPI {
   nodered: {
     getStatus: () => void;
     onStatus: (callback: (status: string) => void) => () => void;
+    setDirty: (dirty: boolean) => void;
   };
   broker: {
     getStatus: () => void;
@@ -172,6 +176,7 @@ const electronAPI: ElectronAPI = {
     getStatus: () => ipcRenderer.send('nodered/status/get'),
     onStatus: (callback: (status: string) => void) =>
       createListener('nodered/status', callback),
+    setDirty: (dirty: boolean) => ipcRenderer.send('nodered/dirty/set', dirty),
   },
 
   broker: {
